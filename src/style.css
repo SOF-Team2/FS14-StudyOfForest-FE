@@ -24,4 +24,8 @@ body { background-color: var(--bg-color); }
 
 .inner { width: 1200px; margin: 0 auto; }
 #header .inner { display: flex; flex-direction: row; justify-content: space-between; width: calc(100vw - 440px); height: 100px; padding: 20px 0; }
-.create_study_btn { display: flex; flex-direction: column; justify-content: center; width: 252px; height: 60px; border-radius: 16px; background: #99C08E; text-align: center; color: var(--wh); font-family: 'JejuStoneWall'; font-size: 18px; }
+.btn { position: relative; display: flex; flex-direction: column; justify-content: center; width: 252px; height: 53px; text-align: center; margin-top: 3px; cursor: pointer; }
+.btn svg { position: absolute; left: 0; top: 0; }
+.btn svg.shadow { top: -3px; }
+.btn span { position: absolute; display: block; left: 50%; transform: translate(-50%, -3px); width: fit-content; color: var(--wh); font-family: 'JejuStoneWall'; font-size: 18px; }
+.btn span.shadow { transform: translate(-50%, -6px); color: var(--green-text); }
