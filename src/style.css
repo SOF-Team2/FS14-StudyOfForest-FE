@@ -1,0 +1,11 @@
+:root {
+  --bg-color: #F6F4EF;
+  --wh: #fff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard'; }
+body { background-color: var(--bg-color); }
+
+.inner { width: 1200px; margin: 0 auto; }
+#header .inner { display: flex; flex-direction: row; justify-content: space-between; width: calc(100vw - 440px); height: 100px; padding: 20px 0; }
+.create_study_btn { display: flex; flex-direction: column; justify-content: center; width: 252px; height: 60px; border-radius: 16px; background: #99C08E; text-align: center; color: var(--wh); font-family: 'JejuStoneWall'; font-size: 18px; }
