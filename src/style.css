@@ -1,6 +1,22 @@
 :root {
   --bg-color: #F6F4EF;
   --wh: #fff;
+  --black: #414141;
+  --dark-gray: #818181;
+  --gray: #DDDDDD;
+  --light-gray: #EEEEEE;
+  --brand: #99C08E;
+  --red-error: #C41013;
+  --red--error-bg: #FFA3A5;
+  --red: #F50E0E;
+  --green: #E1EDDE;
+  --green-text: #578246;
+  --yellow: #FFF1CC;
+  --yellow-text: #C18E1B;
+  --blue: #E0F1F5;
+  --blue-text: #418099;
+  --pink: #FDE0E9;
+  --pink-text: #BC3C6A;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard'; }
