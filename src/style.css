@@ -74,7 +74,7 @@ body { background-color: var(--bg-color); }
 .edit_habit_modal .habit_wrap { margin-bottom: 20px; }
 .habit_line { display: flex; flex-direction: row; justify-content: space-between; gap: 8px; }
 .edit_habit_modal .habit_btn { text-align: center; line-height: 48px; }
-.delete_habit_btn { width: fit-content; height: fit-content; padding: 12px; border-radius: 100%; background-color: var(--pink); border: none; }
+.delete_habit_btn { width: fit-content; height: fit-content; padding: 12px; border-radius: 100%; background-color: var(--pink); border: none; cursor: pointer; }
 .delete_habit_btn img { display: block; width: 24px; height: 24px; }
 
 .modal_btn_wrap { display: flex; flex-direction: row; justify-content: space-between; gap: 24px; margin-top: 24px; }

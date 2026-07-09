@@ -8,6 +8,22 @@ function HabitEditModal({ habits, onClose, onSave }) {
   const [editHabits, setEditHabits] = useState(habits)
   const [newHabitName, setNewHabitName] = useState('')
 
+  const deleteHabit = async (e, habitId) => {
+    e.stopPropagation();
+
+    if (!confirm("습관을 삭제하시겠습니까?")) return;
+
+    try {
+      await axios.delete(`/habits/${habitId}/`);
+      alert("삭제되었습니다.");
+      onSave();
+      
+    } catch (error) {
+      console.error(error);
+      alert("삭제에 실패했습니다.");
+    }
+  }
+
   const handleAddHabit = async (e) => {
     e.preventDefault()
 
@@ -19,7 +35,7 @@ function HabitEditModal({ habits, onClose, onSave }) {
     }
 
     const response = await axios.post(`/studies/${id}/habits`, newHabit);
-    onSave(editHabits);
+    onSave();
   }
 
   return (
@@ -34,9 +50,9 @@ function HabitEditModal({ habits, onClose, onSave }) {
               editHabits.map((habit) => (
                 <div key={habit.id} className='habit_line'>
                   <span className='habit_btn'>{habit.name}</span>
-                  <button type="button" className='delete_habit_btn'>
+                  <div className='delete_habit_btn' onClick={(e) => {deleteHabit(e, habit.id)}}>
                     <img src={trashIcon} alt="삭제 아이콘" />
-                  </button>
+                  </div>
                 </div>
               ))
             )}
