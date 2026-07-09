@@ -11,7 +11,7 @@ function TodayHabitPage() {
   const [habits, setHabits] = useState([]);
 
   const handleLoad = async () => {
-    const response = await axios.get(`/studies/${id}/habits`);
+    const response = await axios.get(`/study/${id}/habit`);
 
     setHabits(response.data);
     setIsEditModalOpen(false);

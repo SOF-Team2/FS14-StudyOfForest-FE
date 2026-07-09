@@ -14,7 +14,7 @@ function HabitEditModal({ habits, onClose, onSave }) {
     if (!confirm("습관을 삭제하시겠습니까?")) return;
 
     try {
-      await axios.delete(`/habits/${habitId}/`);
+      await axios.delete(`/habit/${habitId}/`);
       alert("삭제되었습니다.");
       onSave();
       
@@ -34,7 +34,7 @@ function HabitEditModal({ habits, onClose, onSave }) {
       isChecked: false,
     }
 
-    const response = await axios.post(`/studies/${id}/habits`, newHabit);
+    const response = await axios.post(`/study/${id}/habit`, newHabit);
     onSave();
   }
 
