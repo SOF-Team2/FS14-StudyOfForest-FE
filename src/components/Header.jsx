@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import logoImage from '../assets/img/logo.png';
 
 function Header() {
@@ -5,10 +6,10 @@ function Header() {
     <>
       <header id="header">
         <div className="inner">
-          <a href="#" className="logo">
+          <Link to="/" className="logo">
             <img src={logoImage} alt="공부의 숲 로고 이미지" />
-          </a>
-          <div className="create_study_btn btn">
+          </Link>
+          <Link to="/study-create" className="create_study_btn btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="252" height="54" viewBox="0 0 252 54" preserveAspectRatio="none" fill="none">
               <path d="M25.6491 0.0324321C27.1731 0.0684321 230.297 0.00243214 232.523 0.0324321C237.269 0.110432 248.513 -0.00356827 250.745 8.79843C253.349 19.0764 251.243 40.9404 250.247 44.5764C249.257 48.2124 247.523 53.9964 238.517 53.9964H16.0851C14.5971 53.9964 3.19715 53.4204 1.21115 42.5124C-0.768853 31.6104 0.221147 16.5744 0.449147 13.3104C0.677147 10.0524 1.29515 1.04043 12.3651 0.374432C19.2411 -0.0335681 22.8951 -0.0335679 25.6491 0.0324321Z" fill="#578246"/>
             </svg>
@@ -17,7 +18,7 @@ function Header() {
             </svg>
             <span className='shadow'>스터디 만들기</span>
             <span>스터디 만들기</span>
-          </div>
+          </Link>
         </div>
       </header>
     </>

@@ -2,16 +2,33 @@ import { useNavigate } from "react-router-dom";
 import tagImg from "../../assets/img/ic_point.svg";
 import { addRecentStudy } from "../../utils/recentStudies";
 
+const DAY_IN_MS = 1000 * 60 * 60 * 24;
+
+const getStudyPoint = (study) => study.point ?? study.points ?? 0;
+
+const getElapsedDays = (createdAt) => {
+  if (!createdAt) {
+    return 1;
+  }
+
+  const createdDate = new Date(createdAt);
+
+  if (Number.isNaN(createdDate.getTime())) {
+    return 1;
+  }
+
+  return Math.max(1, Math.floor((Date.now() - createdDate.getTime()) / DAY_IN_MS) + 1);
+};
+
+const getStudyEmojis = (study) => {
+  const emojis = study.topEmojis ?? study.emojis ?? [];
+
+  return Array.isArray(emojis) ? emojis.slice(0, 3) : [];
+};
+
 function StudyCard({ study }) {
   const navigate = useNavigate();
-
-  const getDayCount = (createdAt) => {
-    if (!createdAt) return 0;
-    const diff = Math.floor(
-      (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24),
-    );
-    return diff + 1;
-  };
+  const emojis = getStudyEmojis(study);
 
   const handleClick = () => {
     addRecentStudy(study);
@@ -22,27 +39,24 @@ function StudyCard({ study }) {
     <div className="card" onClick={handleClick}>
       <div className="card_title_wrap">
         <span className="card_title">{study.name}</span>
-        <div className="tag">
+        <div className="tag point_tag">
           <img src={tagImg} alt="태그 장식" />
-          {study.point}P 획득
+          {getStudyPoint(study)}{"\u00A0"}P
         </div>
       </div>
-      <span className="card_status">
-        {getDayCount(study.createdAt)}일째 진행중
-      </span>
+      <span className="card_status">{getElapsedDays(study.createdAt)}일째 진행중</span>
       <div className="card_text">{study.description}</div>
       <div className="tag_wrap">
-        {study.topEmojis && study.topEmojis.length > 0 ? (
-          study.topEmojis.map((te, idx) => (
-            <div className="tag" key={idx}>
-              <span>{te.emoji}</span>
-              <span>{te.count}</span>
+        {emojis.length > 0 ? (
+          emojis.map((emojiItem) => (
+            <div className="tag" key={emojiItem.emoji}>
+              {emojiItem.emoji}<span>{emojiItem.count}</span>
             </div>
           ))
         ) : (
-          <span className="card_status" style={{ marginBottom: 0 }}>
-            아직 응원이 없어요
-          </span>
+          <div className="tag">
+            🌱<span>0</span>
+          </div>
         )}
       </div>
     </div>

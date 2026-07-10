@@ -4,10 +4,10 @@ import searchIcon from "../../assets/img/ic_search.svg";
 import arrowIcon from "../../assets/img/ic_toggle.svg";
 
 const SORT_OPTIONS = [
-  { value: "recent", label: "최근 순" },
+  { value: "latest", label: "최근 순" },
   { value: "oldest", label: "오래된 순" },
-  { value: "pointHigh", label: "많은 포인트 순" },
-  { value: "pointLow", label: "적은 포인트 순" },
+  { value: "points_desc", label: "많은 포인트 순" },
+  { value: "points_asc", label: "적은 포인트 순" },
 ];
 
 function SearchSortBar({ keyword, onKeywordChange, sortValue, onSortChange }) {
