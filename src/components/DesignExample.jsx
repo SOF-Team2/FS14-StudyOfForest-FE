@@ -13,7 +13,7 @@ function DesignExample() {
               <div className="card">
                 <div className="card_title_wrap">
                   <span className="card_title">카드 타이틀</span>
-                  <div className="tag"><img src={tagImg} alt="태그 장식" />310P 획득</div>
+                  <div className="tag point_tag"><img src={tagImg} alt="태그 장식" />310&nbsp;P</div>
                 </div>
                 <span className="card_status">
                   n일째 진행중
@@ -45,7 +45,7 @@ function DesignExample() {
               <div className="card">
                 <div className="card_title_wrap">
                   <span className="card_title">카드 타이틀</span>
-                  <div className="tag"><img src={tagImg} alt="태그 장식" />310P 획득</div>
+                  <div className="tag point_tag"><img src={tagImg} alt="태그 장식" />310&nbsp;P</div>
                 </div>
                 <span className="card_status">
                   n일째 진행중

@@ -14,9 +14,10 @@
 .study-create-notice {
   position: fixed;
   z-index: 20;
-  top: 112px;
+  top: 21px;
   left: 50%;
-  width: min(448px, calc(100% - 40px));
+  width: fit-content;
+  max-width: calc(100% - 40px);
   min-height: 58px;
   display: flex;
   align-items: center;
@@ -80,7 +81,11 @@
 }
 
 .study-create-notice-text {
-  flex: 1;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--black);
   font-size: 16px;
   font-weight: 700;
@@ -366,7 +371,7 @@
 
 @media (max-width: 1024px) {
   .study-create-notice {
-    top: 92px;
+    top: 21px;
   }
 
   .study-create-card {
@@ -396,8 +401,9 @@
   }
 
   .study-create-notice {
-    top: 88px;
-    width: calc(100% - 30px);
+    top: 21px;
+    width: fit-content;
+    max-width: calc(100% - 30px);
     min-height: 54px;
     padding: 10px 10px 10px 12px;
     border-radius: 15px;
