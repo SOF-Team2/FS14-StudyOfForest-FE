@@ -1,16 +1,15 @@
 const RECENT_STUDIES_KEY = "recentStudies";
 const MAX_RECENT_STUDIES = 3;
 
-export const getRecentStudies = () => {
+export const getRecentStudyIds = () => {
   if (typeof window === "undefined") {
     return [];
   }
-
   try {
-    const savedStudies = window.localStorage.getItem(RECENT_STUDIES_KEY);
-    const parsedStudies = savedStudies ? JSON.parse(savedStudies) : [];
+    const saved = window.localStorage.getItem(RECENT_STUDIES_KEY);
+    const parsed = saved ? JSON.parse(saved) : [];
 
-    return Array.isArray(parsedStudies) ? parsedStudies : [];
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
@@ -21,15 +20,14 @@ export const addRecentStudy = (study) => {
     return [];
   }
 
-  const currentStudies = getRecentStudies();
-  const nextStudies = [
-    study,
-    ...currentStudies.filter((currentStudy) => currentStudy.id !== study.id),
+  const currentIds = getRecentStudyIds();
+  const nextIds = [
+    study.id,
+    ...currentIds.filter((id) => id !== study.id),
   ].slice(0, MAX_RECENT_STUDIES);
 
-  window.localStorage.setItem(RECENT_STUDIES_KEY, JSON.stringify(nextStudies));
-
-  return nextStudies;
+  window.localStorage.setItem(RECENT_STUDIES_KEY, JSON.stringify(nextIds));
+  return nextIds;
 };
 
 export const removeRecentStudy = (studyId) => {
@@ -37,12 +35,8 @@ export const removeRecentStudy = (studyId) => {
     return [];
   }
 
-  const currentStudies = getRecentStudies();
-  const nextStudies = currentStudies.filter(
-    (currentStudy) => currentStudy.id !== studyId,
-  );
-
-  window.localStorage.setItem(RECENT_STUDIES_KEY, JSON.stringify(nextStudies));
-
-  return nextStudies;
+  const nextIds = getRecentStudyIds().filter((id) => id !== studyId);
+  
+  window.localStorage.setItem(RECENT_STUDIES_KEY, JSON.stringify(nextIds));
+  return nextIds;
 };
