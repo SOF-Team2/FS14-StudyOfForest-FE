@@ -5,6 +5,7 @@ import StudyCreatePage from "./pages/StudyCreatePage.jsx";
 import StudyListPage from "./pages/StudyListPage.jsx";
 import StudyDetailPage from "./pages/StudyDetailPage.jsx";
 import StudyEditPage from "./pages/StudyEditPage";
+import TodayFocusPage from './pages/TodayFocusPage.jsx';
 
 function Main() {
   return (
@@ -16,6 +17,7 @@ function Main() {
           <Route path="study/:id" element={<StudyDetailPage />} />
           <Route path="study/:id/edit" element={<StudyEditPage />} />
           <Route path="study/:id/habit" element={<TodayHabitPage />} />
+          <Route path="study/:id/focus" element={<TodayFocusPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
