@@ -1,0 +1,37 @@
+.focus-result-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  z-index: 30;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: max-content;
+  max-width: calc(100vw - 40px);
+  min-height: 50px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  box-sizing: border-box;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+
+  pointer-events: none;
+}
+
+/* 성공 중단 토스트 색상 */
+.focus-result-toast--success {
+  background-color: var(--green);
+  color: var(--green-text);
+}
+
+.focus-result-toast--interrupted {
+  background-color: var(--pink);
+  color: var(--red);
+}

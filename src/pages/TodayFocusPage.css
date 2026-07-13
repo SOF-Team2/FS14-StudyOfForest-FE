@@ -1,0 +1,240 @@
+@import '../style.css';
+
+
+/* Focus 페이지에서 사용하는 공통 Header 정렬 */
+.focus-page #header {
+  width: 100%;
+}
+
+.focus-page #header .inner {
+  width: min(calc(100% - 48px), 1200px);
+  height: auto;
+  min-height: 100px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.focus-page__container {
+  width: min(calc(100% - 48px), 1200px);
+  margin: 20px auto 0;
+}
+
+.focus-page__card {
+  width: min(100%, 960px);
+  margin: 0 auto;
+  padding: 32px;
+  background-color: var(--wh);
+  border-radius: 20px;
+}
+
+.focus-page__study-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.focus-page__study-info {
+  min-width: 0;
+}
+
+.focus-page__study-name {
+  margin: 0 0 10px;
+  color: var(--black);
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.focus-page__navigation {
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.focus-page__navigation-button {
+  display: inline-flex;
+  min-width: 110px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  color: var(--dark-gray);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  background-color: var(--wh);
+  border: 1px solid var(--gray);
+  border-radius: 12px;
+}
+
+.focus-page__navigation-button--home{
+  min-width: 82px;
+  height: 48px;
+}
+
+.focus-page__navigation-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+/* 오늘의 집중 영역 */
+.focus-page__content {
+  margin-top: 28px;
+  padding: 28px 16px 16px;
+  border: 1px solid var(--gray);
+  border-radius: 16px;
+}
+
+.focus-page__section-title {
+  margin: 0 0 24px;
+  color: var(--black);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.focus-page__timer-slot {
+  display: flex;
+  min-height: 360px;
+  align-items: center;
+  justify-content: center;
+}
+
+.focus-page__timer-placeholder {
+  margin: 0;
+  color: var(--dark-gray);
+  font-size: 15px;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* ==================================================== */
+/* 미디어 쿼리 */
+/* ==================================================== */
+/* 태블릿 */
+@media (max-width: 1023px) {
+  .focus-page {
+    padding-bottom: 60px;
+  }
+
+  .focus-page #header .inner,
+  .focus-page__container {
+    width: min(calc(100% - 48px), 720px);
+  }
+
+  .focus-page__container {
+    margin-top: 12px;
+  }
+
+  .focus-page__card {
+    width: 100%;
+    padding: 24px;
+  }
+
+  .focus-page__timer-slot {
+    min-height: 320px;
+  }
+}
+
+/* 모바일 */
+@media (max-width: 767px) {
+  .focus-page {
+    padding-bottom: 40px;
+  }
+
+  .focus-page #header .inner,
+  .focus-page__container {
+    width: calc(100% - 32px);
+  }
+
+  .focus-page #header .inner {
+    min-height: 72px;
+    padding: 16px 0;
+  }
+
+  .focus-page #header .logo img {
+    width: 120px;
+    height: auto;
+  }
+
+  .focus-page__container {
+    margin-top: 8px;
+  }
+
+  .focus-page__card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .focus-page__study-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .focus-page__study-name {
+    font-size: 24px;
+  }
+
+  .focus-page__navigation {
+    width: 100%;
+  }
+
+  .focus-page__navigation-button {
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .focus-page__content {
+    margin-top: 24px;
+    padding: 24px 12px 12px;
+  }
+
+  .focus-page__section-title {
+    margin-bottom: 18px;
+    font-size: 17px;
+  }
+
+  .focus-page__timer-slot {
+    min-height: 280px;
+  }
+
+  .focus-page__timer-placeholder {
+    font-size: 14px;
+  }
+}
+
+/* 작은 모바일 */
+@media (max-width: 479px) {
+  .focus-page #header .inner,
+  .focus-page__container {
+    width: calc(100% - 24px);
+  }
+
+  .focus-page__card {
+    padding: 12px;
+  }
+
+  .focus-page__navigation {
+    gap: 8px;
+  }
+
+  .focus-page__navigation-button {
+    font-size: 12px;
+  }
+
+  .focus-page__content {
+    padding: 22px 10px 10px;
+  }
+
+  .focus-page__timer-slot {
+    min-height: 240px;
+  }
+}
