@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import StudyCard from "../components/study/StudyCard";
 import RecentStudyList from "../components/study/RecentStudyList";
 import SearchSortBar from "../components/study/SearchSortBar";
@@ -29,6 +29,25 @@ function StudyListPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const pendingScrollYRef = useRef(null);
+
+  const rememberScrollPosition = () => {
+    pendingScrollYRef.current = window.scrollY;
+  };
+
+  useLayoutEffect(() => {
+    if (pendingScrollYRef.current === null) {
+      return undefined;
+    }
+
+    const scrollY = pendingScrollYRef.current;
+    pendingScrollYRef.current = null;
+    const frameId = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: scrollY, left: 0, behavior: "auto" });
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [items, isLoading, errorMessage]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -87,6 +106,8 @@ function StudyListPage() {
   }, [keyword, sortValue]);
 
   const handleLoadMore = () => {
+    rememberScrollPosition();
+
     const params = new URLSearchParams({
       page: String(page + 1),
       pageSize: "6",
@@ -117,6 +138,16 @@ function StudyListPage() {
       .finally(() => setIsLoading(false));
   };
 
+  const handleKeywordChange = (nextKeyword) => {
+    rememberScrollPosition();
+    setKeyword(nextKeyword);
+  };
+
+  const handleSortChange = (nextSortValue) => {
+    rememberScrollPosition();
+    setSortValue(nextSortValue);
+  };
+
   return (
     <section>
       <div className="inner">
@@ -127,9 +158,9 @@ function StudyListPage() {
 
           <SearchSortBar
             keyword={keyword}
-            onKeywordChange={setKeyword}
+            onKeywordChange={handleKeywordChange}
             sortValue={sortValue}
-            onSortChange={setSortValue}
+            onSortChange={handleSortChange}
           />
 
           <div className="card_wrap">
@@ -150,7 +181,7 @@ function StudyListPage() {
           </div>
 
           {!isLoading && !errorMessage && page < totalPages && (
-            <button className="load_more_button" onClick={handleLoadMore}>
+            <button type="button" className="load_more_button" onClick={handleLoadMore}>
               더보기
             </button>
           )}

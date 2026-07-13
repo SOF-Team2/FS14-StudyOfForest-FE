@@ -1,0 +1,57 @@
+// mock/studies.js
+
+export const mockStudies = [
+  {
+    id: "study-1",
+    nickname: "현지",
+    name: "React 스터디",
+    description: "React를 함께 공부하는 스터디입니다.",
+    background: "green",
+    password: "1234",
+    point: 0,
+    created_at: new Date(),
+    updated_at: new Date(),
+    deleted_at: null,
+    emojis: [
+      { emoji: "🔥", count: 8 },
+      { emoji: "👍", count: 5 },
+      { emoji: "🌱", count: 3 },
+      { emoji: "👏", count: 1 },
+    ],
+  },
+  {
+    id: "study-2",
+    nickname: "도돈보",
+    name: "Node.js 스터디",
+    description: "Node.js와 Express를 공부합니다.",
+    background: "blue",
+    password: "5678",
+    point: 10,
+    created_at: new Date(),
+    updated_at: new Date(),
+    deleted_at: null,
+    emojis: [
+      { emoji: "👍", count: 7 },
+      { emoji: "🔥", count: 4 },
+      { emoji: "💪", count: 2 },
+    ],
+  },
+  {
+    id: "study-3",
+    nickname: "유진",
+    name: "아침 알고리즘 스터디",
+    description: "매일 아침 알고리즘 문제를 풀고 기록하는 스터디입니다.",
+    background: "green",
+    password: "1234",
+    point: 42,
+    created_at: new Date("2026-07-01T09:00:00.000Z"),
+    updated_at: new Date("2026-07-01T09:00:00.000Z"),
+    deleted_at: null,
+    emojis: [
+      { emoji: "🔥", count: 8 },
+      { emoji: "👍", count: 5 },
+      { emoji: "🌱", count: 3 },
+      { emoji: "👏", count: 1 },
+    ],
+  },
+];
