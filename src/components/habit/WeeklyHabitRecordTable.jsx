@@ -41,7 +41,7 @@ const images = [
   icon18,
 ];
 
-function WeeklyHabitRecordTable({ habits, studyId }) {
+function WeeklyHabitRecordTable({ studyId }) {
   const [weeklyHabits, setWeeklyHabits] = useState([]);
   const DAYS = ["월", "화", "수", "목", "금", "토", "일"];
 

@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import AlertMessage from "../components/AlertMessage.jsx";
+import tagImg from '../assets/img/ic_point.svg';
 import "./StudyCreatePage.css";
 import "../style.css";
+import WeeklyHabitRecordTable from "../components/habit/WeeklyHabitRecordTable.jsx";
 
 const API_BASE_URL = "http://127.0.0.1:3000";
 
@@ -209,9 +211,11 @@ const StudyDetailPage = () => {
   }
 
   return (
-    <main>
-      <header>
-        <div className="emoji-container" ref={emojiRef}>
+    <section>
+      <div className="inner">
+      <section className="study-detail-section card_container">
+        <div>
+        <div className="emoji-container" ref={emojiRef} style={{marginBottom: '24px'}}>
           {/* 화면에 기본으로 보여줄 이모지 3개 */}
           {visibleEmoji.map((item) => (
             <button
@@ -287,24 +291,7 @@ const StudyDetailPage = () => {
               </div>
             )}
           </div>
-        </div>
-      </header>
-
-      <section className="study-detail-section">
-        <h1>
-          {study.nickname}의 {study.name}
-        </h1>
-
-        <div>
-          <span>소개</span>
-          <p>{study.description}</p>
-        </div>
-
-        <div>
-          <span>현재까지 획득한 포인트</span>
-          <p> {study.point}P 획득</p>
-        </div>
-        <div className="study-menu-buttons">
+          <div className="study-menu-buttons">
           <button
             type="button"
             onClick={() => handleOpenPasswordModal(`/study/${id}/edit`)}
@@ -318,7 +305,11 @@ const StudyDetailPage = () => {
             삭제하기
           </button>
         </div>
-        <div className="study-action-buttons">
+        </div>
+      </div>
+        <div className="container_title">
+          {study.nickname} 의 {study.name}
+          <div className="study-action-buttons">
           <button
             type="button"
             onClick={() => navigate(`/study/${id}/habit`)}
@@ -333,14 +324,25 @@ const StudyDetailPage = () => {
             오늘의 집중
           </button>
         </div>
+        </div>
+
+        <div>
+          <span style={{ fontSize: '18px', color: '#818181', fontWieht: '300' }}>소개</span>
+          <p style={{ display: 'block', margin: '8px 0 24px', fontSize: '18px' }}>{study.description}</p>
+        </div>
+
+        <div>
+          <span style={{ display: 'block', fontSize: '18px', color: '#818181', fontWeight: '300', marginBottom: '8px'}}>현재까지 획득한 포인트</span>
+          <div className="tag point_tag" style={{ marginBottom: '40px'}}><img src={tagImg} alt="태그 장식" />{study.point}P 획득</div>
+        </div>
+        <WeeklyHabitRecordTable studyId={id}/>
       </section>
-      <section>습관 영역</section>
 
       {isPasswordModalOpen && (
         <div className="password-modal-overlay">
           <div className="password-modal">
             <h2>
-              {study.nickname}의 {study.name}
+              {study.nickname} 의 {study.name}
             </h2>
             <p>권한이 필요해요</p>
             <span>비밀번호</span>
@@ -372,7 +374,8 @@ const StudyDetailPage = () => {
           />
         </div>
       )}
-    </main>
+      </div>
+    </section>
   );
 };
 
