@@ -14,7 +14,8 @@ function TodayHabitPage() {
   const handleLoad = async () => {
     const response = await axios.get(`/study/${id}/habit`);
 
-    setHabits(response.data);
+    setStudy(response.data);
+    setHabits(response.data.habits);
     setIsEditModalOpen(false);
   };
 
@@ -26,7 +27,7 @@ function TodayHabitPage() {
     <section>
       <div className="inner">
         <div className="card_container">
-          <span className="container_title">스터디 이름</span>
+          <span className="container_title">{study.name}</span>
           <div className="card_container inner_container">
             <div className="inner">
               <span className="container_title">오늘의 습관</span>
