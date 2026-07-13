@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './FocusTimer.css';
 
-export default function FocusTimer() {
+export default function FocusTimer({ studyId, password }) {
     const [elapsedSeconds, setElapsedSeconds] = useState(0); // 실제 흘러간 초 (계속 증가, 포인트 계산할 때 역산)
     const [isRunning, setIsRunning] = useState(false);  // 업데이트
     const [isStarted, setIsStarted] = useState(false);  // 한 번이라도 시작했는지 (버튼 바뀌는 거)

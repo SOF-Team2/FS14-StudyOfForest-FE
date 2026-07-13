@@ -11,7 +11,7 @@ function Main() {
                 <Route path="/" element={<App />}>
                     <Route index element={<DesignExample />} />
                     <Route path="study/:id/habit" element={<TodayHabitPage />} />
-                    <Route path="study/:id/focus" element={<TodayFocusPage />} />
+                    <Route path="study/focus" element={<TodayFocusPage />} />
                 </Route>
             </Routes>
         </BrowserRouter>
