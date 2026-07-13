@@ -42,7 +42,11 @@ input:focus { outline-color: var(--brand); }
 .card_container { width: 100%; height: fit-content; padding: 40px; border-radius: 20px; background-color: var(--wh); margin: 24px 0 40px; }
 .card_container.inner_container { border: 1px solid var(--gray); }
 .card_container.inner_container .inner { position: relative; max-width: 400px; }
-.container_title { display: block; color: var(--black); font-family: 'Okticon'; font-size: 32px; font-weight: 700; margin-bottom: 30px; }
+.container_title { display: flex; flex-direction: row; justify-content: space-between; color: var(--black); font-family: 'Okticon'; font-size: 32px; font-weight: 700; margin-bottom: 30px; }
+.emoji_line { display: flex; flex-direction: row; justify-content: space-between; }
+.study-menu-buttons button { border: none; background-color: transparent; padding: 0 12px; color: var(--brand); cursor: pointer; }
+.study-menu-buttons button.delete { color: var(--dark-gray); }
+.study-menu-buttons .dec_line { display: inline-block; transform: translateY(2px); color: var(--gray); }
 .card_container.inner_container .container_title { text-align: center; }
 .container_title_wrap { display: flex; flex-direction: row; justify-content: space-between; }
 

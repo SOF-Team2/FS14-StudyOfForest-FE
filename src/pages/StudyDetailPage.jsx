@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import AlertMessage from "../components/AlertMessage.jsx";
 import tagImg from '../assets/img/ic_point.svg';
 import "./StudyCreatePage.css";
 import "../style.css";
 import WeeklyHabitRecordTable from "../components/habit/WeeklyHabitRecordTable.jsx";
+import arrowRightIcon from '../assets/img/ic_arrow_right.svg';
 
 const API_BASE_URL = "http://127.0.0.1:3000";
 
@@ -214,7 +215,7 @@ const StudyDetailPage = () => {
     <section>
       <div className="inner">
       <section className="study-detail-section card_container">
-        <div>
+        <div className="emoji_line">
         <div className="emoji-container" ref={emojiRef} style={{marginBottom: '24px'}}>
           {/* 화면에 기본으로 보여줄 이모지 3개 */}
           {visibleEmoji.map((item) => (
@@ -291,6 +292,7 @@ const StudyDetailPage = () => {
               </div>
             )}
           </div>
+        </div>
           <div className="study-menu-buttons">
           <button
             type="button"
@@ -298,32 +300,48 @@ const StudyDetailPage = () => {
           >
             수정하기
           </button>
+          <span className="dec_line">|</span>
           <button
+            className="delete"
             type="button"
             onClick={() => handleOpenPasswordModal("", "delete")}
           >
             삭제하기
           </button>
         </div>
-        </div>
       </div>
         <div className="container_title">
           {study.nickname} 의 {study.name}
-          <div className="study-action-buttons">
-          <button
-            type="button"
-            onClick={() => navigate(`/study/${id}/habit`)}
-          >
-            오늘의 습관
-          </button>
+          <nav
+                            className="focus-page__navigation"
+                            aria-label="스터디 페이지 이동"
+                        >
+                            <Link
+                                className="focus-page__navigation-button"
+                                to={`/study/${id}/habit`}
+                            >
+                                <span>오늘의 습관</span>
 
-          <button
-            type="button"
-            onClick={() => navigate(`/study/${id}/focus`)}
-          >
-            오늘의 집중
-          </button>
-        </div>
+                                <img
+                                    className="focus-page__navigation-icon"
+                                    src={arrowRightIcon}
+                                    alt=""
+                                />
+                            </Link>
+
+                            <Link
+                                className="focus-page__navigation-button focus-page__navigation-button--home"
+                                to="/"
+                            >
+                                <span>홈</span>
+
+                                <img
+                                    className="focus-page__navigation-icon"
+                                    src={arrowRightIcon}
+                                    alt=""
+                                />
+                            </Link>
+                        </nav>
         </div>
 
         <div>
