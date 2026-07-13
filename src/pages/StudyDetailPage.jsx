@@ -1,13 +1,28 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
-import { mockStudies } from "../mocks/studyMock.js";
+import AlertMessage from "../components/AlertMessage.jsx";
+import "./StudyCreatePage.css";
 import "../style.css";
+
 const API_BASE_URL = "http://127.0.0.1:3000";
+
+const getStudyErrorMessage = async (response) => {
+  try {
+    const result = await response.json();
+
+    return result?.error?.message || result?.message || "스터디 정보를 불러오지 못했습니다.";
+  } catch {
+    return "스터디 정보를 불러오지 못했습니다.";
+  }
+};
 
 const StudyDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [study, setStudy] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [nextPath, setNextPath] = useState("");
@@ -31,10 +46,52 @@ const StudyDetailPage = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  const study = mockStudies.find((item) => item.id === id);
-  if (!study) {
-    return <div>스터디를 찾을 수 없습니다.</div>;
-  }
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchStudy = async () => {
+      setIsLoading(true);
+      setErrorMessage("");
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/study/${id}`, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(await getStudyErrorMessage(response));
+        }
+
+        const result = await response.json();
+        const nextStudy = result?.data;
+
+        if (!nextStudy?.id) {
+          throw new Error("스터디 정보를 불러오지 못했습니다.");
+        }
+
+        setStudy(nextStudy);
+        setEmoji(Array.isArray(nextStudy.emojis) ? nextStudy.emojis : []);
+      } catch (error) {
+        if (error.name === "AbortError") {
+          return;
+        }
+
+        setStudy(null);
+        setEmoji([]);
+        setErrorMessage(error.message || "스터디 정보를 불러오지 못했습니다.");
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchStudy();
+
+    return () => controller.abort();
+  }, [id]);
+
   // 이모지 선택시 출력 확인
   const handleEmojiClick = (selectedEmoji) => {
     setEmoji((prevEmoji) => {
@@ -73,17 +130,54 @@ const StudyDetailPage = () => {
     setPasswordError("");
     setIsPasswordModalOpen(true);
   };
-  const handlePasswordCheck = () => {
-    if (password === study.password) {
+  const handlePasswordCheck = async () => {
+    if (!password.trim()) {
+      setPasswordError("비밀번호를 입력해주세요.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/study/${id}/password/verify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await getStudyErrorMessage(response));
+      }
+
       setPassword("");
       setPasswordError("");
       setIsPasswordModalOpen(false);
-
       navigate(nextPath);
-    } else {
-      setPasswordError("비밀번호가 일치하지 않습니다. 다시 입력해주세요.");
+    } catch (error) {
+      setPasswordError(error.message || "비밀번호가 일치하지 않습니다.");
     }
   };
+
+  if (isLoading) {
+    return (
+      <main>
+        <AlertMessage message="스터디 정보를 불러오는 중입니다." />
+      </main>
+    );
+  }
+
+  if (errorMessage || !study) {
+    return (
+      <main>
+        <AlertMessage
+          message={errorMessage || "스터디를 찾을 수 없습니다."}
+          variant="error"
+          onClose={() => setErrorMessage("")}
+        />
+      </main>
+    );
+  }
+
   return (
     <main>
       <header>
@@ -246,9 +340,11 @@ const StudyDetailPage = () => {
               </button>
             </div>
           </div>
-          {passwordError && (
-            <div className="password-error-toast">❗ {passwordError}</div>
-          )}
+          <AlertMessage
+            message={passwordError}
+            variant="error"
+            onClose={() => setPasswordError("")}
+          />
         </div>
       )}
     </main>

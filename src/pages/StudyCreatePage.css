@@ -130,6 +130,26 @@
   outline: none;
 }
 
+.study-create-notice.is-error {
+  border-color: rgba(229, 72, 77, 0.18);
+}
+
+.study-create-notice.is-error .study-create-notice-icon {
+  background: var(--red-error);
+}
+
+.study-create-notice.is-error .study-create-notice-icon::before {
+  content: "!";
+  width: auto;
+  height: auto;
+  border: 0;
+  color: var(--wh);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+  transform: none;
+}
+
 .study-create-form,
 .study-create-content,
 .study-create-field,
@@ -220,6 +240,27 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 17px;
+}
+
+.study-edit-password-checkbox {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--black);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.study-edit-password-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  padding: 0;
+  border-radius: 4px;
+  accent-color: var(--brand);
 }
 
 .study-create-submit-error {

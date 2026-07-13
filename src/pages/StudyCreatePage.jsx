@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import AlertMessage from '../components/AlertMessage.jsx';
 import selectedIcon from '../assets/img/ic_bg_selected.png';
 import './StudyCreatePage.css';
 
@@ -175,35 +176,21 @@ function StudyCreatePage() {
 
   return (
     <main className="study-create-page">
-      {isSuccessNoticeOpen && (
-        <div
-          className={`study-create-notice ${
-            successNoticeStatus === 'closing' ? 'is-closing' : ''
-          }`}
-          role="status"
-          aria-live="polite"
-        >
-          <span className="study-create-notice-icon" aria-hidden="true" />
-          <span className="study-create-notice-text">스터디가 만들어졌습니다.</span>
-          <button
-            className="study-create-notice-close"
-            type="button"
-            aria-label="알림 닫기"
-            onClick={closeSuccessNotice}
-          />
-        </div>
-      )}
+      <AlertMessage
+        message={isSuccessNoticeOpen ? '스터디가 만들어졌습니다.' : ''}
+        status={successNoticeStatus}
+        onClose={closeSuccessNotice}
+      />
+      <AlertMessage
+        message={submitErrorMessage}
+        variant="error"
+        onClose={() => setSubmitErrorMessage('')}
+      />
 
       <section className="study-create-card" aria-labelledby="study-create-title">
         <form className="study-create-form" onSubmit={handleSubmit} noValidate>
           <div className="study-create-content">
             <h1 id="study-create-title">스터디 만들기</h1>
-
-            {submitErrorMessage && (
-              <p className="study-create-submit-error" role="alert">
-                {submitErrorMessage}
-              </p>
-            )}
 
             <div className="study-create-field">
               <label htmlFor="nickname">닉네임</label>
