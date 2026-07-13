@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "../utils/axios.js";
 import HabitList from "../components/habit/HabitList.jsx";
 import HabitEditModal from "../components/habit/HabitEditModal.jsx";
@@ -27,6 +27,10 @@ function TodayHabitPage() {
       <div className="inner">
         <div className="card_container">
           <span className="container_title">스터디 이름</span>
+          <div>
+            <Link to={`study/${id}/focus`}>오늘의 집중</Link>
+            <Link to={"/"}>홈</Link>
+          </div>
           <div className="card_container inner_container">
             <div className="inner">
               <span className="container_title">오늘의 습관</span>
