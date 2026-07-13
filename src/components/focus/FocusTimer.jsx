@@ -54,10 +54,29 @@ export default function FocusTimer({ studyId, password }) {
         setIsRunning(true);
     }
 
-    function handleFinish() {
+    async function handleFinish() {
         const point = calculatePoint(elapsedSeconds);
-        console.log('집중한 시간(초):', elapsedSeconds, '/ 획득 포인트:', point);
-        // TODO: 다음 단계에서 여기에 API 전송 붙이기
+
+        try {
+            const res = await fetch(`http://localhost:3000/study/${studyId}/focus/point`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 'password': password, 'point': point }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                console.log(data.errorCode, data.message);
+                return;
+            }
+
+            // 성공했을 때
+            console.log(data);
+
+        } catch (error) {
+            console.error(error);
+        }
 
         handleReset();
     }
@@ -70,7 +89,6 @@ export default function FocusTimer({ studyId, password }) {
 
     return (
         <div className="focus-timer">
-            <span>오늘의 집중</span>
             {isEditing ? (
                 <div
                     className="focus-timer__display focus-timer__display--edit"
