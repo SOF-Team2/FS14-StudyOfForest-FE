@@ -1,13 +1,16 @@
 import { useState } from "react";
 import trashIcon from "../../assets/img/ic_trash.svg";
+import addBtnIcon from "../../assets/img/ic_plus.svg";
 import axios from "../../utils/axios";
 import { useParams } from "react-router-dom";
 import Popup from "../Popup";
 import { modalType } from "../../utils/enum/modalTypeEnum";
+import { useLoading } from "../../contexts/LoadingContext";
 
 function HabitEditModal({ habits, onClose, onSave }) {
+  const { startLoading, endLoading } = useLoading();
   const { id } = useParams();
-  const [editHabits, setEditHabits] = useState(() => 
+  const [editHabits, setEditHabits] = useState(() =>
     habits.map((habit) => ({
       ...habit,
       localId: habit.id,
@@ -63,7 +66,7 @@ function HabitEditModal({ habits, onClose, onSave }) {
   const deleteHabit = async (habit) => {
     // DB에 저장되지 않은 임시 습관
     if (!habit.id) {
-      setEditHabits((prev) => 
+      setEditHabits((prev) =>
         prev.filter((item) => item.localId !== habit.localId),
       );
 
@@ -72,17 +75,22 @@ function HabitEditModal({ habits, onClose, onSave }) {
     }
 
     // DB에 저장된 기존 습관
+    startLoading();
     try {
       await axios.delete(`/study/${id}/habit/${habit.id}/`);
       // 삭제된 항목만 모달 목록에서 사라지도록
-      setEditHabits((prev) => 
+      setEditHabits((prev) =>
         prev.filter((item) => item.localId !== habit.localId),
       );
       // 기존 습관 하나를 삭제해도 handleLoad가 호출되지 않아 모달이 닫히지 않음
-      openAlert("삭제되었습니다.");
     } catch (error) {
       console.error(error);
+      endLoading();
       openAlert("삭제에 실패했습니다.");
+
+    } finally {
+      endLoading();
+      openAlert("삭제되었습니다.");
     }
   };
 
@@ -107,8 +115,16 @@ function HabitEditModal({ habits, onClose, onSave }) {
   const saveUpdatedHabits = async (e) => {
     e.preventDefault();
 
-    const response = await axios.patch(`/study/${id}/habit`, editHabits);
-    onSave();
+    startLoading();
+    try {
+      const response = await axios.patch(`/study/${id}/habit`, editHabits);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      onSave();
+      endLoading();
+      openAlert("추가되었습니다.");
+    }
   };
 
   const handleHabitNameChange = (localId, value) => {
@@ -155,7 +171,9 @@ function HabitEditModal({ habits, onClose, onSave }) {
               onChange={(e) => setNewHabitName(e.target.value)}
             />
 
-            <button type="submit">+</button>
+            <button type="submit">
+              <img src={addBtnIcon} alt="추가 아이콘" />
+            </button>
           </form>
         </div>
         <div className="modal_btn_wrap">
