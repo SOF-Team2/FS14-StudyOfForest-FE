@@ -43,6 +43,7 @@ const images = [
 
 function WeeklyHabitRecordTable({ studyId }) {
   const [weeklyHabits, setWeeklyHabits] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const DAYS = ["월", "화", "수", "목", "금", "토", "일"];
 
   const getMonday = (date = new Date()) => {
@@ -69,9 +70,18 @@ function WeeklyHabitRecordTable({ studyId }) {
   const monday = getMonday();
 
   const handleLoad = async () => {
-    const response = await axios.get(`/study/${studyId}/habit/weekly`);
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`/study/${studyId}/habit/weekly`);
 
-    setWeeklyHabits(response.data);
+      setWeeklyHabits(response.data);
+    } catch (error) {
+      console.log(error);
+      setWeeklyHabits([]);
+    } finally {
+      setIsLoading(false);
+    }
+    
   };
 
   useEffect(() => {
@@ -83,60 +93,68 @@ function WeeklyHabitRecordTable({ studyId }) {
       <div className="card_container inner_container">
         <div className="modal_title left">습관 기록표</div>
         <div className="table_wrap">
-          <div className="day_wrap">
-            <div className="day">월</div>
-            <div className="day">화</div>
-            <div className="day">수</div>
-            <div className="day">목</div>
-            <div className="day">금</div>
-            <div className="day">토</div>
-            <div className="day">일</div>
-          </div>
-          {weeklyHabits.map((habit, habitIndex) => {
-            const recordsByDate = habit.habitRecords.reduce((map, record) => {
-              const dateKey = formatDateKey(record.recordDate);
-              const previousRecord = map.get(dateKey);
-
-              // 같은 날짜의 기록이 여러 개라면 최근 수정된 기록 사용
-              if (
-                !previousRecord ||
-                new Date(record.updatedAt) > new Date(previousRecord.updatedAt)
-              ) {
-                map.set(dateKey, record);
-              }
-
-              return map;
-            }, new Map());
-
-            return (
-              <div className="weekly_habit_record_line" key={habit.id}>
-                <div className="habit_name">{habit.name}</div>
-
-                {DAYS.map((day, dayIndex) => {
-                  const targetDate = new Date(monday);
-                  targetDate.setDate(monday.getDate() + dayIndex);
-
-                  const dateKey = formatDateKey(targetDate);
-                  const record = recordsByDate.get(dateKey);
-
-                  return (
-                    <div
-                      className="habit_record_icon_container"
-                      key={`${habit.id}-${dateKey}`}
-                    >
-                      <img
-                        src={
-                          record?.isChecked ? images[habitIndex] : defaultIcon
-                        }
-                        alt={`${day}요일 습관 체크 아이콘`}
-                        className="habit_record_icon"
-                      />
-                    </div>
-                  );
-                })}
+          { isLoading ? (
+            <div>습관 목록을 불러오는 중입니다.</div>
+          ) : weeklyHabits.length === 0 ? (
+            <div>아직 습관이 없어요.<br /> 오늘의 습관을 생성해보세요.</div>
+          ) : (
+            <>
+              <div className="day_wrap">
+                <div className="day">월</div>
+                <div className="day">화</div>
+                <div className="day">수</div>
+                <div className="day">목</div>
+                <div className="day">금</div>
+                <div className="day">토</div>
+                <div className="day">일</div>
               </div>
-            );
-          })}
+              {weeklyHabits.map((habit, habitIndex) => {
+                const recordsByDate = habit.habitRecords.reduce((map, record) => {
+                  const dateKey = formatDateKey(record.recordDate);
+                  const previousRecord = map.get(dateKey);
+
+                  // 같은 날짜의 기록이 여러 개라면 최근 수정된 기록 사용
+                  if (
+                    !previousRecord ||
+                    new Date(record.updatedAt) > new Date(previousRecord.updatedAt)
+                  ) {
+                    map.set(dateKey, record);
+                  }
+
+                  return map;
+                }, new Map());
+
+                return (
+                  <div className="weekly_habit_record_line" key={habit.id}>
+                    <div className="habit_name">{habit.name}</div>
+
+                    {DAYS.map((day, dayIndex) => {
+                      const targetDate = new Date(monday);
+                      targetDate.setDate(monday.getDate() + dayIndex);
+
+                      const dateKey = formatDateKey(targetDate);
+                      const record = recordsByDate.get(dateKey);
+
+                      return (
+                        <div
+                          className="habit_record_icon_container"
+                          key={`${habit.id}-${dateKey}`}
+                        >
+                          <img
+                            src={
+                              record?.isChecked ? images[habitIndex] : defaultIcon
+                            }
+                            alt={`${day}요일 습관 체크 아이콘`}
+                            className="habit_record_icon"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </>
+          )}
         </div>
       </div>
     </>
