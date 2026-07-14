@@ -1,6 +1,6 @@
 import HabitItem from "./HabitItem.jsx"
 
-function HabitList({ habits = [] , handleLoad }) {
+function HabitList({ habits, handleLoad }) {
   if (habits.length === 0) {
     return (
       <p>
