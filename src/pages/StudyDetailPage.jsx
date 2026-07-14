@@ -9,7 +9,9 @@ import WeeklyHabitRecordTable from "../components/habit/WeeklyHabitRecordTable.j
 import arrowRightIcon from "../assets/img/ic_arrow_right.svg";
 import useAlert from "../components/useAlert.js";
 
-const API_BASE_URL = "http://127.0.0.1:3000";
+//const API_BASE_URL = "http://127.0.0.1:3000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 
 const getStudyErrorMessage = async (response) => {
   try {

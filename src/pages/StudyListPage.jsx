@@ -3,7 +3,8 @@ import StudyCard from "../components/study/StudyCard";
 import RecentStudyList from "../components/study/RecentStudyList";
 import SearchSortBar from "../components/study/SearchSortBar";
 
-const API_BASE_URL = "http://127.0.0.1:3000";
+//const API_BASE_URL = "http://127.0.0.1:3000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const normalizeStudyItems = (data) => {
   if (Array.isArray(data)) {
@@ -181,7 +182,11 @@ function StudyListPage() {
           </div>
 
           {!isLoading && !errorMessage && page < totalPages && (
-            <button type="button" className="load_more_button" onClick={handleLoadMore}>
+            <button
+              type="button"
+              className="load_more_button"
+              onClick={handleLoadMore}
+            >
               더보기
             </button>
           )}
