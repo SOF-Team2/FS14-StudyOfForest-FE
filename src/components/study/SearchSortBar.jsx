@@ -43,6 +43,11 @@ function SearchSortBar({ keyword, onKeywordChange, sortValue, onSortChange }) {
           placeholder="검색"
           value={keyword}
           onChange={(e) => onKeywordChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              onKeywordChange("");
+            }
+          }}
         />
       </div>
       <div className="sort_dropdown" ref={dropdownRef}>
