@@ -2,11 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import AlertMessage from "../components/AlertMessage.jsx";
-import tagImg from '../assets/img/ic_point.svg';
+import tagImg from "../assets/img/ic_point.svg";
 import "./StudyCreatePage.css";
 import "../style.css";
 import WeeklyHabitRecordTable from "../components/habit/WeeklyHabitRecordTable.jsx";
-import arrowRightIcon from '../assets/img/ic_arrow_right.svg';
+import arrowRightIcon from "../assets/img/ic_arrow_right.svg";
 
 const API_BASE_URL = "http://127.0.0.1:3000";
 
@@ -14,7 +14,11 @@ const getStudyErrorMessage = async (response) => {
   try {
     const result = await response.json();
 
-    return result?.error?.message || result?.message || "스터디 정보를 불러오지 못했습니다.";
+    return (
+      result?.error?.message ||
+      result?.message ||
+      "스터디 정보를 불러오지 못했습니다."
+    );
   } catch {
     return "스터디 정보를 불러오지 못했습니다.";
   }
@@ -44,10 +48,19 @@ const StudyDetailPage = () => {
       }
     };
 
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsEmojiOpen(false);
+        setIsEmojiMoreOpen(false);
+        setIsPasswordModalOpen(false);
+      }
+    };
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
@@ -169,13 +182,16 @@ const StudyDetailPage = () => {
 
     try {
       const isDeleteAction = passwordAction === "delete";
-      const response = await fetch(`${API_BASE_URL}/study/${id}${isDeleteAction ? "" : "/password/verify"}`, {
-        method: isDeleteAction ? "DELETE" : "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${API_BASE_URL}/study/${id}${isDeleteAction ? "" : "/password/verify"}`,
+        {
+          method: isDeleteAction ? "DELETE" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ password }),
         },
-        body: JSON.stringify({ password }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error(await getStudyErrorMessage(response));
@@ -214,184 +230,210 @@ const StudyDetailPage = () => {
   return (
     <section>
       <div className="inner">
-      <section className="study-detail-section card_container">
-        <div className="emoji_line">
-        <div className="emoji-container" ref={emojiRef} style={{marginBottom: '24px'}}>
-          {/* 화면에 기본으로 보여줄 이모지 3개 */}
-          {visibleEmoji.map((item) => (
-            <button
-              type="button"
-              key={item.emoji}
-              className="emoji-item"
-              onClick={() => handleEmojiClick(item.emoji)}
+        <section className="study-detail-section card_container">
+          <div className="emoji_line">
+            <div
+              className="emoji-container"
+              ref={emojiRef}
+              style={{ marginBottom: "24px" }}
             >
-              <span>{item.emoji}</span>
-              <span>{item.count}</span>
-            </button>
-          ))}
+              {/* 화면에 기본으로 보여줄 이모지 3개 */}
+              {visibleEmoji.map((item) => (
+                <button
+                  type="button"
+                  key={item.emoji}
+                  className="emoji-item"
+                  onClick={() => handleEmojiClick(item.emoji)}
+                >
+                  <span>{item.emoji}</span>
+                  <span>{item.count}</span>
+                </button>
+              ))}
 
-          {/* 숨겨진 이모지 목록 */}
-          {hiddenEmoji.length > 0 && (
-            <div className="emoji-more-wrapper">
-              <button
-                type="button"
-                className="emoji-more-button"
-                onClick={() => {
-                  setIsEmojiMoreOpen((prev) => !prev);
-                  setIsEmojiOpen(false);
-                }}
-              >
-                +{hiddenEmoji.length}...
-              </button>
+              {/* 숨겨진 이모지 목록 */}
+              {hiddenEmoji.length > 0 && (
+                <div className="emoji-more-wrapper">
+                  <button
+                    type="button"
+                    className="emoji-more-button"
+                    onClick={() => {
+                      setIsEmojiMoreOpen((prev) => !prev);
+                      setIsEmojiOpen(false);
+                    }}
+                  >
+                    +{hiddenEmoji.length}...
+                  </button>
 
-              {isEmojiMoreOpen && (
-                <div className="more-emoji-list">
-                  {hiddenEmoji.map((item) => (
-                    <button
-                      type="button"
-                      key={item.emoji}
-                      className="emoji-item"
-                      onClick={() => {
-                        handleEmojiClick(item.emoji);
-                        setIsEmojiOpen(false);
-                        setIsEmojiMoreOpen(false);
-                      }}
-                    >
-                      <span>{item.emoji}</span>
-                      <span>{item.count}</span>
-                    </button>
-                  ))}
+                  {isEmojiMoreOpen && (
+                    <div className="more-emoji-list">
+                      {hiddenEmoji.map((item) => (
+                        <button
+                          type="button"
+                          key={item.emoji}
+                          className="emoji-item"
+                          onClick={() => {
+                            handleEmojiClick(item.emoji);
+                            setIsEmojiOpen(false);
+                            setIsEmojiMoreOpen(false);
+                          }}
+                        >
+                          <span>{item.emoji}</span>
+                          <span>{item.count}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
 
-          {/* 이모지 추가 */}
-          <div className="emoji-add-wrapper">
-            <button
-              type="button"
-              className="emoji-add-button"
-              onClick={() => {
-                setIsEmojiOpen((prev) => !prev);
-                setIsEmojiMoreOpen(true);
-              }}
-            >
-              <span></span>
-              <span>추가</span>
-            </button>
-
-            {isEmojiOpen && (
-              <div className="emoji-picker">
-                <EmojiPicker
-                  onEmojiClick={(emojiData) => {
-                    handleEmojiClick(emojiData.emoji);
-                    // setIsEmojiOpen(false);
-                    // setIsEmojiMoreOpen(true);
+              {/* 이모지 추가 */}
+              <div className="emoji-add-wrapper">
+                <button
+                  type="button"
+                  className="emoji-add-button"
+                  onClick={() => {
+                    setIsEmojiOpen((prev) => !prev);
+                    setIsEmojiMoreOpen(true);
                   }}
-                />
+                >
+                  <span></span>
+                  <span>추가</span>
+                </button>
+
+                {isEmojiOpen && (
+                  <div className="emoji-picker">
+                    <EmojiPicker
+                      onEmojiClick={(emojiData) => {
+                        handleEmojiClick(emojiData.emoji);
+                        // setIsEmojiOpen(false);
+                        // setIsEmojiMoreOpen(true);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-          <div className="study-menu-buttons">
-          <button
-            type="button"
-            onClick={() => handleOpenPasswordModal(`/study/${id}/edit`)}
-          >
-            수정하기
-          </button>
-          <span className="dec_line">|</span>
-          <button
-            className="delete"
-            type="button"
-            onClick={() => handleOpenPasswordModal("", "delete")}
-          >
-            삭제하기
-          </button>
-        </div>
-      </div>
-        <div className="container_title">
-          {study.nickname} 의 {study.name}
-          <nav
-                            className="focus-page__navigation"
-                            aria-label="스터디 페이지 이동"
-                        >
-                            <Link
-                                className="focus-page__navigation-button"
-                                to={`/study/${id}/habit`}
-                            >
-                                <span>오늘의 습관</span>
-
-                                <img
-                                    className="focus-page__navigation-icon"
-                                    src={arrowRightIcon}
-                                    alt=""
-                                />
-                            </Link>
-
-                            <Link
-                                className="focus-page__navigation-button focus-page__navigation-button--home"
-                                to="/"
-                            >
-                                <span>홈</span>
-
-                                <img
-                                    className="focus-page__navigation-icon"
-                                    src={arrowRightIcon}
-                                    alt=""
-                                />
-                            </Link>
-                        </nav>
-        </div>
-
-        <div>
-          <span style={{ fontSize: '18px', color: '#818181', fontWieht: '300' }}>소개</span>
-          <p style={{ display: 'block', margin: '8px 0 24px', fontSize: '18px' }}>{study.description}</p>
-        </div>
-
-        <div>
-          <span style={{ display: 'block', fontSize: '18px', color: '#818181', fontWeight: '300', marginBottom: '8px'}}>현재까지 획득한 포인트</span>
-          <div className="tag point_tag" style={{ marginBottom: '40px'}}><img src={tagImg} alt="태그 장식" />{study.point}P 획득</div>
-        </div>
-        <WeeklyHabitRecordTable studyId={id}/>
-      </section>
-
-      {isPasswordModalOpen && (
-        <div className="password-modal-overlay">
-          <div className="password-modal">
-            <h2>
-              {study.nickname} 의 {study.name}
-            </h2>
-            <p>권한이 필요해요</p>
-            <span>비밀번호</span>
-
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="비밀번호를 입력하세요"
-            />
-
-            <div>
+            </div>
+            <div className="study-menu-buttons">
               <button
                 type="button"
-                onClick={closePasswordModal}
+                onClick={() => handleOpenPasswordModal(`/study/${id}/edit`)}
               >
-                나가기
+                수정하기
               </button>
-
-              <button type="button" onClick={handlePasswordCheck}>
-                {passwordAction === "delete" ? "삭제하기" : "수정하러 가기"}
+              <span className="dec_line">|</span>
+              <button
+                className="delete"
+                type="button"
+                onClick={() => handleOpenPasswordModal("", "delete")}
+              >
+                삭제하기
               </button>
             </div>
           </div>
-          <AlertMessage
-            message={passwordError}
-            variant="error"
-            onClose={() => setPasswordError("")}
-          />
-        </div>
-      )}
+          <div className="container_title">
+            {study.nickname} 의 {study.name}
+            <nav
+              className="focus-page__navigation"
+              aria-label="스터디 페이지 이동"
+            >
+              <Link
+                className="focus-page__navigation-button"
+                to={`/study/${id}/habit`}
+              >
+                <span>오늘의 습관</span>
+
+                <img
+                  className="focus-page__navigation-icon"
+                  src={arrowRightIcon}
+                  alt=""
+                />
+              </Link>
+
+              <Link
+                className="focus-page__navigation-button focus-page__navigation-button--home"
+                to="/"
+              >
+                <span>홈</span>
+
+                <img
+                  className="focus-page__navigation-icon"
+                  src={arrowRightIcon}
+                  alt=""
+                />
+              </Link>
+            </nav>
+          </div>
+
+          <div>
+            <span
+              style={{ fontSize: "18px", color: "#818181", fontWieht: "300" }}
+            >
+              소개
+            </span>
+            <p
+              style={{
+                display: "block",
+                margin: "8px 0 24px",
+                fontSize: "18px",
+              }}
+            >
+              {study.description}
+            </p>
+          </div>
+
+          <div>
+            <span
+              style={{
+                display: "block",
+                fontSize: "18px",
+                color: "#818181",
+                fontWeight: "300",
+                marginBottom: "8px",
+              }}
+            >
+              현재까지 획득한 포인트
+            </span>
+            <div className="tag point_tag" style={{ marginBottom: "40px" }}>
+              <img src={tagImg} alt="태그 장식" />
+              {study.point}P 획득
+            </div>
+          </div>
+          <WeeklyHabitRecordTable studyId={id} />
+        </section>
+
+        {isPasswordModalOpen && (
+          <div className="password-modal-overlay">
+            <div className="password-modal">
+              <h2>
+                {study.nickname} 의 {study.name}
+              </h2>
+              <p>권한이 필요해요</p>
+              <span>비밀번호</span>
+
+              <input
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="비밀번호를 입력하세요"
+              />
+
+              <div>
+                <button type="button" onClick={closePasswordModal}>
+                  나가기
+                </button>
+
+                <button type="button" onClick={handlePasswordCheck}>
+                  {passwordAction === "delete" ? "삭제하기" : "수정하러 가기"}
+                </button>
+              </div>
+            </div>
+            <AlertMessage
+              message={passwordError}
+              variant="error"
+              onClose={() => setPasswordError("")}
+            />
+          </div>
+        )}
       </div>
     </section>
   );
