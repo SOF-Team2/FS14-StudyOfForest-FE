@@ -27,7 +27,7 @@ a { color: inherit; text-decoration: none; }
 input:focus { outline-color: var(--brand); }
 
 /* 헤더 */
-#header .inner { display: flex; flex-direction: row; justify-content: space-between; width: calc(100vw - 440px); height: 100px; padding: 20px 0; }
+#header .inner { display: flex; flex-direction: row; justify-content: space-between; height: 100px; padding: 20px 0; }
 #header .logo { display: block; width: 182px; height: 60px; }
 #header .logo img { display: block; width: 100%; height: 100%; object-fit: contain; }
 
@@ -51,7 +51,7 @@ input:focus { outline-color: var(--brand); }
 .container_title_wrap { display: flex; flex-direction: row; justify-content: space-between; }
 
 .link_wrap { display: flex; flex-direction: row; justify-content: right; gap: 16px; }
-.link_wrap .link_btn { display: flex; flex-direction: row; justify-content: space-between; gap: 4px; width: fit-content; height: fit-content; line-height: 24px; padding: 12px; border-radius: 15px; border: 1px solid var(--gray); text-decoration: none; color: var(--dark-gray); font-weight: 400; font-size: 16px; }
+.link_wrap .link_btn { display: flex; flex-direction: row; justify-content: space-between; gap: 4px; width: fit-content; height: fit-content; line-height: 30px; padding: 8px 12px; border-radius: 15px; border: 1px solid var(--gray); text-decoration: none; color: var(--dark-gray); font-weight: 400; font-size: 16px; }
 .link_btn img { display: block; width: 24px; height: 24px; }
 
 .card_wrap { display: flex; flex-direction: row; justify-content: left; gap: 24px; flex-wrap: wrap; }
@@ -220,15 +220,26 @@ input:focus { outline-color: var(--brand); }
 
   .load_more_button { padding: 17px 80px; }
 
-  }
+  .day_wrap { margin: 20px 0; }
+  .day_wrap .day { width: calc(100% / 7); }
+  .weekly_habit_record_line { display: block; margin: 20px 0; }
+  .weekly_habit_record_line .habit_name { padding: 0 6px; font-size: 12pt; text-align: left; line-height: unset; }
+  .habit_record_icon_container { display: inline-block; width: calc(100% /7); padding: 6px; text-align: center; }
+  .habit_record_icon { width: 36px; height: 36px; }
+}
 
 /* Mobile */
 @media (max-width: 743px) {
+  * { font-size: 11pt; }
   .inner { width: 100%; padding: 0 16px; }
   #header .inner { width: 100%; padding: 16px; }
 
-  .card_container { padding: 24px; }
-
+  .card_container { padding: 24px; margin: 10px 0; }
+  .container_title_wrap { display: block; }
+  .container_title { display: block; margin-bottom: 10px; font-size: 15pt; }
+  .focus-page__navigation { margin: 20px 0; }
+  .link_wrap { justify-content: left; margin-bottom: 20px; gap: 6px; }
+  
   .btn { width: 106px; height: 38px; }
   .btn span { font-size: 11.925px; }
 
@@ -237,6 +248,8 @@ input:focus { outline-color: var(--brand); }
   .card_status { margin-bottom: 8px; }
   .card_text { height: auto; margin-bottom: 8px; }
 
+  .modal_title { font-size: 14pt; }
+  
   /* 스터디 둘러보기 */
   .card_container:not(.recent_scroll) .card_wrap { flex-direction: column; flex-wrap: nowrap; gap: 16px; }
   .card_container:not(.recent_scroll) .card_wrap .card { width: 100%; height: 180px; padding: 16px; flex-direction: row; overflow: hidden; }
@@ -272,6 +285,6 @@ input:focus { outline-color: var(--brand); }
 }
 
 @media (max-width: 520px) {
-  #header .inner { padding: 32px 20px; }
-  #header .logo { width: 106px; height: 35px; }
+  #header .logo { width: unset; height: 40px; margin-top: 10px; }
+  .create_study_btn { margin-top: 14px; }
 }
