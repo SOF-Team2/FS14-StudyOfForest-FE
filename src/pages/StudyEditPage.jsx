@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AlertMessage from "../components/AlertMessage.jsx";
+import useAlert from "../components/useAlert.js";
 import selectedIcon from "../assets/img/ic_bg_selected.png";
 import "./StudyCreatePage.css";
 
@@ -34,9 +35,6 @@ const initialErrors = {
   newPassword: "",
   newPasswordConfirm: "",
 };
-
-const NOTICE_VISIBLE_DURATION = 3200;
-const NOTICE_FADE_DURATION = 400;
 
 const getResponseErrorMessage = async (response) => {
   try {
@@ -73,6 +71,7 @@ const getSelectedBackgroundId = (study) => {
 function StudyEditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showAlert } = useAlert();
   const [formValues, setFormValues] = useState(initialFormValues);
   const [selectedBackground, setSelectedBackground] = useState(backgroundOptions[0].id);
   const [visiblePasswords, setVisiblePasswords] = useState({
@@ -86,8 +85,6 @@ function StudyEditPage() {
   const [submitErrorMessage, setSubmitErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successNoticeStatus, setSuccessNoticeStatus] = useState("hidden");
-  const isSuccessNoticeOpen = successNoticeStatus !== "hidden";
 
   useEffect(() => {
     const controller = new AbortController();
@@ -138,32 +135,6 @@ function StudyEditPage() {
 
     return () => controller.abort();
   }, [id]);
-
-  useEffect(() => {
-    if (successNoticeStatus === "hidden") {
-      return undefined;
-    }
-
-    if (successNoticeStatus === "visible") {
-      const noticeTimer = window.setTimeout(() => {
-        setSuccessNoticeStatus("closing");
-      }, NOTICE_VISIBLE_DURATION);
-
-      return () => window.clearTimeout(noticeTimer);
-    }
-
-    const closeTimer = window.setTimeout(() => {
-      setSuccessNoticeStatus("hidden");
-    }, NOTICE_FADE_DURATION);
-
-    return () => window.clearTimeout(closeTimer);
-  }, [successNoticeStatus]);
-
-  const closeSuccessNotice = () => {
-    setSuccessNoticeStatus((currentStatus) => (
-      currentStatus === "hidden" ? currentStatus : "closing"
-    ));
-  };
 
   const clearErrors = (...fieldNames) => {
     setSubmitErrorMessage("");
@@ -253,7 +224,6 @@ function StudyEditPage() {
     setSubmitErrorMessage("");
 
     if (Object.values(nextErrors).some(Boolean)) {
-      closeSuccessNotice();
       return;
     }
 
@@ -308,9 +278,9 @@ function StudyEditPage() {
         newPasswordConfirm: false,
       });
       setErrors(initialErrors);
-      setSuccessNoticeStatus("visible");
+      showAlert("스터디가 수정되었습니다.");
+      navigate(`/study/${id}`);
     } catch (error) {
-      closeSuccessNotice();
       setSubmitErrorMessage(normalizeSubmitErrorMessage(error));
     } finally {
       setIsSubmitting(false);
@@ -346,12 +316,6 @@ function StudyEditPage() {
 
   return (
     <main className="study-create-page">
-      <AlertMessage
-        message={isSuccessNoticeOpen ? "스터디가 수정되었습니다." : ""}
-        status={successNoticeStatus}
-        onClose={closeSuccessNotice}
-      />
-
       <section className="study-create-card" aria-labelledby="study-edit-title">
         <form className="study-create-form" onSubmit={handleSubmit} noValidate>
           <div className="study-create-content">
