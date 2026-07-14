@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import AlertMessage from "../components/AlertMessage.jsx";
 import tagImg from "../assets/img/ic_point.svg";
@@ -7,6 +7,7 @@ import "./StudyCreatePage.css";
 import "../style.css";
 import WeeklyHabitRecordTable from "../components/habit/WeeklyHabitRecordTable.jsx";
 import arrowRightIcon from "../assets/img/ic_arrow_right.svg";
+import useAlert from "../components/useAlert.js";
 
 const API_BASE_URL = "http://127.0.0.1:3000";
 
@@ -27,6 +28,7 @@ const getStudyErrorMessage = async (response) => {
 const StudyDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showAlert } = useAlert();
   const [study, setStudy] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -187,12 +189,17 @@ const StudyDetailPage = () => {
       if (!response.ok) {
         throw new Error(await getStudyErrorMessage(response));
       }
+      console.log("비밀번호확인", password);
 
       setPassword("");
       setPasswordError("");
       setIsPasswordModalOpen(false);
       setPasswordAction("navigate");
-      navigate(isDeleteAction ? "/" : nextPath);
+      navigate(isDeleteAction ? "/" : nextPath, {
+        state: {
+          password,
+        },
+      });
     } catch (error) {
       setPasswordError(error.message || "비밀번호가 일치하지 않습니다.");
     }
@@ -217,6 +224,16 @@ const StudyDetailPage = () => {
       </main>
     );
   }
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      showAlert("주소복사완료");
+    } catch (error) {
+      console.log(error);
+      showAlert("주소복사실패");
+    }
+  };
 
   return (
     <section>
@@ -305,6 +322,11 @@ const StudyDetailPage = () => {
               </div>
             </div>
             <div className="study-menu-buttons">
+              <button type="button" onClick={handleShare}>
+                공유하기
+              </button>
+              <span className="dec_line">|</span>
+
               <button
                 type="button"
                 onClick={() => handleOpenPasswordModal(`/study/${id}/edit`)}
@@ -395,8 +417,13 @@ const StudyDetailPage = () => {
         </section>
 
         {isPasswordModalOpen && (
-          <div className="password-modal-overlay">
-            <div className="password-modal">
+          <div className="password-modal-overlay" onClick={closePasswordModal}>
+            <div
+              className="password-modal"
+              onClick={(event) => {
+                event.stopPropagation();
+              }}
+            >
               <h2>
                 {study.nickname} 의 {study.name}
               </h2>
@@ -411,12 +438,8 @@ const StudyDetailPage = () => {
               />
 
               <div>
-                <button type="button" onClick={closePasswordModal}>
-                  나가기
-                </button>
-
                 <button type="button" onClick={handlePasswordCheck}>
-                  {passwordAction === "delete" ? "삭제하기" : "수정하러 가기"}
+                  {passwordAction === "delete" ? "삭제하기" : "확인"}
                 </button>
               </div>
             </div>
