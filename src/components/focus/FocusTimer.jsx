@@ -21,6 +21,7 @@ export default function FocusTimer({ studyId, password }) {
 
     const totalSettingSeconds = settingMinutes * 60 + settingSeconds;
     const remainingSeconds = totalSettingSeconds - elapsedSeconds;
+    const isCompleted = elapsedSeconds >= totalSettingSeconds;
 
     useEffect(() => {
         if (!isRunning) return;
@@ -41,6 +42,37 @@ export default function FocusTimer({ studyId, password }) {
             setToast({ resultType: 'goalAchieved' });
         }
     }, [remainingSeconds, isRunning]);
+
+    useEffect(() => {
+        function handleKeyDown(e) {
+            // 편집 중일 땐 단축키 무시 (숫자 입력해야 하니까)
+            if (isEditing) return;
+
+            if (e.code === 'Space') {
+                e.preventDefault();   // 스페이스로 화면이 스크롤되는 기본 동작 막기
+
+                if (!isStarted) {
+                    handleStart();
+                } else if (isRunning) {
+                    handlePause();
+                } else {
+                    handleResume();
+                }
+            }
+
+            if (e.key === 'Escape') {
+                if (isStarted) {
+                    handleFinish();
+                }
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isStarted, isRunning, isEditing]);
 
     // 토스트가 뜨면 3초 뒤 자동으로 사라짐
     useEffect(() => {
@@ -85,9 +117,6 @@ export default function FocusTimer({ studyId, password }) {
     }
 
     async function handleFinish() {
-        // 설정한 시간을 다 채웠는지 확인
-        const isCompleted = elapsedSeconds >= totalSettingSeconds;
-
         if (!isCompleted) {
             setToast({ resultType: 'interrupted' });
             handleReset();
@@ -199,7 +228,10 @@ export default function FocusTimer({ studyId, password }) {
                         ) : (
                             <FocusButton onClick={handleResume}><img src={playIcon} alt="" />계속</FocusButton>
                         )}
-                        <FocusButton onClick={handleFinish}><img src={stopIcon} alt="" />정지</FocusButton>
+                        <FocusButton onClick={handleFinish}>
+                            <img src={stopIcon} alt="" />
+                            {isCompleted ? '완료' : '정지'}
+                        </FocusButton>
                     </>
                 )}
             </div>
