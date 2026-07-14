@@ -2,17 +2,6 @@
 
 
 /* Focus 페이지에서 사용하는 공통 Header 정렬 */
-.focus-page #header {
-  width: 100%;
-}
-
-.focus-page #header .inner {
-  width: min(calc(100% - 48px), 1200px);
-  height: auto;
-  min-height: 100px;
-  margin: 0 auto;
-  padding: 20px 0;
-}
 
 .focus-page__container {
   width: min(calc(100% - 48px), 1200px);
@@ -68,7 +57,7 @@
   border-radius: 12px;
 }
 
-.focus-page__navigation-button--home{
+.focus-page__navigation-button--home {
   min-width: 82px;
   height: 48px;
 }
@@ -122,7 +111,6 @@
     padding-bottom: 60px;
   }
 
-  .focus-page #header .inner,
   .focus-page__container {
     width: min(calc(100% - 48px), 720px);
   }
@@ -147,20 +135,10 @@
     padding-bottom: 40px;
   }
 
-  .focus-page #header .inner,
   .focus-page__container {
     width: calc(100% - 32px);
   }
 
-  .focus-page #header .inner {
-    min-height: 72px;
-    padding: 16px 0;
-  }
-
-  .focus-page #header .logo img {
-    width: 120px;
-    height: auto;
-  }
 
   .focus-page__container {
     margin-top: 8px;
@@ -213,7 +191,6 @@
 
 /* 작은 모바일 */
 @media (max-width: 479px) {
-  .focus-page #header .inner,
   .focus-page__container {
     width: calc(100% - 24px);
   }

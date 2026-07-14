@@ -51,3 +51,22 @@
 .focus-timer__display--over {
   color: var(--green-text);
 }
+
+.focus-timer__target {
+    padding: 4px 8px;
+    border: 1px solid var(--gray);
+    border-radius: 16px;
+    font-size: 14px;
+    color: var(--dark-gray);
+}
+
+.btn span img {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.btn span.shadow img {
+  visibility: hidden;
+}

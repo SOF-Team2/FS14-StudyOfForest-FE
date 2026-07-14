@@ -2,7 +2,6 @@
   position: fixed;
   left: 50%;
   bottom: 40px;
-  transform: translateX(-50%);
   z-index: 30;
 
   display: inline-flex;
@@ -13,25 +12,104 @@
   max-width: calc(100vw - 40px);
   min-height: 50px;
   padding: 12px 24px;
-  border-radius: 12px;
+
   box-sizing: border-box;
+  border-radius: 12px;
+  transform: translateX(-50%);
 
   font-family: Pretendard, sans-serif;
   font-size: 14px;
   font-weight: 500;
-  line-height: 20px;
-  white-space: nowrap;
+  line-height: 1.5;
+  text-align: center;
+  word-break: keep-all;
 
   pointer-events: none;
 }
 
-/* 성공 중단 토스트 색상 */
-.focus-result-toast--success {
-  background-color: var(--green);
-  color: var(--green-text);
+/* 토스트 내부 메시지 */
+.focus-result-toast__message {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
+/* 이모지 아이콘 */
+.focus-result-toast__icon {
+  flex-shrink: 0;
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* 목표 달성 토스트의 텍스트 영역 */
+.focus-result-toast__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+/* 목표 달성 제목 */
+.focus-result-toast__title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* 목표 달성 상세 설명 */
+.focus-result-toast__description {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* 성공 및 목표 달성 */
+.focus-result-toast--success {
+  color: var(--green-text);
+  background-color: var(--green);
+}
+
+/* 집중 중단 */
 .focus-result-toast--interrupted {
-  background-color: var(--pink);
   color: var(--red);
+  background-color: var(--pink);
+}
+
+/* 모바일 */
+@media (max-width: 767px) {
+  .focus-result-toast {
+    bottom: 24px;
+
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    min-height: 48px;
+    padding: 10px 16px;
+
+    font-size: 13px;
+  }
+
+  .focus-result-toast__message {
+    gap: 6px;
+  }
+
+  .focus-result-toast__icon {
+    font-size: 16px;
+  }
+
+  .focus-result-toast__title {
+    font-size: 13px;
+  }
+
+  .focus-result-toast__description {
+    font-size: 12px;
+  }
+}
+
+/* 작은 모바일 */
+@media (max-width: 479px) {
+  .focus-result-toast {
+    width: calc(100vw - 24px);
+    max-width: none;
+  }
 }
