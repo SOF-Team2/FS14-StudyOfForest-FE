@@ -24,7 +24,10 @@ function RecentStudyList() {
         const results = await Promise.all(
           ids.map(async (id) => {
             const res = await fetch(`${API_BASE_URL}/study/${id}`);
-            if (!res.ok) return null;
+            if (!res.ok) {
+              removeRecentStudy(id);
+              return null;
+            }
             const json = await res.json();
             return json?.data ?? json;
           }),
