@@ -27,6 +27,7 @@ function StudyListPage() {
   const [keyword, setKeyword] = useState("");
   const [sortValue, setSortValue] = useState("latest");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -117,7 +118,7 @@ function StudyListPage() {
     const trimmedKeyword = keyword.trim();
     if (trimmedKeyword) params.set("keyword", trimmedKeyword);
 
-    setIsLoading(true);
+    setIsLoadingMore(true);
     setErrorMessage("");
 
     fetch(`${API_BASE_URL}/study?${params.toString()}`)
@@ -136,7 +137,7 @@ function StudyListPage() {
       .catch((error) => {
         setErrorMessage(error.message || "스터디 목록을 불러오지 못했습니다.");
       })
-      .finally(() => setIsLoading(false));
+      .finally(() => setIsLoadingMore(false));
   };
 
   const handleKeywordChange = (nextKeyword) => {
@@ -179,6 +180,9 @@ function StudyListPage() {
             {!isLoading &&
               !errorMessage &&
               items.map((study) => <StudyCard key={study.id} study={study} />)}
+            {isLoadingMore && (
+              <p className="list_state_message">불러오는 중...</p>
+            )}
           </div>
 
           {!isLoading && !errorMessage && page < totalPages && (
