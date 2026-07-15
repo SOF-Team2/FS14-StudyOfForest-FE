@@ -17,6 +17,7 @@ import icon15 from "../../assets/img/sticker_yellow_300_15.svg";
 import icon16 from "../../assets/img/sticker_pink_100_16.svg";
 import icon17 from "../../assets/img/sticker_pink_200_17.svg";
 import icon18 from "../../assets/img/sticker_pink_300_18.svg";
+import arrowRightIcon from "../../assets/img/ic_arrow_right.svg";
 import { useEffect, useState } from "react";
 import axios from "../../utils/axios";
 
@@ -44,7 +45,11 @@ const images = [
 function WeeklyHabitRecordTable({ studyId }) {
   const [weeklyHabits, setWeeklyHabits] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const DAYS = ["월", "화", "수", "목", "금", "토", "일"];
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  
+  const weekNames = ["월", "화", "수", "목", "금", "토", "일"];
+
+  const today = new Date();
 
   const getMonday = (date = new Date()) => {
     const result = new Date(date);
@@ -58,6 +63,22 @@ function WeeklyHabitRecordTable({ studyId }) {
     return result;
   };
 
+  const monday = getMonday(selectedDate);
+
+  const week = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + i);
+
+    return {
+      label: `${date.getMonth() + 1}/${date.getDate()}`,
+      day: weekNames[i],
+      isToday:
+        date.getFullYear() === today.getFullYear() &&
+        date.getMonth() === today.getMonth() &&
+        date.getDate() === today.getDate(),
+    };
+  });
+
   const formatDateKey = (date) => {
     return new Intl.DateTimeFormat("en-CA", {
       timeZone: "Asia/Seoul",
@@ -67,12 +88,17 @@ function WeeklyHabitRecordTable({ studyId }) {
     }).format(new Date(date));
   };
 
-  const monday = getMonday();
-
   const handleLoad = async () => {
     setIsLoading(true);
+
     try {
-      const response = await axios.get(`/study/${studyId}/habit/weekly`);
+      const date = formatDateKey(selectedDate);
+
+      const response = await axios.get(`/study/${studyId}/habit/weekly`, {
+        params: {
+          date,
+        },
+      });
 
       setWeeklyHabits(response.data);
     } catch (error) {
@@ -81,54 +107,116 @@ function WeeklyHabitRecordTable({ studyId }) {
     } finally {
       setIsLoading(false);
     }
-    
+  };
+
+  const handlePreviousWeek = () => {
+    setSelectedDate((prevDate) => {
+      const newDate = new Date(prevDate);
+      newDate.setDate(newDate.getDate() - 7);
+
+      return newDate;
+    });
+  };
+
+  const handleNextWeek = () => {
+    setSelectedDate((prevDate) => {
+      const newDate = new Date(prevDate);
+      newDate.setDate(newDate.getDate() + 7);
+
+      return newDate;
+    });
   };
 
   useEffect(() => {
     handleLoad();
-  }, []);
+  }, [studyId, selectedDate]);
 
   return (
     <>
       <div className="card_container inner_container">
-        <div className="modal_title left">습관 기록표</div>
+        <div className="modal_title left">
+          습관 기록표
+          <nav
+            className="focus-page__navigation"
+          >
+            <button
+              type="button"
+              className="focus-page__navigation-button"
+              onClick={() => console.log(1)}
+            >
+              <img
+                className="focus-page__navigation-icon"
+                src={arrowRightIcon}
+                style={{rotate: '180deg'}}
+                alt=""
+              />
+              <span style={{transform: 'translateY(2px)'}} onClick={handlePreviousWeek}>이전 주</span>
+            </button>
+
+            <button
+              type="button"
+              className="focus-page__navigation-button"
+              onClick={() => console.log(1)}
+            >
+              <span style={{transform: 'translateY(2px)'}} onClick={handleNextWeek}>다음 주</span>
+
+              <img
+                className="focus-page__navigation-icon"
+                src={arrowRightIcon}
+                alt=""
+              />
+            </button>
+          </nav>
+        </div>
         <div className="table_wrap">
-          { isLoading ? (
-            <div className="habit_state_message">습관 목록을 불러오는 중입니다.</div>
+          {isLoading ? (
+            <div className="habit_state_message">
+              습관 목록을 불러오는 중입니다.
+            </div>
           ) : weeklyHabits.length === 0 ? (
-            <div className="habit_state_message">아직 습관이 없어요.<br /> 오늘의 습관에서 습관을 생성해보세요.</div>
+            <div className="habit_state_message">
+              아직 습관이 없어요.
+              <br /> 오늘의 습관에서 습관을 생성해보세요.
+            </div>
           ) : (
             <>
               <div className="day_wrap">
-                <div className="day">월</div>
-                <div className="day">화</div>
-                <div className="day">수</div>
-                <div className="day">목</div>
-                <div className="day">금</div>
-                <div className="day">토</div>
-                <div className="day">일</div>
+                {week.map((item) => (
+                  <div
+                    className={`day ${item.isToday ? "today" : ""}`}
+                    key={item.day}
+                  >
+                    {item.label}
+                    <br />
+                    {item.day}
+                  </div>
+                ))}
               </div>
               {weeklyHabits.map((habit, habitIndex) => {
-                const recordsByDate = habit.habitRecords.reduce((map, record) => {
-                  const dateKey = formatDateKey(record.recordDate);
-                  const previousRecord = map.get(dateKey);
+                const recordsByDate = habit.habitRecords.reduce(
+                  (map, record) => {
+                    const dateKey = formatDateKey(record.recordDate);
+                    const previousRecord = map.get(dateKey);
 
-                  // 같은 날짜의 기록이 여러 개라면 최근 수정된 기록 사용
-                  if (
-                    !previousRecord ||
-                    new Date(record.updatedAt) > new Date(previousRecord.updatedAt)
-                  ) {
-                    map.set(dateKey, record);
-                  }
+                    // 같은 날짜의 기록이 여러 개라면 최근 수정된 기록 사용
+                    if (
+                      !previousRecord ||
+                      new Date(record.updatedAt) >
+                        new Date(previousRecord.updatedAt)
+                    ) {
+                      map.set(dateKey, record);
+                    }
 
-                  return map;
-                }, new Map());
+                    return map;
+                  },
+                  new Map(),
+                );
 
                 return (
                   <div className="weekly_habit_record_line" key={habit.id}>
                     <div className="habit_name">{habit.name}</div>
 
-                    {DAYS.map((day, dayIndex) => {
+                    {weekNames.map((day, dayIndex) => {
                       const targetDate = new Date(monday);
                       targetDate.setDate(monday.getDate() + dayIndex);
 
@@ -142,7 +230,9 @@ function WeeklyHabitRecordTable({ studyId }) {
                         >
                           <img
                             src={
-                              record?.isChecked ? images[habitIndex] : defaultIcon
+                              record?.isChecked
+                                ? images[habitIndex]
+                                : defaultIcon
                             }
                             alt={`${day}요일 습관 체크 아이콘`}
                             className="habit_record_icon"
