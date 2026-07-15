@@ -90,7 +90,7 @@ function WeeklyHabitRecordTable({ studyId }) {
 
   return (
     <>
-      <div className="card_container inner_container">
+      <div className="card_container inner_container weekly_habit_record_table">
         <div className="modal_title left">습관 기록표</div>
         <div className="table_wrap">
           { isLoading ? (

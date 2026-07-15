@@ -22,7 +22,7 @@
 
   background-color: var(--wh);
   border: 1px solid var(--gray);
-  border-radius: 12px;
+  border-radius: 20px;
   box-shadow: 0 6px 20px rgb(0 0 0 / 12%);
 
   transform: translateX(-50%);
