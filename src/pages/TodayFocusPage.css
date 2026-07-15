@@ -200,11 +200,24 @@
   }
 
   .focus-page__navigation {
+    display: grid;
+    grid-template-columns: 1fr 1.35fr 0.75fr;
     gap: 8px;
   }
 
-  .focus-page__navigation-button *{
-    font-size: 11pt;
+  .focus-page__navigation-button {
+    width: 100%;
+    min-width: 0;
+    padding: 0 8px;
+
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .focus-page__navigation-icon {
+    width: 16px;
+    height: 16px;
+    margin-left: 2px;
   }
 
   .focus-page__content {

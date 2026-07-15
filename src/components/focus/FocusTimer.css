@@ -70,3 +70,28 @@
 .btn span.shadow img {
   visibility: hidden;
 }
+
+.focus-timer__guide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin: 0;
+}
+
+.focus-timer__guide span {
+  white-space: nowrap;
+}
+
+@media (max-width: 479px) {
+  .focus-timer__guide {
+    flex-direction: column;
+    gap: 0;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .focus-timer__guide-separator {
+    display: none;
+  }
+}
