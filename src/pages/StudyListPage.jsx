@@ -3,8 +3,8 @@ import StudyCard from "../components/study/StudyCard";
 import RecentStudyList from "../components/study/RecentStudyList";
 import SearchSortBar from "../components/study/SearchSortBar";
 
-const API_BASE_URL = "http://127.0.0.1:3000";
-//const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+//const API_BASE_URL = "http://127.0.0.1:3000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const normalizeStudyItems = (data) => {
   if (Array.isArray(data)) {
