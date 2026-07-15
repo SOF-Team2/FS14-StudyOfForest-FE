@@ -133,7 +133,7 @@ function WeeklyHabitRecordTable({ studyId }) {
 
   return (
     <>
-      <div className="card_container inner_container">
+      <div className="card_container inner_container weekly_habit_record_table">
         <div className="modal_title left">
           습관 기록표
           <nav
@@ -142,23 +142,23 @@ function WeeklyHabitRecordTable({ studyId }) {
             <button
               type="button"
               className="focus-page__navigation-button"
-              onClick={() => console.log(1)}
+              onClick={handlePreviousWeek}
             >
               <img
                 className="focus-page__navigation-icon"
                 src={arrowRightIcon}
-                style={{rotate: '180deg'}}
+                style={{ rotate: "180deg" }}
                 alt=""
               />
-              <span style={{transform: 'translateY(2px)'}} onClick={handlePreviousWeek}>이전 주</span>
+              <span style={{ transform: "translateY(2px)" }}>이전 주</span>
             </button>
 
             <button
               type="button"
               className="focus-page__navigation-button"
-              onClick={() => console.log(1)}
+              onClick={handleNextWeek}
             >
-              <span style={{transform: 'translateY(2px)'}} onClick={handleNextWeek}>다음 주</span>
+              <span style={{ transform: "translateY(2px)" }}>다음 주</span>
 
               <img
                 className="focus-page__navigation-icon"

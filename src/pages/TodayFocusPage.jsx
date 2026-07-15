@@ -7,7 +7,7 @@ import FocusTimer from '../components/focus/FocusTimer.jsx';
 import FocusPoint from '../components/focus/FocusPoint.jsx';
 import FocusStatusAlert from '../components/focus/FocusStatusAlert.jsx';
 import arrowRightIcon from '../assets/img/ic_arrow_right.svg';
-import './TodayFocusPage.css';
+import { getStudyBackgroundStyle } from '../utils/studyBackground.js';
 
 function FocusPage() {
     const { id: studyId } = useParams();
@@ -19,6 +19,7 @@ function FocusPage() {
         studyName: '',
         currentPoint: 0,
     });
+    const [studyDetail, setStudyDetail] = useState({});
     const [isFocusLoading, setIsFocusLoading] = useState(true);
     const [focusLoadError, setFocusLoadError] = useState('');
 
@@ -43,10 +44,20 @@ function FocusPage() {
                     password,
                 });
 
+                const nextFocusData = response.data.data;
+
                 setFocusData({
-                    studyName: response.data.data.studyName,
-                    currentPoint: response.data.data.currentPoint,
+                    studyName: nextFocusData.studyName,
+                    currentPoint: nextFocusData.currentPoint,
                 });
+
+                try {
+                    const studyResponse = await axios.get(`/study/${studyId}`);
+                    setStudyDetail(studyResponse.data?.data ?? studyResponse.data ?? {});
+                } catch (studyError) {
+                    console.error('스터디 상세 조회 오류:', studyError);
+                    setStudyDetail({ name: nextFocusData.studyName });
+                }
             } catch (error) {
                 console.error('오늘의 집중 조회 오류:', error);
 
@@ -66,9 +77,14 @@ function FocusPage() {
         studyName,
         currentPoint,
     } = focusData;
+    const study = {
+        ...studyDetail,
+        name: studyDetail.name ?? studyName,
+    };
+    const studyDetailBackgroundStyle = getStudyBackgroundStyle(study);
 
     return (
-        <div className="focus-page">
+        <section>
             {isFocusLoading && (
                 <FocusStatusAlert
                     type="loading"
@@ -83,24 +99,22 @@ function FocusPage() {
                 />
             )}
 
-            <div className="focus-page__container">
-                <main className="focus-page__card">
-                    <section className="focus-page__study-header">
-                        <div className="focus-page__study-info">
-                            <h1 className="focus-page__study-name">
-                                {studyName}
-                            </h1>
+            <div className="inner">
+                <section className="study-detail-section card_container study-subpage-detail">
+                    <div
+                        className="study-detail-background-layer"
+                        style={studyDetailBackgroundStyle}
+                        aria-hidden="true"
+                    />
 
-                            <FocusPoint point={currentPoint} />
-                        </div>
-
+                    <div className="study-detail-content">
                         <nav
                             className="focus-page__navigation"
                             aria-label="스터디 페이지 이동"
                         >
                             <Link
-                                className="focus-page__navigation-button"
                                 to={`/study/${studyId}`}
+                                className="focus-page__navigation-button"
                             >
                                 <span>스터디</span>
 
@@ -112,8 +126,9 @@ function FocusPage() {
                             </Link>
 
                             <Link
-                                className="focus-page__navigation-button"
                                 to={`/study/${studyId}/habit`}
+                                state={{ password }}
+                                className="focus-page__navigation-button"
                             >
                                 <span>오늘의 습관</span>
 
@@ -123,39 +138,40 @@ function FocusPage() {
                                     alt=""
                                 />
                             </Link>
-
-                            <Link
-                                className="focus-page__navigation-button focus-page__navigation-button--home"
-                                to="/"
-                            >
-                                <span>홈</span>
-
-                                <img
-                                    className="focus-page__navigation-icon"
-                                    src={arrowRightIcon}
-                                    alt=""
-                                />
-                            </Link>
                         </nav>
-                    </section>
 
-                    <section className="focus-page__content">
-                        <h2 className="focus-page__section-title">
-                            오늘의 집중
-                        </h2>
-
-                        <div className="focus-page__timer-slot">
-                            <div className="focus-page__timer-placeholder">
-                                <FocusTimer
-                                    studyId={studyId}
-                                    password={password}
-                                />
+                        <div className="study-detail-secondary-actions">
+                            <div className="study-detail-current-point">
+                                <FocusPoint point={currentPoint} />
                             </div>
                         </div>
-                    </section>
-                </main>
+
+                        <div className="container_title">
+                            <div className="study-detail-title">
+                                {study.nickname && (
+                                    <>
+                                        <span>{study.nickname}</span>
+                                        <span>의</span>
+                                    </>
+                                )}
+                                <span>{study.name}</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div className="card_container inner_container">
+                        <div className="inner">
+                            <span className="container_title">오늘의 집중</span>
+                            <FocusTimer
+                                studyId={studyId}
+                                password={password}
+                            />
+                        </div>
+                    </div>
+                </section>
             </div>
-        </div>
+        </section>
     );
 }
 

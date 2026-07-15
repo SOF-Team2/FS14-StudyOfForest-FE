@@ -1,20 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import tagImg from "../../assets/img/ic_point.svg";
 import { addRecentStudy } from "../../utils/recentStudies";
-import bgDesk from "../../assets/img/bg_create_desk.svg";
-import bgWindow from "../../assets/img/bg_create_window.svg";
-import bgTiles from "../../assets/img/bg_create_tiles.svg";
-import bgLeaves from "../../assets/img/bg_create_leaves.svg";
-import { backgroundColorEnum } from "../../utils/enum/colorEnum";
+import {
+  getStudyBackgroundStyle,
+  isImageBackground,
+} from "../../utils/studyBackground.js";
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
-
-const IMAGE_BACKGROUND_MAP = {
-  desk: bgDesk,
-  window: bgWindow,
-  tiles: bgTiles,
-  leaves: bgLeaves,
-};
 
 const getStudyPoint = (study) => study.point ?? study.points ?? 0;
 
@@ -41,21 +33,6 @@ const getStudyEmojis = (study) => {
   return Array.isArray(emojis) ? emojis.slice(0, 3) : [];
 };
 
-const getCardStyle = (study) => {
-  if (study.backgroundType === "image") {
-    const imageUrl = IMAGE_BACKGROUND_MAP[study.backgroundValue];
-
-    return imageUrl
-      ? {
-          backgroundImage: `url("${imageUrl}")`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }
-      : {};
-  }
-  return { backgroundColor: study.backgroundValue };
-};
-
 const getNicknameStyle = (study) => {
   const color = study.backgroundValue;
 
@@ -73,8 +50,9 @@ const getNicknameStyle = (study) => {
 function StudyCard({ study }) {
   const navigate = useNavigate();
   const emojis = getStudyEmojis(study);
-  const cardstyle = getCardStyle(study);
+  const cardstyle = getStudyBackgroundStyle(study);
   const nicknameStyle = getNicknameStyle(study);
+  const backgroundTypeClassName = study.backgroundType?.toLowerCase() ?? "color";
 
   const handleClick = () => {
     addRecentStudy(study);
@@ -83,11 +61,11 @@ function StudyCard({ study }) {
 
   return (
     <div
-      className={study.backgroundType + " card"}
+      className={`${backgroundTypeClassName} card`}
       style={cardstyle}
       onClick={handleClick}
     >
-      {study.backgroundType === "image" && (
+      {isImageBackground(study) && (
         <div className="background_cover"></div>
       )}
       <div className="card_title_wrap">

@@ -2,20 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "../utils/axios.js";
 import AlertMessage from "../components/AlertMessage.jsx";
+import BackgroundSelector from "../components/study/BackgroundSelector.jsx";
 import useAlert from "../components/useAlert.js";
-import selectedIcon from "../assets/img/ic_bg_selected.png";
-import "./StudyCreatePage.css";
-
-const backgroundOptions = [
-  { id: "green", type: "color", value: "#E1EDDE", className: "study-create-bg-green" },
-  { id: "yellow", type: "color", value: "#FFF1CC", className: "study-create-bg-yellow" },
-  { id: "blue", type: "color", value: "#E0F1F5", className: "study-create-bg-blue" },
-  { id: "pink", type: "color", value: "#FDE0E9", className: "study-create-bg-pink" },
-  { id: "desk", type: "image", value: "desk", className: "study-create-bg-desk" },
-  { id: "window", type: "image", value: "window", className: "study-create-bg-window" },
-  { id: "tiles", type: "image", value: "tiles", className: "study-create-bg-tiles" },
-  { id: "leaves", type: "image", value: "leaves", className: "study-create-bg-leaves" },
-];
+import {
+  backgroundOptions,
+  createDefaultCustomBackground,
+  getBackgroundPayload,
+  getBackgroundSelectionFromStudy,
+} from "../utils/studyBackground.js";
 
 const initialFormValues = {
   nickname: "",
@@ -51,26 +45,15 @@ const normalizeSubmitErrorMessage = (error) => {
   return error.message || "스터디 수정에 실패했습니다.";
 };
 
-const getSelectedBackgroundId = (study) => {
-  const backgroundType = study?.backgroundType ?? "";
-  const backgroundValue = study?.backgroundValue ?? "";
-  const normalizedBackgroundValue = backgroundValue.toLowerCase();
-
-  const matchedOption = backgroundOptions.find((option) => (
-    (option.type === backgroundType && option.value === backgroundValue)
-    || option.id === normalizedBackgroundValue
-    || option.value.toLowerCase() === normalizedBackgroundValue
-  ));
-
-  return matchedOption?.id ?? backgroundOptions[0].id;
-};
-
 function StudyEditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showAlert } = useAlert();
   const [formValues, setFormValues] = useState(initialFormValues);
   const [selectedBackground, setSelectedBackground] = useState(backgroundOptions[0].id);
+  const [customBackground, setCustomBackground] = useState(
+    createDefaultCustomBackground,
+  );
   const [visiblePasswords, setVisiblePasswords] = useState({
     currentPassword: false,
     newPassword: false,
@@ -109,7 +92,10 @@ function StudyEditPage() {
           newPassword: "",
           newPasswordConfirm: "",
         });
-        setSelectedBackground(getSelectedBackgroundId(study));
+        const backgroundSelection = getBackgroundSelectionFromStudy(study);
+
+        setSelectedBackground(backgroundSelection.selectedBackground);
+        setCustomBackground(backgroundSelection.customBackground);
       } catch (error) {
         if (error.name === "AbortError" || error.code === "ERR_CANCELED") {
           return;
@@ -219,15 +205,22 @@ function StudyEditPage() {
       return;
     }
 
-    const selectedBackgroundOption = (
-      backgroundOptions.find((option) => option.id === selectedBackground) ?? backgroundOptions[0]
+    const backgroundPayload = getBackgroundPayload(
+      selectedBackground,
+      customBackground,
     );
+
+    if (!backgroundPayload) {
+      setSubmitErrorMessage("업로드한 배경 사진을 확인해주세요.");
+      return;
+    }
+
     const payload = {
       nickname: formValues.nickname.trim(),
       name: formValues.studyName.trim(),
       description: formValues.description.trim(),
-      backgroundType: selectedBackgroundOption.type,
-      backgroundValue: selectedBackgroundOption.value,
+      backgroundType: backgroundPayload.type,
+      backgroundValue: backgroundPayload.value,
     };
 
     if (changePassword) {
@@ -308,7 +301,7 @@ function StudyEditPage() {
               onClose={() => setSubmitErrorMessage("")}
             />
 
-            <div className="study-create-field">
+            <div className="study-create-field study-create-field--nickname">
               <label htmlFor="nickname">닉네임</label>
               <div className="study-create-control">
                 <input
@@ -330,7 +323,7 @@ function StudyEditPage() {
               </div>
             </div>
 
-            <div className="study-create-field">
+            <div className="study-create-field study-create-field--study-name">
               <label htmlFor="studyName">스터디 이름</label>
               <div className="study-create-control">
                 <input
@@ -352,7 +345,7 @@ function StudyEditPage() {
               </div>
             </div>
 
-            <div className="study-create-field">
+            <div className="study-create-field study-create-field--description">
               <label htmlFor="description">소개</label>
               <div className="study-create-control">
                 <textarea
@@ -373,35 +366,15 @@ function StudyEditPage() {
               </div>
             </div>
 
-            <fieldset className="study-create-background">
-              <legend>배경을 선택해주세요</legend>
-              <div className="study-create-background-grid">
-                {backgroundOptions.map((option) => {
-                  const isSelected = selectedBackground === option.id;
+            <BackgroundSelector
+              selectedBackground={selectedBackground}
+              customBackground={customBackground}
+              onSelectedBackgroundChange={setSelectedBackground}
+              onCustomBackgroundChange={setCustomBackground}
+              onError={setSubmitErrorMessage}
+            />
 
-                  return (
-                    <label className="study-create-background-option" key={option.id}>
-                      <input
-                        type="radio"
-                        name="background"
-                        value={option.value}
-                        data-background-type={option.type}
-                        checked={isSelected}
-                        onChange={() => setSelectedBackground(option.id)}
-                      />
-                      <span
-                        className={`study-create-background-tile ${option.className ?? ""}`}
-                        aria-hidden="true"
-                      >
-                        {isSelected && <img src={selectedIcon} alt="" />}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            </fieldset>
-
-            <div className="study-create-field">
+            <div className="study-create-field study-create-field--password-toggle">
               <label className="study-edit-password-checkbox">
                 <input
                   type="checkbox"
@@ -414,7 +387,7 @@ function StudyEditPage() {
 
             {changePassword && (
               <>
-                <div className="study-create-field">
+                <div className="study-create-field study-create-field--current-password">
                   <label htmlFor="currentPassword">현재 비밀번호</label>
                   <div className="study-create-control">
                     <div className="study-create-password">
@@ -451,7 +424,7 @@ function StudyEditPage() {
                   </div>
                 </div>
 
-                <div className="study-create-field">
+                <div className="study-create-field study-create-field--new-password">
                   <label htmlFor="newPassword">새 비밀번호</label>
                   <div className="study-create-control">
                     <div className="study-create-password">
@@ -483,7 +456,7 @@ function StudyEditPage() {
                   </div>
                 </div>
 
-                <div className="study-create-field">
+                <div className="study-create-field study-create-field--new-password-confirm">
                   <label htmlFor="newPasswordConfirm">새 비밀번호 확인</label>
                   <div className="study-create-control">
                     <div className="study-create-password">
