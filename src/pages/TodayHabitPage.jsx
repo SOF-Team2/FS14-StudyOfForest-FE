@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import axios from "../utils/axios.js";
 import HabitList from "../components/habit/HabitList.jsx";
 import HabitEditModal from "../components/habit/HabitEditModal.jsx";
@@ -7,7 +7,10 @@ import CurrentTime from "../components/habit/CurrentTime.jsx";
 import arrowRight from "../assets/img/ic_arrow_right.svg";
 import { useLoading } from "../contexts/LoadingContext.jsx";
 
+
 function TodayHabitPage() {
+  const location = useLocation();
+  const password = location.state?.password;
   const { startLoading, endLoading } = useLoading();
   const [isHabitLoading, setIsHabitLoading] = useState(true)
   const { id } = useParams();
@@ -47,7 +50,7 @@ function TodayHabitPage() {
               <Link to={`/study/${id}`} className="link_btn">스터디
                 <img src={arrowRight} alt="링크 버튼 장식" />
               </Link>
-              <Link to={`/study/${id}/focus`} className="link_btn">오늘의 집중
+              <Link to={`/study/${id}/focus`} state={{ password }} className="link_btn">오늘의 집중
                 <img src={arrowRight} alt="링크 버튼 장식" />
               </Link>
               <Link to={"/"} className="link_btn">홈
