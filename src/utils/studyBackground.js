@@ -64,7 +64,7 @@ const IMAGE_BACKGROUND_MAP = {
 };
 
 const CUSTOM_BACKGROUND_KIND = "custom-image";
-const TARGET_CUSTOM_BACKGROUND_BYTES = 256 * 1024;
+const TARGET_CUSTOM_BACKGROUND_BYTES = 80 * 1024;
 const MAX_ORIGINAL_IMAGE_FILE_SIZE = 30 * 1024 * 1024;
 const DEFAULT_CUSTOM_LAYOUT = {
   fit: "cover",
@@ -337,5 +337,5 @@ export const createCustomBackgroundFromFile = async (file, previousLayout) => {
     }
   }
 
-  throw new Error("이미지를 256KB 이하로 자동 압축하지 못했습니다. 더 작은 이미지를 업로드해주세요.");
+  throw new Error("이미지를 80KB 이하로 자동 압축하지 못했습니다. 더 작은 이미지를 업로드해주세요.");
 };
