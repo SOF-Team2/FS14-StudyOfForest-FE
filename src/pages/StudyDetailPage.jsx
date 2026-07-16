@@ -3,11 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import AlertMessage from "../components/AlertMessage.jsx";
 import tagImg from "../assets/img/ic_point.svg";
-import "./StudyCreatePage.css";
 import "../style.css";
 import WeeklyHabitRecordTable from "../components/habit/WeeklyHabitRecordTable.jsx";
 import arrowRightIcon from "../assets/img/ic_arrow_right.svg";
+import plusIcon from "../assets/img/ic_plus.svg";
 import useAlert from "../components/useAlert.js";
+import { getStudyBackgroundStyle } from "../utils/studyBackground.js";
 
 //const API_BASE_URL = "http://127.0.0.1:3000";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -244,117 +245,19 @@ const StudyDetailPage = () => {
       showAlert("주소복사실패");
     }
   };
+  const studyDetailBackgroundStyle = getStudyBackgroundStyle(study);
 
   return (
     <section>
       <div className="inner">
         <section className="study-detail-section card_container">
-          <div className="emoji_line">
-            <div
-              className="emoji-container"
-              ref={emojiRef}
-              style={{ marginBottom: "24px" }}
-            >
-              {/* 화면에 기본으로 보여줄 이모지 3개 */}
-              {visibleEmoji.map((item) => (
-                <button
-                  type="button"
-                  key={item.emoji}
-                  className="emoji-item"
-                  onClick={() => handleEmojiClick(item.emoji)}
-                >
-                  <span>{item.emoji}</span>
-                  <span>{item.count}</span>
-                </button>
-              ))}
+          <div
+            className="study-detail-background-layer"
+            style={studyDetailBackgroundStyle}
+            aria-hidden="true"
+          />
 
-              {/* 숨겨진 이모지 목록 */}
-              {hiddenEmoji.length > 0 && (
-                <div className="emoji-more-wrapper">
-                  <button
-                    type="button"
-                    className="emoji-more-button"
-                    onClick={() => {
-                      setIsEmojiMoreOpen((prev) => !prev);
-                      setIsEmojiOpen(false);
-                    }}
-                  >
-                    +{hiddenEmoji.length}...
-                  </button>
-
-                  {isEmojiMoreOpen && (
-                    <div className="more-emoji-list">
-                      {hiddenEmoji.map((item) => (
-                        <button
-                          type="button"
-                          key={item.emoji}
-                          className="emoji-item"
-                          onClick={() => {
-                            handleEmojiClick(item.emoji);
-                            setIsEmojiOpen(false);
-                            setIsEmojiMoreOpen(false);
-                          }}
-                        >
-                          <span>{item.emoji}</span>
-                          <span>{item.count}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* 이모지 추가 */}
-              <div className="emoji-add-wrapper">
-                <button
-                  type="button"
-                  className="emoji-add-button"
-                  onClick={() => {
-                    setIsEmojiOpen((prev) => !prev);
-                    setIsEmojiMoreOpen(true);
-                  }}
-                >
-                  <span></span>
-                  <span>추가</span>
-                </button>
-
-                {isEmojiOpen && (
-                  <div className="emoji-picker">
-                    <EmojiPicker
-                      onEmojiClick={(emojiData) => {
-                        handleEmojiClick(emojiData.emoji);
-                        // setIsEmojiOpen(false);
-                        // setIsEmojiMoreOpen(true);
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="study-menu-buttons">
-              <button type="button" onClick={handleShare}>
-                공유하기
-              </button>
-              <span className="dec_line">|</span>
-
-              <button
-                type="button"
-                onClick={() => handleOpenPasswordModal(`/study/${id}/edit`)}
-              >
-                수정하기
-              </button>
-              <span className="dec_line">|</span>
-              <button
-                className="delete"
-                type="button"
-                onClick={() => handleOpenPasswordModal("", "delete")}
-              >
-                삭제하기
-              </button>
-            </div>
-          </div>
-          <div className="container_title">
-            {study.nickname} 의 {study.name}
+          <div className="study-detail-content">
             <nav
               className="focus-page__navigation"
               aria-label="스터디 페이지 이동"
@@ -387,42 +290,158 @@ const StudyDetailPage = () => {
                 />
               </button>
             </nav>
-          </div>
 
-          <div>
-            <span
-              style={{ fontSize: "18px", color: "#818181", fontWieht: "300" }}
-            >
-              소개
-            </span>
-            <p
-              style={{
-                display: "block",
-                margin: "8px 0 24px",
-                fontSize: "18px",
-              }}
-            >
-              {study.description}
-            </p>
-          </div>
+            <div className="study-detail-secondary-actions">
+              <div className="study-detail-point-summary">
+                <span>획득한 포인트</span>
+                <div className="tag point_tag">
+                  <img src={tagImg} alt="태그 장식" />
+                  {study.point} P
+                </div>
+              </div>
 
-          <div>
-            <span
-              style={{
-                display: "block",
-                fontSize: "18px",
-                color: "#818181",
-                fontWeight: "300",
-                marginBottom: "8px",
-              }}
-            >
-              현재까지 획득한 포인트
-            </span>
-            <div className="tag point_tag" style={{ marginBottom: "40px" }}>
-              <img src={tagImg} alt="태그 장식" />
-              {study.point}P 획득
+              <div className="study-menu-buttons">
+                <button
+                  type="button"
+                  onClick={() => handleOpenPasswordModal(`/study/${id}/edit`)}
+                >
+                  수정하기
+                </button>
+                <span className="dec_line">|</span>
+
+                <button
+                  className="delete"
+                  type="button"
+                  onClick={() => handleOpenPasswordModal("", "delete")}
+                >
+                  삭제하기
+                </button>
+                <span className="dec_line">|</span>
+                <button type="button" onClick={handleShare}>
+                  공유하기
+                </button>
+              </div>
             </div>
+
+            <div className="emoji_line">
+              <div
+                className="emoji-container"
+                ref={emojiRef}
+                style={{ marginBottom: "24px" }}
+              >
+                {/* 화면에 기본으로 보여줄 이모지 3개 */}
+                {visibleEmoji.map((item) => (
+                  <button
+                    type="button"
+                    key={item.emoji}
+                    className="emoji-item"
+                    onClick={() => handleEmojiClick(item.emoji)}
+                  >
+                    <span>{item.emoji}</span>
+                    <span>{item.count}</span>
+                  </button>
+                ))}
+
+                {/* 숨겨진 이모지 목록 */}
+                {hiddenEmoji.length > 0 && (
+                  <div className="emoji-more-wrapper">
+                    <button
+                      type="button"
+                      className="emoji-more-button"
+                      onClick={() => {
+                        setIsEmojiMoreOpen((prev) => !prev);
+                        setIsEmojiOpen(false);
+                      }}
+                    >
+                      +{hiddenEmoji.length}...
+                    </button>
+
+                    {isEmojiMoreOpen && (
+                      <div className="more-emoji-list">
+                        {hiddenEmoji.map((item) => (
+                          <button
+                            type="button"
+                            key={item.emoji}
+                            className="emoji-item"
+                            onClick={() => {
+                              handleEmojiClick(item.emoji);
+                              setIsEmojiOpen(false);
+                              setIsEmojiMoreOpen(false);
+                            }}
+                          >
+                            <span>{item.emoji}</span>
+                            <span>{item.count}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 이모지 추가 */}
+                <div
+                  className={`emoji-add-wrapper${isEmojiOpen ? " is-open" : ""}`}
+                >
+                  <button
+                    type="button"
+                    className="emoji-add-button"
+                    aria-label="이모지 추가"
+                    onClick={() => {
+                      setIsEmojiOpen((prev) => !prev);
+                      setIsEmojiMoreOpen(true);
+                    }}
+                  >
+                    <img
+                      className="emoji-add-icon"
+                      src={plusIcon}
+                      alt=""
+                      aria-hidden="true"
+                    />
+                  </button>
+
+                  {isEmojiOpen && (
+                    <div className="emoji-picker">
+                      <EmojiPicker
+                        onEmojiClick={(emojiData) => {
+                          handleEmojiClick(emojiData.emoji);
+                          // setIsEmojiOpen(false);
+                          // setIsEmojiMoreOpen(true);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="container_title">
+              <div className="study-detail-title">
+                <span>{study.nickname}</span>
+                <span>의</span>
+                <span>{study.name}</span>
+              </div>
+            </div>
+
+            <div>
+              <span
+                style={{ fontSize: "22px", color: "#000000", fontWeight: "300" }}
+              >
+                소개
+              </span>
+              <p
+                style={{
+                  display: "block",
+                  margin: "8px 0 24px",
+                  fontSize: "18px",
+                  color: "#000000",
+                }}
+              >
+                {study.description}
+              </p>
+            </div>
+
           </div>
+
           <WeeklyHabitRecordTable studyId={id} />
         </section>
 

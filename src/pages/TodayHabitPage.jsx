@@ -4,18 +4,19 @@ import axios from "../utils/axios.js";
 import HabitList from "../components/habit/HabitList.jsx";
 import HabitEditModal from "../components/habit/HabitEditModal.jsx";
 import CurrentTime from "../components/habit/CurrentTime.jsx";
-import arrowRight from "../assets/img/ic_arrow_right.svg";
+import arrowRightIcon from "../assets/img/ic_arrow_right.svg";
 import { useLoading } from "../contexts/LoadingContext.jsx";
+import { getStudyBackgroundStyle } from "../utils/studyBackground.js";
 
 
 function TodayHabitPage() {
   const location = useLocation();
   const password = location.state?.password;
   const { startLoading, endLoading } = useLoading();
-  const [isHabitLoading, setIsHabitLoading] = useState(true)
+  const [isHabitLoading, setIsHabitLoading] = useState(true);
   const { id } = useParams();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [study, setStudy] = useState([]);
+  const [study, setStudy] = useState({});
   const [habits, setHabits] = useState([]);
 
   const handleLoad = async () => {
@@ -36,29 +37,79 @@ function TodayHabitPage() {
   };
 
   useEffect(() => {
-    handleLoad();
+    const loadTimer = window.setTimeout(() => {
+      handleLoad();
+    }, 0);
+
+    return () => window.clearTimeout(loadTimer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const studyDetailBackgroundStyle = getStudyBackgroundStyle(study);
 
   return (
     <section>
       <div className="inner">
-        <div className="card_container">
-          <div className="container_title_wrap">
-            <span className="container_title">{study.name}</span>
+        <section className="study-detail-section card_container study-subpage-detail study-habit-detail">
+          <div
+            className="study-detail-background-layer"
+            style={studyDetailBackgroundStyle}
+            aria-hidden="true"
+          />
 
-            <div className="link_wrap">
-              <Link to={`/study/${id}`} className="link_btn">스터디
-                <img src={arrowRight} alt="링크 버튼 장식" />
+          <div className="study-detail-content">
+            <nav
+              className="focus-page__navigation"
+              aria-label="스터디 페이지 이동"
+            >
+              <Link
+                to={`/study/${id}`}
+                className="focus-page__navigation-button"
+              >
+                <span>스터디</span>
+
+                <img
+                  className="focus-page__navigation-icon"
+                  src={arrowRightIcon}
+                  alt=""
+                />
               </Link>
-              <Link to={`/study/${id}/focus`} state={{ password }} className="link_btn">오늘의 집중
-                <img src={arrowRight} alt="링크 버튼 장식" />
+
+              <Link
+                to={`/study/${id}/focus`}
+                state={{ password }}
+                className="focus-page__navigation-button"
+              >
+                <span>오늘의 집중</span>
+
+                <img
+                  className="focus-page__navigation-icon"
+                  src={arrowRightIcon}
+                  alt=""
+                />
               </Link>
-              <Link to={"/"} className="link_btn">홈
-                <img src={arrowRight} alt="링크 버튼 장식" />
-              </Link>
+            </nav>
+
+            <div className="study-detail-secondary-actions">
+              <div className="study-detail-current-time">
+                <CurrentTime />
+              </div>
             </div>
+
+            <div className="container_title">
+              <div className="study-detail-title">
+                {study.nickname && (
+                  <>
+                    <span>{study.nickname}</span>
+                    <span>의</span>
+                  </>
+                )}
+                <span>{study.name}</span>
+              </div>
+            </div>
+
           </div>
-          <CurrentTime />
+
           <div className="card_container inner_container today_habit_card">
             <div className="inner">
               <span className="container_title">오늘의 습관</span>
@@ -76,7 +127,7 @@ function TodayHabitPage() {
               />
             </div>
           </div>
-        </div>
+        </section>
       </div>
       {isEditModalOpen && (
                 <HabitEditModal
