@@ -58,6 +58,8 @@ body { background-color: var(--bg-color); }
 a { color: inherit; text-decoration: none; }
 .inner { width: 1200px; margin: 0 auto; }
 input:focus { outline-color: var(--brand); }
+.bold { font-weight: 700; }
+.green { color: var(--green-text); }
 
 /* 헤더 */
 #header .inner { display: flex; flex-direction: row; justify-content: space-between; height: 100px; padding: 20px 0; }
@@ -83,6 +85,7 @@ input:focus { outline-color: var(--brand); }
 .card_container.inner_container { border: 1px solid var(--gray); }
 .card_container.inner_container .inner { position: relative; max-width: 400px; }
 .container_title { display: flex; flex-direction: row; justify-content: space-between; color: var(--black); font-family: var(--font1); font-size: 32px; font-weight: 700; margin-bottom: 30px; }
+.container_title.dec { padding-left: 30px; border-left: 10px solid var(--brand); }
 .emoji_line { display: flex; flex-direction: row; justify-content: space-between; }
 .study-detail-point-summary {
   display: grid;
