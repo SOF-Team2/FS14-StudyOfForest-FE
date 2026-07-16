@@ -13,8 +13,8 @@ function StudyRanking() {
     }  
   };
 
-  const topStudyRankings = studyRanking.slice(0, 3);
-  const otherStudyRankings = studyRanking.slice(3, 10);
+  const topStudyRanking = studyRanking.slice(0, 3);
+  const otherStudyRanking = studyRanking.slice(3, 10);
 
   useEffect(() => {
     getStudyRanking();
@@ -23,12 +23,12 @@ function StudyRanking() {
   return (
     <div>
       <span>스터디 랭킹</span>
-      {topStudyRankings.map((study) => (
+      {topStudyRanking.map((study) => (
         <div key={study.id}>
           {study.rank}위 {study.name} {study.point}P
         </div>
       ))}
-      {otherStudyRankings.map((study) => (
+      {otherStudyRanking.map((study) => (
         <div key={study.id}>
           {study.rank}위 {study.name} {study.point}P
         </div>
