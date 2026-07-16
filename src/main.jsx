@@ -7,6 +7,7 @@ import StudyListPage from "./pages/StudyListPage.jsx";
 import StudyDetailPage from "./pages/StudyDetailPage.jsx";
 import StudyEditPage from "./pages/StudyEditPage";
 import TodayFocusPage from "./pages/TodayFocusPage.jsx";
+import RangkingPage from "./pages/RankingPage.jsx";
 import { LoadingProvider } from "./contexts/LoadingContext.jsx";
 import GlobalLoading from "./components/GlobalLoading.jsx";
 
@@ -23,6 +24,7 @@ function Main() {
               <Route path="study/:id/edit" element={<StudyEditPage />} />
               <Route path="study/:id/habit" element={<TodayHabitPage />} />
               <Route path="study/:id/focus" element={<TodayFocusPage />} />
+              <Route path="ranking" element={<RangkingPage />} />
             </Route>
           </Routes>
         </BrowserRouter>
