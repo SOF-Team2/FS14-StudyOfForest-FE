@@ -53,7 +53,7 @@ style.css 구성표
 * { margin: 0; padding: 0; box-sizing: border-box; 
   font-family: var(--font1);
    font-weight: 300; }
-html { min-width: 320px; background-color: var(--bg-color); }
+html { min-width: 428px; background-color: var(--bg-color); }
 body { background-color: var(--bg-color); }
 a { color: inherit; text-decoration: none; }
 .inner { width: 1200px; margin: 0 auto; }
