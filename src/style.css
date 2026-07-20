@@ -474,6 +474,7 @@ input:focus { outline-color: var(--brand); }
   color: #4f7841;
   font-size: 20px;
   font-weight: 700;
+  padding-top: 7px;
   background-color: rgba(255, 255, 255, 0.7);
 }
 
