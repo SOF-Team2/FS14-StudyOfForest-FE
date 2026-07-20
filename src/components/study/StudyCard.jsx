@@ -61,7 +61,7 @@ function StudyCard({ study }) {
 
   return (
     <div
-      className={`${backgroundTypeClassName} card`}
+      className={`${backgroundTypeClassName} card study-card`}
       style={cardstyle}
       onClick={handleClick}
     >

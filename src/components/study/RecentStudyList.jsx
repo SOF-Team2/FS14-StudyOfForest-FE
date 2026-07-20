@@ -58,7 +58,11 @@ function RecentStudyList() {
       <span className="container_title">최근 조회한 스터디</span>
       <div className="card_wrap">
         {studies.length > 0 ? (
-          studies.map((study) => <StudyCard key={study.id} study={study} />)
+          studies.map((study) => (
+            <div className="recent-study-card-slot" key={study.id}>
+              <StudyCard study={study} />
+            </div>
+          ))
         ) : (
           <p className="list_state_message">아직 조회한 스터디가 없어요</p>
         )}

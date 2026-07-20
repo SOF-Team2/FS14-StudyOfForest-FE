@@ -1,69 +1,57 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import logoImage from "../assets/img/logo.png";
 import userIcon from "../assets/img/ic_user.svg";
-import { useState } from "react";
+import Button from "./Button.jsx";
 import UserMenu from "./user/UserMenu";
 
 function Header() {
   const { pathname } = useLocation();
   const isAuthPage =
-    pathname === "/" ||
     pathname === "/signin" ||
     pathname === "/signup";
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
   const toggleIsUserMenuOpen = () => {
-    setIsUserMenuOpen(!isUserMenuOpen);
-  }
+    setIsUserMenuOpen((isOpen) => !isOpen);
+  };
 
   return (
     <>
       {!isAuthPage && (
-      <header id="header">
-        <div className="inner">
-          <Link to="/" className="logo">
-            <img src={logoImage} alt="공부의 숲 로고 이미지" />
-          </Link>
-            {/* <Link to="/study-create" className="create_study_btn btn">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="252"
-                height="54"
-                viewBox="0 0 252 54"
-                preserveAspectRatio="none"
-                fill="none"
+        <header id="header">
+          <div className="inner">
+            <Link to="/" className="logo">
+              <img src={logoImage} alt="공부의 숲 로고 이미지" />
+            </Link>
+
+            <div className="header-actions">
+              <Button
+                as={Link}
+                to="/study-create"
+                className="create_study_btn"
               >
-                <path
-                  d="M25.6491 0.0324321C27.1731 0.0684321 230.297 0.00243214 232.523 0.0324321C237.269 0.110432 248.513 -0.00356827 250.745 8.79843C253.349 19.0764 251.243 40.9404 250.247 44.5764C249.257 48.2124 247.523 53.9964 238.517 53.9964H16.0851C14.5971 53.9964 3.19715 53.4204 1.21115 42.5124C-0.768853 31.6104 0.221147 16.5744 0.449147 13.3104C0.677147 10.0524 1.29515 1.04043 12.3651 0.374432C19.2411 -0.0335681 22.8951 -0.0335679 25.6491 0.0324321Z"
-                  fill="#578246"
-                />
-              </svg>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="252"
-                height="54"
-                viewBox="0 0 252 54"
-                preserveAspectRatio="none"
-                fill="none"
-                className="shadow"
-              >
-                <path
-                  d="M25.6491 0.0296702C27.1731 0.0656702 230.297 -0.000329804 232.523 0.0296702C237.269 0.10767 248.513 -0.00632973 250.745 8.79567C253.349 19.0737 251.243 40.9377 250.247 44.5737C249.257 48.2097 247.523 53.9937 238.517 53.9937H16.0851C14.5971 53.9937 3.19715 53.4177 1.21115 42.5097C-0.768853 31.6077 0.221147 16.5717 0.449147 13.3077C0.677147 10.0497 1.29515 1.03767 12.3651 0.37767C19.2471 -0.0363298 22.9011 -0.0303298 25.6491 0.0296702Z"
-                  fill="#99C08E"
-                />
-              </svg>
-              <span className="shadow">스터디 만들기</span>
-              <span>스터디 만들기</span>
-            </Link> */}
-            <div className="user_wrap">
-              <div className="user_pic_wrap" onClick={toggleIsUserMenuOpen}>
-                <img src={userIcon} alt="유저 아이콘" />
+                스터디 만들기
+              </Button>
+
+              <div className="user_wrap">
+                <button
+                  className="user_pic_wrap"
+                  type="button"
+                  aria-label="사용자 메뉴 열기"
+                  aria-expanded={isUserMenuOpen}
+                  onClick={toggleIsUserMenuOpen}
+                >
+                  <img src={userIcon} alt="" />
+                </button>
+                {isUserMenuOpen && (
+                  <UserMenu toggleIsUserMenuOpen={toggleIsUserMenuOpen} />
+                )}
               </div>
-              {isUserMenuOpen && (
-                <UserMenu toggleIsUserMenuOpen={toggleIsUserMenuOpen}/>
-              )}
             </div>
-        </div>
-      </header>)}
+          </div>
+        </header>
+      )}
     </>
   );
 }

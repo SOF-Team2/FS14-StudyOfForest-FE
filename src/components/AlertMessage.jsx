@@ -9,12 +9,13 @@ function AlertMessage({
   }
 
   const isError = variant === "error";
+  const isLoading = variant === "loading";
 
   return (
     <div
       className={`study-create-notice ${isError ? "is-error" : ""} ${
-        status === "closing" ? "is-closing" : ""
-      }`}
+        isLoading ? "is-loading" : ""
+      } ${status === "closing" ? "is-closing" : ""}`}
       role={isError ? "alert" : "status"}
       aria-live={isError ? "assertive" : "polite"}
     >

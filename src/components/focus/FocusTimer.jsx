@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 
 import axios from '../../utils/axios.js';
-import FocusResultToast from './FocusResultToast.jsx';
-import FocusButton from './FocusButton';
+import Button from '../Button.jsx';
+import useAlert from '../useAlert.js';
 import playIcon from '../../assets/img/ic_play.svg';
 import pauseIcon from '../../assets/img/ic_pause.svg';
 import stopIcon from '../../assets/img/ic_pause (1).svg';
@@ -16,7 +16,7 @@ export default function FocusTimer({ studyId, password }) {
   const [settingMinutes, setSettingMinutes] = useState(25);  // 설정한 분
   const [settingSeconds, setSettingSeconds] = useState(0);   // 설정한 초
   const [isEditing, setIsEditing] = useState(false);         // 수정할 때 쓴 거 
-  const [toast, setToast] = useState(null);
+  const { showAlert } = useAlert();
 
 
   const totalSettingSeconds = settingMinutes * 60 + settingSeconds;
@@ -39,9 +39,9 @@ export default function FocusTimer({ studyId, password }) {
 
   useEffect(() => {
     if (isRunning && remainingSeconds === 0) {
-      setToast({ resultType: 'goalAchieved' });
+      showAlert('목표 시간 달성! 10분 더 집중할 때마다 1P가 추가돼요.');
     }
-  }, [remainingSeconds, isRunning]);
+  }, [remainingSeconds, isRunning, showAlert]);
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -74,19 +74,6 @@ export default function FocusTimer({ studyId, password }) {
     };
   }, [isStarted, isRunning, isEditing]);
 
-  // 토스트가 뜨면 3초 뒤 자동으로 사라짐
-  useEffect(() => {
-    if (!toast) return;   // 토스트가 없으면 아무것도 안 함
-
-    const timeoutId = setTimeout(() => {
-      setToast(null);
-    }, 3000);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [toast]);
-
   function formatTime(totalSeconds) {
     const isNegative = totalSeconds < 0;
     const abs = Math.abs(totalSeconds);
@@ -103,7 +90,6 @@ export default function FocusTimer({ studyId, password }) {
   }
 
   function handleStart() {
-    setToast(null);
     setIsRunning(true);
     setIsStarted(true);
   }
@@ -118,7 +104,7 @@ export default function FocusTimer({ studyId, password }) {
 
   async function handleFinish() {
     if (!isCompleted) {
-      setToast({ resultType: 'interrupted' });
+      showAlert('집중이 중단되었습니다.', 'error');
       handleReset();
       return;
     }
@@ -138,10 +124,7 @@ export default function FocusTimer({ studyId, password }) {
 
       console.log('집중 성공:', response.data);
 
-      setToast({
-        resultType: 'success',
-        earnedPoint: point,
-      });
+      showAlert(`${point}포인트를 획득했습니다!`);
     } catch (error) {
       console.error(
         '포인트 업데이트 실패:',
@@ -211,27 +194,20 @@ export default function FocusTimer({ studyId, password }) {
         </div>
       )}
 
-      {toast && (
-        <FocusResultToast
-          resultType={toast.resultType}
-          earnedPoint={toast.earnedPoint}
-        />
-      )}
-
       <div className="focus-timer__buttons">
         {!isStarted ? (
-          <FocusButton onClick={handleStart}><img src={playIcon} alt="" />시작</FocusButton>
+          <Button onClick={handleStart}><img src={playIcon} alt="" />시작</Button>
         ) : (
           <>
             {isRunning ? (
-              <FocusButton onClick={handlePause}><img src={pauseIcon} alt="" />일시정지</FocusButton>
+              <Button onClick={handlePause}><img src={pauseIcon} alt="" />일시정지</Button>
             ) : (
-              <FocusButton onClick={handleResume}><img src={playIcon} alt="" />계속</FocusButton>
+              <Button onClick={handleResume}><img src={playIcon} alt="" />계속</Button>
             )}
-            <FocusButton onClick={handleFinish}>
+            <Button onClick={handleFinish}>
               <img src={stopIcon} alt="" />
               {isCompleted ? '완료' : '정지'}
-            </FocusButton>
+            </Button>
           </>
         )}
       </div>

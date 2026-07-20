@@ -19,7 +19,8 @@ function Main() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<App />}>
-              <Route index element={<SignInPage />} />
+              <Route index element={<StudyListPage />} />
+              <Route path="signin" element={<SignInPage />} />
               <Route path="home" element={<StudyListPage />} />
               <Route path="user/dashboard" element={<DashboardPage />} />
               <Route path="study-create" element={<StudyCreatePage />} />

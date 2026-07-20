@@ -64,13 +64,14 @@ input:focus { outline-color: var(--brand); }
 
 /* 헤더 */
 #header .inner { display: flex; flex-direction: row; justify-content: space-between; height: 100px; padding: 20px 0; }
+#header .header-actions { display: flex; align-items: center; gap: 16px; }
 #header .logo { display: block; width: 182px; height: 60px; }
 #header .logo img { display: block; width: 100%; height: 100%; object-fit: contain; }
 
 #header.auth_header .inner { justify-content: center; padding-top: 120px; }
 
 /* 버튼 */
-.btn { position: relative; display: flex; flex-direction: column; justify-content: center; width: 252px; height: 53px; text-align: center; margin-top: 3px; cursor: pointer; }
+.btn { position: relative; display: flex; flex-direction: column; justify-content: center; width: 252px; height: 53px; padding: 0; border: 0; background: transparent; font: inherit; text-align: center; margin-top: 3px; cursor: pointer; }
 .btn svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
 .btn svg.shadow { top: -3px; }
 .btn span { position: absolute; display: block; left: 50%; transform: translate(-50%, -3px); width: fit-content; white-space: nowrap; color: var(--wh); font-family: var(--font3); font-size: 18px; }
@@ -101,15 +102,7 @@ input:focus { outline-color: var(--brand); }
   color: var(--black);
   font-size: 18px;
   font-weight: 300;
-}
-.study-detail-point-summary .point_tag {
-  height: 29px;
-  padding: 5px 13px;
-  font-size: 16px;
-  gap: 5px;
-}
-.study-detail-point-summary .point_tag img {
-  height: 18px;
+  word-break: keep-all;
 }
 .study-detail-secondary-actions {
   grid-column: 1 / -1;
@@ -278,6 +271,14 @@ input:focus { outline-color: var(--brand); }
 
 .card_wrap { display: flex; flex-direction: row; justify-content: left; gap: 24px; flex-wrap: wrap; }
 .card { position: relative; width: calc((100% - 48px) / 3); padding: 30px; background-color: var(--dark-gray); border-radius: 20px; cursor: pointer; overflow: hidden; }
+.study-card { transform-origin: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+@media (hover: hover) and (pointer: fine) {
+  .study-card:hover { z-index: 1; transform: scale(1.02); box-shadow: 0 0 16px rgba(0, 0, 0, 0.25); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .study-card { transition: none; }
+  .study-card:hover { transform: none; }
+}
 .card_title_wrap { position: relative; display: flex; flex-direction: row; justify-content: space-between; margin-bottom: 10px; }
 .card_title { color: var(--wh); font-size: 18px; font-weight: 400; word-break: keep-all; }
 .card_title,
@@ -1162,6 +1163,41 @@ input:focus { outline-color: var(--brand); }
   }
 }
 
+/* 최근 조회 카드: hover 확대와 그림자 영역을 포함한 고정 스크롤 슬롯 */
+.recent_scroll .card_wrap {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 0;
+  padding-bottom: 20px;
+}
+.recent_scroll .recent-study-card-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 398px;
+  width: 398px;
+  height: 283px;
+}
+.recent_scroll .recent-study-card-slot:not(:last-child) {
+  margin-right: -16px;
+}
+.recent_scroll .recent-study-card-slot .card {
+  width: 358px;
+  min-width: 358px;
+  height: 243px;
+  flex: 0 0 358px;
+}
+.recent_scroll .card_wrap::-webkit-scrollbar {
+  height: 10px;
+  background-color: #EEF1EC;
+  border-radius: 10px;
+}
+.recent_scroll .card_wrap::-webkit-scrollbar-thumb {
+  height: 10px;
+  background-color: #A8B89D;
+  border-radius: 10px;
+}
+
 /* 모달 */
 .modal_wrap { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.3); }
 .modal { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 650px; padding: 40px 30px; background-color: var(--wh); border-radius: 20px; }
@@ -1236,6 +1272,11 @@ input:focus { outline-color: var(--brand); }
 .load_more_button { display: flex; padding: 17px 119px; justify-content: center; align-items: center; gap: 10px; margin: 60px auto 0; border-radius: 20px; border: 1px solid var(--gray); background: var(--wh); color: var(--green-text); text-align: center; font-family: 'Okticon'; font-size: 16px; font-style: normal; font-weight: 400; line-height: normal; }
 
 .empty_text { display: flex; align-items: center; justify-content: center; min-height: 620px; color: var(--gray-gray_818181, var(--dark-gray)); font-family: 'Pretendard'; font-size: 20px; font-style: normal; font-weight: 400; line-height: normal; }
+
+.study-list-login-action { display: flex; justify-content: flex-end; margin-top: 24px; }
+.study-list-login-button { display: inline-flex; align-items: center; justify-content: center; min-width: 96px; min-height: 42px; padding: 9px 20px; border: 1px solid var(--gray); border-radius: 20px; background: var(--wh); color: var(--green-text); font-size: 16px; font-weight: 400; }
+.study-list-login-button:hover,
+.study-list-login-button:focus-visible { background: var(--green); outline: none; }
 
 
 .emoji-container {
@@ -1681,12 +1722,15 @@ input:focus { outline-color: var(--brand); }
   .emoji-add-wrapper.is-open::before {
     content: none;
   }
+  .emoji-add-wrapper {
+    position: static;
+  }
   .emoji-picker {
-    position: fixed;
+    position: absolute;
     left: 50%;
     right: auto;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: calc(100% + 8px);
+    transform: translateX(-50%);
     z-index: 240;
   }
   .emoji-picker .EmojiPickerReact {
@@ -1808,13 +1852,6 @@ input:focus { outline-color: var(--brand); }
   }
 }
 
-/* 최근 조회한 스터디 (Tablet + Mobile 공통) */
-@media screen and (max-width: 1199px) {
-  .recent_scroll .card_wrap { flex-wrap: nowrap; overflow-x: auto; gap: 16px; padding-bottom: 20px; }
-  .recent_scroll .card_wrap::-webkit-scrollbar { width: 10px; background-color: #EEF1EC; border-radius: 10px; }
-  .recent_scroll .card_wrap::-webkit-scrollbar-thumb { width: 10px; background-color: #A8B89D; border-radius: 10px; }
-  .recent_scroll .card { width: 358px; height: 243px; min-width: 358px; flex-shrink: 0; }
-}
 .sort_menu li:hover,
 .sort_menu li.active { background-color: var(--light-gray); }
 .sort_menu li:last-child { border-bottom: none;}
@@ -1847,6 +1884,10 @@ input:focus { outline-color: var(--brand); }
   .study-detail-content .emoji-container {
     justify-content: center;
   }
+}
+
+@media screen and (max-width: 500px) {
+  .study-detail-point-label-suffix { display: none; }
 }
 
 /* ===== 스터디 만들기/수정 페이지 ===== */
@@ -2002,6 +2043,23 @@ input:focus { outline-color: var(--brand); }
   font-weight: 800;
   line-height: 1;
   transform: none;
+}
+
+.study-create-notice.is-loading .study-create-notice-icon {
+  background: var(--wh);
+  border: 2px solid var(--gray);
+  border-top-color: var(--green-text);
+  animation: study-create-notice-spin 0.8s linear infinite;
+}
+
+.study-create-notice.is-loading .study-create-notice-icon::before {
+  content: none;
+}
+
+@keyframes study-create-notice-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* 스터디 만들기/수정: 폼 레이아웃과 입력 검증 */

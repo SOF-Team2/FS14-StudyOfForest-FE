@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import AlertMessage from "../components/AlertMessage.jsx";
-import tagImg from "../assets/img/ic_point.svg";
+import PointSummary from "../components/PointSummary.jsx";
 import "../style.css";
 import WeeklyHabitRecordTable from "../components/habit/WeeklyHabitRecordTable.jsx";
 import arrowRightIcon from "../assets/img/ic_arrow_right.svg";
@@ -293,11 +293,7 @@ const StudyDetailPage = () => {
 
             <div className="study-detail-secondary-actions">
               <div className="study-detail-point-summary">
-                <span>획득한 포인트</span>
-                <div className="tag point_tag">
-                  <img src={tagImg} alt="태그 장식" />
-                  {study.point} P
-                </div>
+                <PointSummary point={study.point} variant="detail" />
               </div>
 
               <div className="study-menu-buttons">

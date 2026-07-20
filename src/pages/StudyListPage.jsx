@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "../utils/axios";
 import StudyCard from "../components/study/StudyCard";
 import RecentStudyList from "../components/study/RecentStudyList";
@@ -165,6 +166,12 @@ function StudyListPage() {
   return (
     <section>
       <div className="inner">
+        <div className="study-list-login-action">
+          <Link className="study-list-login-button" to="/signin">
+            임시 로그인
+          </Link>
+        </div>
+
         <RecentStudyList />
 
         <div className="card_container">

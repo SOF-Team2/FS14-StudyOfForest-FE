@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams, useLocation, useNavigate } from 'react-router-dom';
 
 import axios from '../utils/axios.js';
 import useAlert from '../components/useAlert.js';
+import AlertMessage from '../components/AlertMessage.jsx';
 import FocusTimer from '../components/focus/FocusTimer.jsx';
-import FocusPoint from '../components/focus/FocusPoint.jsx';
-import FocusStatusAlert from '../components/focus/FocusStatusAlert.jsx';
+import PointSummary from '../components/PointSummary.jsx';
 import arrowRightIcon from '../assets/img/ic_arrow_right.svg';
 import { getStudyBackgroundStyle } from '../utils/studyBackground.js';
+
+const FOCUS_LOADING_FADE_DURATION = 400;
 
 function FocusPage() {
     const { id: studyId } = useParams();
@@ -21,7 +23,9 @@ function FocusPage() {
     });
     const [studyDetail, setStudyDetail] = useState({});
     const [isFocusLoading, setIsFocusLoading] = useState(true);
+    const [focusLoadingAlertStatus, setFocusLoadingAlertStatus] = useState('visible');
     const [focusLoadError, setFocusLoadError] = useState('');
+    const loadingAlertTimerRef = useRef(null);
 
     // 비밀번호 없이 들어왔으면 상세 페이지로 돌려보내기
     useEffect(() => {
@@ -35,29 +39,48 @@ function FocusPage() {
         // 비밀번호가 없으면 타이머를 그리지 않음 (이동하는 동안 빈 화면)
         if (!password) return;
 
+        let isActive = true;
+
         async function fetchFocusData() {
             setIsFocusLoading(true);
+            setFocusLoadingAlertStatus('visible');
             setFocusLoadError('');
 
             try {
-                const response = await axios.post(`/study/${studyId}/focus`, {
+                const studyRequest = axios
+                    .get(`/study/${studyId}`)
+                    .then((response) => {
+                        setStudyDetail(
+                            response.data?.data ?? response.data ?? {},
+                        );
+                        return response;
+                    })
+                    .catch((studyError) => {
+                        console.error('스터디 상세 조회 오류:', studyError);
+                        return null;
+                    });
+
+                const focusRequest = axios.post(`/study/${studyId}/focus`, {
                     password,
                 });
 
-                const nextFocusData = response.data.data;
+                const [focusResponse] = await Promise.all([
+                    focusRequest,
+                    studyRequest,
+                ]);
+
+                const nextFocusData = focusResponse.data.data;
 
                 setFocusData({
                     studyName: nextFocusData.studyName,
                     currentPoint: nextFocusData.currentPoint,
                 });
 
-                try {
-                    const studyResponse = await axios.get(`/study/${studyId}`);
-                    setStudyDetail(studyResponse.data?.data ?? studyResponse.data ?? {});
-                } catch (studyError) {
-                    console.error('스터디 상세 조회 오류:', studyError);
-                    setStudyDetail({ name: nextFocusData.studyName });
-                }
+                setStudyDetail((currentStudy) => (
+                    Object.keys(currentStudy).length > 0
+                        ? currentStudy
+                        : { name: nextFocusData.studyName }
+                ));
             } catch (error) {
                 console.error('오늘의 집중 조회 오류:', error);
 
@@ -66,11 +89,31 @@ function FocusPage() {
                     '오늘의 집중 정보를 불러오지 못했습니다.',
                 );
             } finally {
-                setIsFocusLoading(false);
+                if (isActive) {
+                    if (loadingAlertTimerRef.current) {
+                        window.clearTimeout(loadingAlertTimerRef.current);
+                    }
+
+                    setIsFocusLoading(false);
+                    setFocusLoadingAlertStatus('closing');
+                    loadingAlertTimerRef.current = window.setTimeout(() => {
+                        setFocusLoadingAlertStatus('hidden');
+                        loadingAlertTimerRef.current = null;
+                    }, FOCUS_LOADING_FADE_DURATION);
+                }
             }
         }
 
         fetchFocusData();
+
+        return () => {
+            isActive = false;
+
+            if (loadingAlertTimerRef.current) {
+                window.clearTimeout(loadingAlertTimerRef.current);
+                loadingAlertTimerRef.current = null;
+            }
+        };
     }, [studyId, password]);
 
     const {
@@ -85,18 +128,16 @@ function FocusPage() {
 
     return (
         <section>
-            {isFocusLoading && (
-                <FocusStatusAlert
-                    type="loading"
+            {focusLoadingAlertStatus !== 'hidden' && (
+                <AlertMessage
                     message="오늘의 집중 정보를 불러오고 있습니다."
+                    variant="loading"
+                    status={focusLoadingAlertStatus}
                 />
             )}
 
-            {!isFocusLoading && focusLoadError && (
-                <FocusStatusAlert
-                    type="error"
-                    message={focusLoadError}
-                />
+            {!isFocusLoading && focusLoadingAlertStatus === 'hidden' && focusLoadError && (
+                <AlertMessage message={focusLoadError} variant="error" />
             )}
 
             <div className="inner">
@@ -142,7 +183,7 @@ function FocusPage() {
 
                         <div className="study-detail-secondary-actions">
                             <div className="study-detail-current-point">
-                                <FocusPoint point={currentPoint} />
+                                <PointSummary point={currentPoint} />
                             </div>
                         </div>
 
