@@ -1,5 +1,5 @@
 const RECENT_STUDIES_KEY = "recentStudies";
-const MAX_RECENT_STUDIES = 3;
+const MAX_RECENT_STUDIES = 10;
 
 export const getRecentStudyIds = () => {
   if (typeof window === "undefined") {

@@ -64,7 +64,7 @@ const IMAGE_BACKGROUND_MAP = {
 };
 
 const CUSTOM_BACKGROUND_KIND = "custom-image";
-const TARGET_DATA_URL_LENGTH = 1 * 1024 * 1024;
+const TARGET_CUSTOM_BACKGROUND_BYTES = 80 * 1024;
 const MAX_ORIGINAL_IMAGE_FILE_SIZE = 30 * 1024 * 1024;
 const DEFAULT_CUSTOM_LAYOUT = {
   fit: "cover",
@@ -146,6 +146,8 @@ const stringifyCustomBackground = (customBackground) => {
     zoom: normalizedBackground.zoom,
   });
 };
+
+const getStringBytes = (value) => new Blob([value]).size;
 
 export const getBackgroundPayload = (selectedBackground, customBackground) => {
   if (selectedBackground === CUSTOM_BACKGROUND_ID) {
@@ -315,14 +317,18 @@ export const createCustomBackgroundFromFile = async (file, previousLayout) => {
   const originalDataUrl = await readFileAsDataUrl(file);
   const image = await loadImage(originalDataUrl);
   const layout = normalizeCustomBackground(previousLayout);
-  const maxSizes = [1920, 1600, 1280, 1080, 900, 760, 620, 520, 420, 360];
-  const qualities = [0.88, 0.8, 0.7, 0.6, 0.5, 0.42, 0.35];
+  const maxSizes = [900, 760, 620, 520, 420, 360, 300, 260, 220];
+  const qualities = [0.82, 0.74, 0.66, 0.58, 0.5, 0.42, 0.34, 0.28];
 
   for (const maxSize of maxSizes) {
     for (const quality of qualities) {
       const nextDataUrl = createCanvasDataUrl(image, maxSize, quality);
+      const nextBackgroundValue = stringifyCustomBackground({
+        ...layout,
+        src: nextDataUrl,
+      });
 
-      if (nextDataUrl.length <= TARGET_DATA_URL_LENGTH) {
+      if (getStringBytes(nextBackgroundValue) <= TARGET_CUSTOM_BACKGROUND_BYTES) {
         return {
           ...layout,
           src: nextDataUrl,
@@ -331,5 +337,5 @@ export const createCustomBackgroundFromFile = async (file, previousLayout) => {
     }
   }
 
-  throw new Error("이미지를 1MB 수준으로 자동 압축하지 못했습니다. 더 작은 이미지를 업로드해주세요.");
+  throw new Error("이미지를 80KB 이하로 자동 압축하지 못했습니다. 더 작은 이미지를 업로드해주세요.");
 };

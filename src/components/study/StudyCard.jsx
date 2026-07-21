@@ -5,6 +5,7 @@ import {
   getStudyBackgroundStyle,
   isImageBackground,
 } from "../../utils/studyBackground.js";
+import FavoriteButton from "../favoriteButton.jsx";
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -38,61 +39,117 @@ const getNicknameStyle = (study) => {
 
   if (color === "GREEN" || color === "#E1EDDE") {
     return { color: "#578246" };
-  } else if (color === "YELLOW" || color === "#FFF1CC") {
+  }
+
+  if (color === "YELLOW" || color === "#FFF1CC") {
     return { color: "#C18E1B" };
-  } else if (color === "BLUE" || color === "#E0F1F5") {
+  }
+
+  if (color === "BLUE" || color === "#E0F1F5") {
     return { color: "#418099" };
-  } else if (color === "PINK" || color === "#FDE0E9") {
+  }
+
+  if (color === "PINK" || color === "#FDE0E9") {
     return { color: "#BC3C6A" };
   }
+
+  return {};
 };
 
-function StudyCard({ study }) {
+function StudyCard({ study, onFavoriteChange }) {
   const navigate = useNavigate();
+
   const emojis = getStudyEmojis(study);
-  const cardstyle = getStudyBackgroundStyle(study);
+  const cardStyle = getStudyBackgroundStyle(study);
   const nicknameStyle = getNicknameStyle(study);
-  const backgroundTypeClassName = study.backgroundType?.toLowerCase() ?? "color";
+
+  const backgroundTypeClassName =
+    study.backgroundType?.toLowerCase() ?? "color";
 
   const handleClick = () => {
     addRecentStudy(study);
     navigate(`/study/${study.id}`);
   };
 
+  const handleFavoriteChange = (isFavorite) => {
+    onFavoriteChange?.(study.id, isFavorite);
+  };
+
   return (
     <div
-      className={`${backgroundTypeClassName} card`}
-      style={cardstyle}
+      className={`${backgroundTypeClassName} card study-card`}
+      style={cardStyle}
       onClick={handleClick}
     >
       {isImageBackground(study) && (
-        <div className="background_cover"></div>
+        <div
+          className="background_cover"
+          aria-hidden="true"
+        />
       )}
+
       <div className="card_title_wrap">
         <span className="card_title">
-          <span style={nicknameStyle}>{study.nickname}</span><span style={{fontWeight: 300}}>의</span> {study.name}
+          <span style={nicknameStyle}>
+            {study.nickname}
+          </span>
+
+          <span style={{ fontWeight: 300 }}>
+            의
+          </span>
+
+          {" "}
+          {study.name}
         </span>
+
         <div className="tag point_tag">
           <img src={tagImg} alt="태그 장식" />
+
           {getStudyPoint(study)}
           {"\u00A0"}P
         </div>
       </div>
+
       <span className="card_status">
         {getElapsedDays(study.createdAt)}일째 진행중
       </span>
-      <div className="card_text">{study.description}</div>
+
+      <div className="card_text">
+        {study.description}
+      </div>
+
       <div className="tag_wrap">
         {emojis.length > 0 ? (
           emojis.map((emojiItem) => (
-            <div className="tag" key={emojiItem.emoji}>
+            <div
+              className="tag"
+              key={emojiItem.emoji}
+            >
               {emojiItem.emoji}
               <span>{emojiItem.count}</span>
             </div>
           ))
         ) : (
-          <span className="tag_empty">아직 반응이 없어요</span>
+          <span className="tag_empty">
+            아직 반응이 없어요
+          </span>
         )}
+      </div>
+
+      <div
+        className="favorite_btn_wrap"
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+      >
+        <FavoriteButton
+          studyId={study.id}
+          isFavorite={
+            study.isFavorite ?? false
+          }
+      onFavoriteChange={onFavoriteChange}
+        />
       </div>
     </div>
   );

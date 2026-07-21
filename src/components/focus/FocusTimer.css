@@ -30,8 +30,7 @@
     gap: 12px;
   }
   
-  .focus-timer__buttons button {
-    padding: 12px 32px;
+  .focus-timer__buttons .btn {
     font-size: 16px;
     cursor: pointer;
   }

@@ -1,0 +1,566 @@
+/* =========================================================
+   공부의 숲 Dark Mode
+   사용법: body 또는 html에 class="dark-mode" 추가
+   이 파일은 기존 style.css보다 나중에 불러오세요.
+========================================================= */
+
+/* ---------- Dark mode color tokens ---------- */
+body.dark-mode {
+  --bg-color: #151914;
+  --wh: #232a22;
+  --black: #f1f5ef;
+  --dark-gray: #aeb8ab;
+  --gray: #465045;
+  --light-gray: #30382f;
+  --brand: #8eb882;
+  --red-error: #ff8c90;
+  --red--error-bg: #5a2b2d;
+  --red: #ff7378;
+  --green: #2d3e2b;
+  --green-text: #a8d19d;
+  --yellow: #4a4027;
+  --yellow-text: #f0c96b;
+  --blue: #263e44;
+  --blue-text: #80bed0;
+  --pink: #452c36;
+  --pink-text: #e58bab;
+
+  color-scheme: dark;
+  color: var(--black);
+  background-color: var(--bg-color);
+}
+
+html:has(body.dark-mode),
+body.dark-mode {
+  background-color: var(--bg-color);
+}
+
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select,
+body.dark-mode button {
+  color: var(--black);
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #859083;
+}
+
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+  outline-color: var(--brand);
+}
+
+/* ---------- Header ---------- */
+body.dark-mode #header {
+  background-color: var(--bg-color);
+}
+
+body.dark-mode .user_pic_wrap {
+  border-color: var(--gray);
+  background-color: var(--wh);
+}
+
+body.dark-mode .user_pic_wrap img {
+  filter: brightness(1.35);
+}
+
+body.dark-mode .user_menu_wrap {
+  background-color: rgba(0, 0, 0, 0.22);
+}
+
+body.dark-mode .user_menu_container {
+  border-color: var(--gray);
+  background-color: #252c24;
+  box-shadow: 2px 10px 32px rgba(0, 0, 0, 0.38);
+}
+
+body.dark-mode .user_menu {
+  color: var(--dark-gray);
+  border-color: var(--gray);
+}
+
+body.dark-mode .user_menu_header {
+  border-color: var(--gray);
+}
+
+body.dark-mode .user_menu:hover {
+  color: var(--black);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .user_menu.red {
+  color: var(--red);
+}
+
+/* ---------- Common containers ---------- */
+body.dark-mode .card_container,
+body.dark-mode .modal,
+body.dark-mode .more-emoji-list,
+body.dark-mode .sort_menu,
+body.dark-mode .emoji-picker .EmojiPickerReact {
+  border-color: var(--gray) !important;
+  background-color: var(--wh) !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.24);
+}
+
+body.dark-mode .card_container.inner_container {
+  border-color: var(--gray);
+}
+
+body.dark-mode .container_title,
+body.dark-mode .modal_title,
+body.dark-mode .input_container label {
+  color: var(--black);
+}
+
+body.dark-mode .container_title.dec {
+  border-left-color: var(--brand);
+}
+
+body.dark-mode .green {
+  color: var(--green-text);
+}
+
+/* ---------- Common cards ---------- */
+body.dark-mode .card {
+  background-color: #353d34;
+}
+
+body.dark-mode .card.color {
+  background-color: #2c342b !important;
+}
+
+body.dark-mode .card.color .card_title,
+body.dark-mode .card.color .card_text {
+  color: var(--black) !important;
+}
+
+body.dark-mode .card.color .card_status {
+  color: var(--dark-gray);
+}
+
+body.dark-mode .card_title,
+body.dark-mode .card_text {
+  color: #f5f7f3;
+}
+
+body.dark-mode .card_status {
+  color: #c3cbc0;
+}
+
+body.dark-mode .tag,
+body.dark-mode .current_time {
+  color: #f4f7f2;
+  border-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
+body.dark-mode .background_cover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- Dashboard ---------- */
+body.dark-mode .dashboard_more_link {
+  color: var(--green-text);
+}
+
+body.dark-mode .dashboard_card {
+  color: #dce8d8;
+  background: linear-gradient(145deg, #283327 0%, #202a20 100%);
+  border-color: rgba(153, 192, 142, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+body.dark-mode .dashboard_card:hover {
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.34);
+}
+
+body.dark-mode .dashboard_card_label,
+body.dark-mode .dashboard_card_value,
+body.dark-mode .dashboard_card_value strong,
+body.dark-mode .dashboard_study_summary strong,
+body.dark-mode .dashboard_study_top span,
+body.dark-mode .dashboard_weekly_total,
+body.dark-mode .dashboard_weekly_total strong,
+body.dark-mode .dashboard_achievement_item strong,
+body.dark-mode .dashboard_favorite_item strong,
+body.dark-mode .dashboard_goal_value,
+body.dark-mode .dashboard_goal_value strong,
+body.dark-mode .dashboard_goal_value span {
+  color: #dce8d8;
+}
+
+body.dark-mode .dashboard_card_description,
+body.dark-mode .dashboard_card_value span,
+body.dark-mode .dashboard_study_summary,
+body.dark-mode .dashboard_weekly_total span,
+body.dark-mode .dashboard_chart_item span,
+body.dark-mode .dashboard_achievement_item p,
+body.dark-mode .dashboard_favorite_item p,
+body.dark-mode .dashboard_goal_description,
+body.dark-mode .dashboard_card_footer {
+  color: #aab7a6;
+}
+
+body.dark-mode .dashboard_card_icon {
+  color: #b9d9b0;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .dashboard_progress,
+body.dark-mode .dashboard_chart_bar_wrap {
+  background-color: rgba(168, 209, 157, 0.16);
+}
+
+body.dark-mode .dashboard_progress_bar,
+body.dark-mode .dashboard_chart_bar {
+  background-color: #8eb882;
+}
+
+body.dark-mode .dashboard_card_footer {
+  border-top-color: rgba(168, 209, 157, 0.18);
+}
+
+body.dark-mode .dashboard_card_footer strong,
+body.dark-mode .dashboard_study_top strong,
+body.dark-mode .dashboard_favorite_item > span,
+body.dark-mode .dashboard_increase {
+  color: var(--green-text);
+}
+
+body.dark-mode .dashboard_achievement_item,
+body.dark-mode .dashboard_favorite_item {
+  background-color: rgba(255, 255, 255, 0.055);
+}
+
+body.dark-mode .dashboard_favorite_item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .dashboard_achievement_icon {
+  background-color: rgba(153, 192, 142, 0.14);
+}
+
+/* ---------- Study detail ---------- */
+body.dark-mode .study-detail-background-layer::after {
+  background: linear-gradient(
+    to top,
+    var(--wh) 0%,
+    rgba(35, 42, 34, 0.15) 100%
+  );
+}
+
+body.dark-mode .study-detail-content,
+body.dark-mode .study-detail-content > .container_title,
+body.dark-mode .study-detail-point-summary span {
+  color: var(--black);
+}
+
+body.dark-mode .study-detail-title {
+  color: var(--black);
+}
+
+body.dark-mode .study-menu-buttons,
+body.dark-mode .link_wrap .link_btn {
+  color: var(--dark-gray);
+  border-color: var(--gray);
+  background-color: #293128;
+}
+
+body.dark-mode .study-menu-buttons button {
+  color: var(--brand);
+}
+
+body.dark-mode .study-menu-buttons button:hover,
+body.dark-mode .study-detail-content .focus-page__navigation-button:hover::before,
+body.dark-mode .focus-page-link-navigation .focus-page__navigation-button:hover::before {
+  background-color: var(--green);
+}
+
+body.dark-mode .study-menu-buttons .dec_line {
+  color: var(--gray);
+}
+
+body.dark-mode .study-detail-content .focus-page__navigation-button::before,
+body.dark-mode .focus-page-link-navigation .focus-page__navigation-button::before {
+  border-color: var(--gray);
+  background-color: #293128;
+}
+
+/* ---------- Modal ---------- */
+body.dark-mode .modal_wrap,
+body.dark-mode .password-modal-overlay {
+  background-color: rgba(0, 0, 0, 0.68);
+}
+
+body.dark-mode .modal_sub_text,
+body.dark-mode .modal_close_btn {
+  color: var(--dark-gray);
+}
+
+body.dark-mode .input_wrap input,
+body.dark-mode .edit_habit_modal input,
+body.dark-mode .password-modal input {
+  color: var(--black);
+  border-color: var(--gray);
+  background-color: #1c221c;
+}
+
+body.dark-mode .password-modal {
+  color: var(--black);
+  background-color: var(--wh);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.36);
+}
+
+body.dark-mode .password-modal h2,
+body.dark-mode .password-modal span {
+  color: var(--black);
+}
+
+body.dark-mode .password-modal p {
+  color: var(--dark-gray);
+}
+
+body.dark-mode .password-confirm-button {
+  color: #142014;
+  background-color: var(--brand);
+}
+
+body.dark-mode .password-confirm-button:hover {
+  background-color: #a2ca98;
+}
+
+body.dark-mode .password-error-toast {
+  color: #ffb1b4;
+  background-color: #53292c;
+}
+
+/* ---------- Habit ---------- */
+body.dark-mode .habit_btn {
+  color: var(--black);
+  background-color: var(--light-gray);
+}
+
+body.dark-mode .habit_btn.checked {
+  color: #142014;
+  background-color: var(--brand);
+}
+
+body.dark-mode .edit_habit_btn,
+body.dark-mode .day,
+body.dark-mode .habit_state_message,
+body.dark-mode .current_time_title {
+  color: var(--dark-gray);
+}
+
+body.dark-mode .day.today {
+  color: var(--green-text);
+}
+
+body.dark-mode .weekly_habit_record_line .habit_name {
+  color: var(--black);
+}
+
+body.dark-mode .delete_habit_btn {
+  background-color: #30382f;
+}
+
+body.dark-mode .delete_habit_btn:hover {
+  background-color: #3b4639;
+}
+
+body.dark-mode .edit_habit_modal form button {
+  background-color: var(--blue);
+}
+
+body.dark-mode .modal_btn_wrap button {
+  color: #eff4ec;
+  background-color: #4b5549;
+}
+
+body.dark-mode .modal_btn_wrap button.green {
+  color: #142014;
+  background-color: var(--brand);
+}
+
+/* ---------- Scrollbars ---------- */
+body.dark-mode .today_habit_card .habit_wrap::-webkit-scrollbar,
+body.dark-mode .edit_habit_modal .habit_wrap::-webkit-scrollbar,
+body.dark-mode .recent_scroll .card_wrap::-webkit-scrollbar {
+  background-color: #262e25;
+}
+
+body.dark-mode .today_habit_card .habit_wrap::-webkit-scrollbar-thumb,
+body.dark-mode .edit_habit_modal .habit_wrap::-webkit-scrollbar-thumb,
+body.dark-mode .recent_scroll .card_wrap::-webkit-scrollbar-thumb {
+  background-color: #667363;
+}
+
+body.dark-mode * {
+  scrollbar-color: #667363 #262e25;
+}
+
+/* ---------- Search / sort ---------- */
+body.dark-mode .search_box,
+body.dark-mode .sort_toggle,
+body.dark-mode .load_more_button {
+  color: var(--dark-gray);
+  border-color: var(--gray);
+  background-color: var(--wh);
+}
+
+body.dark-mode .search_box input {
+  color: var(--black);
+  background-color: transparent;
+}
+
+body.dark-mode .search_box input::placeholder {
+  color: var(--dark-gray);
+}
+
+body.dark-mode .sort_menu {
+  background-color: #252c24 !important;
+}
+
+body.dark-mode .sort_menu li {
+  color: var(--black);
+  border-bottom-color: var(--light-gray);
+}
+
+body.dark-mode .sort_menu li:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .load_more_button {
+  color: var(--green-text);
+}
+
+body.dark-mode .empty_text {
+  color: var(--dark-gray);
+}
+
+/* ---------- Emoji ---------- */
+body.dark-mode .emoji-item,
+body.dark-mode .emoji-more-button {
+  color: #f4f7f2;
+  background-color: #4c574a;
+}
+
+body.dark-mode .emoji-item:hover,
+body.dark-mode .emoji-more-button:hover {
+  background-color: #5c6859;
+}
+
+body.dark-mode .emoji-add-button {
+  border-color: var(--gray);
+  background-color: var(--wh);
+}
+
+body.dark-mode .emoji-add-button:hover {
+  background-color: #30382f;
+}
+
+body.dark-mode .emoji-add-icon {
+  filter: brightness(0) invert(1);
+}
+
+/* ---------- Global loading ---------- */
+body.dark-mode .global_loading {
+  background-color: rgba(15, 18, 15, 0.76);
+}
+
+body.dark-mode .global_loading_spinner {
+  border-color: #465045;
+  border-top-color: var(--brand);
+}
+
+/* ---------- Study create / edit common ---------- */
+body.dark-mode .study-form-page,
+body.dark-mode .study-form-section {
+  color: var(--black);
+}
+
+body.dark-mode .study-form-card,
+body.dark-mode .study-form-container,
+body.dark-mode .study-create-container,
+body.dark-mode .study-edit-container {
+  color: var(--black);
+  border-color: var(--gray);
+  background-color: var(--wh);
+}
+
+body.dark-mode .study-form-page input,
+body.dark-mode .study-form-page textarea,
+body.dark-mode .study-form-page select,
+body.dark-mode .study-create-container input,
+body.dark-mode .study-create-container textarea,
+body.dark-mode .study-edit-container input,
+body.dark-mode .study-edit-container textarea {
+  color: var(--black);
+  border-color: var(--gray);
+  background-color: #1c221c;
+}
+
+body.dark-mode .study-form-page input::placeholder,
+body.dark-mode .study-form-page textarea::placeholder,
+body.dark-mode .study-create-container input::placeholder,
+body.dark-mode .study-create-container textarea::placeholder,
+body.dark-mode .study-edit-container input::placeholder,
+body.dark-mode .study-edit-container textarea::placeholder {
+  color: #859083;
+}
+
+body.dark-mode .study-form-page label,
+body.dark-mode .study-create-container label,
+body.dark-mode .study-edit-container label {
+  color: var(--black);
+}
+
+body.dark-mode .study-form-page small,
+body.dark-mode .study-form-page p,
+body.dark-mode .study-create-container small,
+body.dark-mode .study-edit-container small {
+  color: var(--dark-gray);
+}
+
+/* background cards/options used on study create/edit */
+body.dark-mode [class*="background-option"],
+body.dark-mode [class*="background-card"],
+body.dark-mode [class*="background-item"],
+body.dark-mode [class*="upload-box"],
+body.dark-mode [class*="preview-box"] {
+  border-color: var(--gray);
+}
+
+body.dark-mode [class*="upload-box"] {
+  background-color: #1f261f;
+}
+
+/* ---------- Error / notice states ---------- */
+body.dark-mode [class*="error-message"],
+body.dark-mode [class*="error_text"],
+body.dark-mode [class*="error-text"] {
+  color: #ff9a9e;
+}
+
+body.dark-mode [class*="alert"],
+body.dark-mode [class*="notice"] {
+  border-color: var(--gray);
+}
+
+/* ---------- Image icons ---------- */
+/* 검은색 SVG/PNG 아이콘 중 다크 배경에서 안 보이는 경우 개별적으로 dark_icon 클래스 추가 */
+body.dark-mode img.dark_icon,
+body.dark-mode .link_btn img,
+body.dark-mode .focus-page__navigation-icon {
+  filter: brightness(0) invert(0.88);
+}
+
+/* ---------- Native selection ---------- */
+body.dark-mode ::selection {
+  color: #142014;
+  background-color: #9ec795;
+}

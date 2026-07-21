@@ -26,11 +26,17 @@ function StudyListPage() {
   const [sortValue, setSortValue] = useState("latest");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [favoriteState, setFavoriteState] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const pendingScrollYRef = useRef(null);
   const sentinelRef = useRef(null);
+  const relatedSuggestions = Array.from(
+    new Map(
+      items.filter((study) => study?.name).map((study) => [study.name, study]),
+    ).values(),
+  ).slice(0, 5);
 
   const rememberScrollPosition = () => {
     pendingScrollYRef.current = window.scrollY;
@@ -72,6 +78,10 @@ function StudyListPage() {
         const response = await axios.get("/study", {
           params,
           signal: controller.signal,
+
+          headers: {
+            "x-user-id": "942d8758-939d-47f4-ba70-f418cccbdfd4",
+          },
         });
 
         const data = response.data;
@@ -82,7 +92,7 @@ function StudyListPage() {
         setTotalPages(tp);
         setPage(targetPage);
       } catch (error) {
-        if (axios.isCancel(error) || error.name === "CanceledError") {
+        if (error.name === "CanceledError") {
           return;
         }
 
@@ -162,11 +172,31 @@ function StudyListPage() {
     setSortValue(nextSortValue);
   };
 
+  const handleFavoriteChange = (studyId, isFavorite) => {
+    setFavoriteState((prev) => ({
+      ...prev,
+      [studyId]: isFavorite,
+    }));
+
+    setItems((prevItems) =>
+      prevItems.map((study) =>
+        study.id === studyId
+          ? {
+              ...study,
+              isFavorite,
+            }
+          : study,
+      ),
+    );
+  };
+
   return (
     <section>
       <div className="inner">
-        <RecentStudyList />
-
+        <RecentStudyList
+          favoriteState={favoriteState}
+          onFavoriteChange={handleFavoriteChange}
+        />
         <div className="card_container">
           <span className="container_title">스터디 둘러보기</span>
 
@@ -175,6 +205,8 @@ function StudyListPage() {
             onKeywordChange={handleKeywordChange}
             sortValue={sortValue}
             onSortChange={handleSortChange}
+            suggestions={relatedSuggestions}
+            isSearching={isLoading}
           />
 
           <div className="card_wrap">
@@ -191,7 +223,17 @@ function StudyListPage() {
             )}
             {!isLoading &&
               !errorMessage &&
-              items.map((study) => <StudyCard key={study.id} study={study} />)}
+              items.map((study) => (
+                <StudyCard
+                  key={study.id}
+                  study={{
+                    ...study,
+                    isFavorite:
+                      favoriteState[study.id] ?? study.isFavorite ?? false,
+                  }}
+                  onFavoriteChange={handleFavoriteChange}
+                />
+              ))}
             {isLoadingMore && (
               <p className="list_state_message">불러오는 중...</p>
             )}
