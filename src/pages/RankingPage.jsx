@@ -71,7 +71,6 @@ function RankingPage() {
       return;
     }
 
-    setRankingLoading(true);
     setSelectTab(tab);
   };
 
@@ -135,12 +134,12 @@ function RankingPage() {
             </button>
           </div>
 
-          {selectTab === "study" && (
+          <div className={selectTab === "study" ? "ranking-panel active" : "ranking-panel"}>
             <StudyRanking onLoadComplete={() => setRankingLoading(false)} />
-          )}
-          {selectTab === "user" && (
+          </div>
+          <div className={selectTab === "user" ? "ranking-panel active" : "ranking-panel"}>
             <UserRanking onLoadComplete={() => setRankingLoading(false)} />
-          )}
+          </div>
 
           <p className="ranking-guide">
             포인트를 모아 더 높은 순위에 도전해보세요!
