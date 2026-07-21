@@ -82,6 +82,10 @@ body.dark-mode .user_menu {
   border-color: var(--gray);
 }
 
+body.dark-mode .user_menu_header {
+  border-color: var(--gray);
+}
+
 body.dark-mode .user_menu:hover {
   color: var(--black);
   background-color: rgba(255, 255, 255, 0.06);
