@@ -10,6 +10,7 @@ import TodayFocusPage from "./pages/TodayFocusPage.jsx";
 import { LoadingProvider } from "./contexts/LoadingContext.jsx";
 import GlobalLoading from "./components/GlobalLoading.jsx";
 import SignInPage from "./pages/SignInPage.jsx";
+import SignUpPage from "./pages/SignUpPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 
 function Main() {
@@ -21,6 +22,7 @@ function Main() {
             <Route path="/" element={<App />}>
               <Route index element={<StudyListPage />} />
               <Route path="signin" element={<SignInPage />} />
+              <Route path="signup" element={<SignUpPage />} />
               <Route path="home" element={<StudyListPage />} />
               <Route path="user/dashboard" element={<DashboardPage />} />
               <Route path="study-create" element={<StudyCreatePage />} />
