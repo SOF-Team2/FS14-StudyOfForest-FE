@@ -1,47 +1,92 @@
-import { Link, useNavigate } from "react-router-dom";
-import { removeUserId } from "../../utils/authStorage.js";
+import { Link } from "react-router-dom";
 
-function UserMenu({ toggleIsUserMenuOpen }) {
-  // 로그아웃 후 로그인 페이지로 이동할 때 사용하는 함수
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    // localStorage에 저장된 로그인 사용자 ID 삭제
-    removeUserId();
-
-    // 열려 있는 사용자 메뉴 닫기
-    toggleIsUserMenuOpen();
-
-    // 로그아웃 후 로그인 페이지로 이동
-    // replace를 사용하면 뒤로 가기로 로그아웃 전 페이지로 돌아가는 것을 줄일 수 있음
-    navigate("/signin", { replace: true });
-  };
-
+function DashboardIcon() {
   return (
-    // 메뉴 바깥쪽 영역을 클릭하면 사용자 메뉴 닫기
-    <div className="user_menu_wrap" onClick={toggleIsUserMenuOpen}>
-      <div
-        className="user_menu_container"
-        // 메뉴 내부 클릭이 바깥 영역까지 전달되지 않도록 막음
-        onClick={(event) => event.stopPropagation()}
+    <svg className="user_menu_icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="2" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="2" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="2" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function StudyRegisterIcon() {
+  return (
+    <svg className="user_menu_icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M6 3H14L18 7V21H6V3Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M14 3V7H18" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M12 11V17M9 14H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function LogoutIcon() {
+  return (
+    <svg className="user_menu_icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M10 4H5V20H10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M13 8L17 12L13 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 12H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function SignUpIcon() {
+  return (
+    <svg className="user_menu_icon user_menu_signup_icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="9" cy="8" r="3" stroke="currentColor" strokeWidth="2" />
+      <path d="M3 20C3 16.686 5.686 14 9 14C10.246 14 11.402 14.38 12.36 15.03" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M18 8V14M15 11H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function UserMenu({ isOpen, isAuthenticated, onClose, onLogout }) {
+  return (
+    <>
+      <button
+        className="user_menu_wrap"
+        type="button"
+        aria-label="사용자 메뉴 닫기"
+        onClick={onClose}
+      />
+      <nav
+        className={`user_menu_container ${isAuthenticated ? "" : "is-guest"} ${
+          isOpen ? "is-open" : "is-closing"
+        }`}
+        aria-label="사용자 메뉴"
       >
-        <Link to="/user/dashboard" className="user_menu">
-          대시보드
-        </Link>
-
-        <Link to="/study-create" className="user_menu">
-          스터디 등록
-        </Link>
-
-        <button
-          type="button"
-          className="user_menu red"
-          onClick={handleLogout}
-        >
-          로그아웃
-        </button>
-      </div>
-    </div>
+        {isAuthenticated ? (
+          <>
+            <div className="user_menu user_menu_header user_menu_with_icon">
+              <span className="user_menu_label">내 정보</span>
+            </div>
+            <Link to="/user/dashboard" className="user_menu user_menu_with_icon">
+              <DashboardIcon />
+              <span className="user_menu_label">대시보드</span>
+            </Link>
+            <Link to="/study-create" className="user_menu user_menu_with_icon">
+              <StudyRegisterIcon />
+              <span className="user_menu_label">스터디 등록</span>
+            </Link>
+            <button className="user_menu user_menu_with_icon red" type="button" onClick={onLogout}>
+              <LogoutIcon />
+              <span className="user_menu_label">로그아웃</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/signin" className="user_menu user_menu_with_icon">
+              <span className="user_menu_label">로그인</span>
+            </Link>
+            <Link to="/signin?mode=signup" className="user_menu user_menu_with_icon">
+              <span className="user_menu_label">회원가입</span>
+              <SignUpIcon />
+            </Link>
+          </>
+        )}
+      </nav>
+    </>
   );
 }
 
