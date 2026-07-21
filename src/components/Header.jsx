@@ -1,19 +1,62 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../assets/img/logo.png";
-import userIcon from "../assets/img/ic_user.svg";
-import Button from "./Button.jsx";
+import userIcon from "../assets/img/ic_user_line.svg";
 import UserMenu from "./user/UserMenu";
+import { getUserId, removeUserId } from "../utils/authStorage.js";
+
+const USER_MENU_ANIMATION_MS = 250;
+
+const getIsAuthenticated = () =>
+  Boolean(getUserId());
 
 function Header() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const isAuthPage =
     pathname === "/signin" ||
     pathname === "/signup";
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isUserMenuVisible, setIsUserMenuVisible] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(getIsAuthenticated);
+  const userMenuCloseTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => window.clearTimeout(userMenuCloseTimerRef.current);
+  }, []);
+
+  useEffect(() => {
+    setIsAuthenticated(getIsAuthenticated());
+  }, [pathname]);
+
+  const openUserMenu = () => {
+    window.clearTimeout(userMenuCloseTimerRef.current);
+    setIsUserMenuVisible(true);
+    setIsUserMenuOpen(true);
+  };
+
+  const closeUserMenu = () => {
+    setIsUserMenuOpen(false);
+    window.clearTimeout(userMenuCloseTimerRef.current);
+    userMenuCloseTimerRef.current = window.setTimeout(() => {
+      setIsUserMenuVisible(false);
+    }, USER_MENU_ANIMATION_MS);
+  };
 
   const toggleIsUserMenuOpen = () => {
-    setIsUserMenuOpen((isOpen) => !isOpen);
+    if (isUserMenuOpen) {
+      closeUserMenu();
+      return;
+    }
+
+    openUserMenu();
+  };
+
+  const logout = () => {
+    removeUserId();
+    setIsAuthenticated(false);
+    closeUserMenu();
+    navigate("/signin", { replace: true });
   };
 
   return (
@@ -26,15 +69,11 @@ function Header() {
             </Link>
 
             <div className="header-actions">
-              <Button
-                as={Link}
-                to="/study-create"
-                className="create_study_btn"
+              <div
+                className={`user_wrap ${isUserMenuOpen ? "has-menu" : ""} ${
+                  isUserMenuVisible && !isUserMenuOpen ? "is-closing" : ""
+                }`}
               >
-                스터디 만들기
-              </Button>
-
-              <div className="user_wrap">
                 <button
                   className="user_pic_wrap"
                   type="button"
@@ -44,8 +83,13 @@ function Header() {
                 >
                   <img src={userIcon} alt="" />
                 </button>
-                {isUserMenuOpen && (
-                  <UserMenu toggleIsUserMenuOpen={toggleIsUserMenuOpen} />
+                {isUserMenuVisible && (
+                  <UserMenu
+                    isOpen={isUserMenuOpen}
+                    isAuthenticated={isAuthenticated}
+                    onClose={closeUserMenu}
+                    onLogout={logout}
+                  />
                 )}
               </div>
             </div>

@@ -5,6 +5,7 @@ import {
   getStudyBackgroundStyle,
   isImageBackground,
 } from "../../utils/studyBackground.js";
+import FavoriteButton from "../favoriteButton.jsx";
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -93,6 +94,12 @@ function StudyCard({ study }) {
         ) : (
           <span className="tag_empty">아직 반응이 없어요</span>
         )}
+      </div>
+      <div className="favorite_btn_wrap">
+        <FavoriteButton
+            studyId={study.id} 
+            initialIsFavorite={study.isFavorite} 
+          />
       </div>
     </div>
   );

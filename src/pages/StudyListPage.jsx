@@ -1,5 +1,4 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import axios from "../utils/axios";
 import StudyCard from "../components/study/StudyCard";
 import RecentStudyList from "../components/study/RecentStudyList";
@@ -32,6 +31,13 @@ function StudyListPage() {
   const [totalPages, setTotalPages] = useState(1);
   const pendingScrollYRef = useRef(null);
   const sentinelRef = useRef(null);
+  const relatedSuggestions = Array.from(
+    new Map(
+      items
+        .filter((study) => study?.name)
+        .map((study) => [study.name, study]),
+    ).values(),
+  ).slice(0, 5);
 
   const rememberScrollPosition = () => {
     pendingScrollYRef.current = window.scrollY;
@@ -73,6 +79,10 @@ function StudyListPage() {
         const response = await axios.get("/study", {
           params,
           signal: controller.signal,
+
+          headers: {
+            "x-user-id": "942d8758-939d-47f4-ba70-f418cccbdfd4",
+          },
         });
 
         const data = response.data;
@@ -166,12 +176,6 @@ function StudyListPage() {
   return (
     <section>
       <div className="inner">
-        <div className="study-list-login-action">
-          <Link className="study-list-login-button" to="/signin">
-            로그인
-          </Link>
-        </div>
-
         <RecentStudyList />
 
         <div className="card_container">
@@ -182,6 +186,8 @@ function StudyListPage() {
             onKeywordChange={handleKeywordChange}
             sortValue={sortValue}
             onSortChange={handleSortChange}
+            suggestions={relatedSuggestions}
+            isSearching={isLoading}
           />
 
           <div className="card_wrap">
