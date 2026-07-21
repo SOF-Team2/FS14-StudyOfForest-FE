@@ -1,7 +1,64 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import useAlert from "../components/useAlert.js";
+import { useLoading } from "../contexts/LoadingContext.jsx";
+import axios from "../utils/axios.js";
+import { saveUserId } from "../utils/authStorage.js";
 import logoImage from "../assets/img/logo.png";
 
 function SignInPage() {
+  const [loginId, setLoginId] = useState("");
+  const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
+  const { showAlert } = useAlert();
+  const { startLoading, endLoading } = useLoading();
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    const trimmedLoginId = loginId.trim();
+
+    if (!trimmedLoginId || !password) {
+      showAlert("아이디와 비밀번호를 모두 입력해주세요.", "error");
+      return;
+    }
+
+    startLoading();
+
+    try {
+      const response = await axios.post("/users/login", {
+        loginId: trimmedLoginId,
+        password,
+      });
+
+      const userId = response.data?.data?.id;
+
+      if (!userId) {
+        throw new Error(
+          "로그인 응답에서 사용자 ID를 확인할 수 없습니다.",
+        );
+      }
+
+      saveUserId(userId);
+
+      showAlert(
+        response.data?.message ?? "로그인에 성공했습니다.",
+      );
+
+      navigate("/");
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ??
+        error.message ??
+        "로그인에 실패했습니다.";
+
+      showAlert(errorMessage, "error");
+    } finally {
+      endLoading();
+    }
+  };
+
   return (
     <>
       <section className="auth_section">
@@ -10,30 +67,34 @@ function SignInPage() {
         </Link>
         <div className="inner">
           <div className="card_container auth_container">
-            <div className="inner">
+            <form className="inner" onSubmit={handleLogin}>
               <div className="auth_input_wrap">
-                <label htmlFor="userId">아이디</label>
+                <label htmlFor="loginId">아이디</label>
                 <input
-                  id="userId"
-                  name="userId"
+                  id="loginId"
+                  name="loginId"
                   type="text"
                   maxLength="50"
                   placeholder="아이디를 입력해주세요."
+                  value={loginId}
+                  onChange={(event) => setLoginId(event.target.value)}
                   required
                 />
               </div>
               <div className="auth_input_wrap">
-                <label htmlFor="userId">비밀번호</label>
+                <label htmlFor="password">비밀번호</label>
                 <input
-                  id="userId"
-                  name="userId"
+                  id="password"
+                  name="password"
                   type="password"
                   maxLength="50"
                   placeholder="비밀번호를 입력해주세요."
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
                   required
                 />
               </div>
-              <div className="btn">
+              <button type="submit" className="btn">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="252"
@@ -63,7 +124,7 @@ function SignInPage() {
                 </svg>
                 <span className="shadow">로그인</span>
                 <span>로그인</span>
-              </div>
+              </button>
               <div className="btn">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -95,7 +156,7 @@ function SignInPage() {
                 <span className="shadow">회원가입</span>
                 <span>회원가입</span>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </section>
