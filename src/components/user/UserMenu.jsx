@@ -1,13 +1,20 @@
 import { Link, useNavigate } from "react-router-dom";
+import useAlert from "../useAlert.js";
 import { removeUserId } from "../../utils/authStorage.js";
 
 function UserMenu({ toggleIsUserMenuOpen }) {
   // 로그아웃 후 로그인 페이지로 이동할 때 사용하는 함수
   const navigate = useNavigate();
 
+  // 전체 앱에서 공통으로 사용하는 알림 표시 함수
+  const { showAlert } = useAlert();
+
   const handleLogout = () => {
     // localStorage에 저장된 로그인 사용자 ID 삭제
     removeUserId();
+
+    // 로그아웃이 정상적으로 처리되었다는 성공 알림 표시
+    showAlert("로그아웃되었습니다.");
 
     // 열려 있는 사용자 메뉴 닫기
     toggleIsUserMenuOpen();
