@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import AlertMessage from "../components/AlertMessage.jsx";
 import PreviousRanking from "../components/ranking/PreviousRanking.jsx";
 import StudyRanking from "../components/ranking/StudyRanking.jsx";
 import UserRanking from "../components/ranking/UserRanking.jsx";
@@ -54,54 +55,99 @@ const formatDate = (date) => {
 
 function RankingPage() {
   const [selectTab, setSelectTab] = useState("study");
+
+  // 지난주 랭킹과 현재 랭킹 로딩 상태
+  const [previousLoading, setPreviousLoading] = useState(true);
+  const [rankingLoading, setRankingLoading] = useState(true);
+
+  const isLoading = previousLoading || rankingLoading;
+
   const [remainingTime, setRemainingTime] = useState(getRemainingTime());
 
   const { startDate, endDate } = getWeekRange();
+
+  const handleTabChange = (tab) => {
+    if (tab === selectTab) {
+      return;
+    }
+
+    setRankingLoading(true);
+    setSelectTab(tab);
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
       setRemainingTime(getRemainingTime());
     }, 60000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   return (
-    <section className="inner">
-      <div className="card_container">
-        <PreviousRanking />
-      </div>
-      <div className="card_container ranking-container">
-        <div className="ranking-header">
-          <h1 className="ranking-title container_title">이번 주 랭킹</h1>
-          <div className="ranking-info">
-            <p>집계 기간: {formatDate(startDate)} ~ {formatDate(endDate)}</p>
-            <p>다음 랭킹까지 {remainingTime.days}일 {remainingTime.hours}시간</p>
+    <>
+      {isLoading && (
+        <AlertMessage message="랭킹을 불러오는 중입니다." />
+      )}
+
+      <section 
+        className="inner"
+        style={{visibility: isLoading ? "hidden" : "visible" }}
+      >
+        <div className="card_container">
+          <PreviousRanking
+            onLoadComplete={() => setPreviousLoading(false)}
+          />
+        </div>
+
+        <div className="card_container ranking-container">
+          <div className="ranking-header">
+            <h1 className="ranking-title container_title">
+              이번 주 랭킹
+            </h1>
+
+            <div className="ranking-info">
+              <p>
+                집계 기간: {formatDate(startDate)} ~ {formatDate(endDate)}
+              </p>
+              <p>
+                다음 랭킹까지 {remainingTime.days}일 {remainingTime.hours}시간
+              </p>
+            </div>
           </div>
+
+          <div className="ranking-tabs">
+            <button
+              type="button"
+              className={`${selectTab === "study" ? "active" : ""}`}
+              onClick={() => handleTabChange("study")}
+            >
+              스터디 랭킹
+            </button>
+
+            <button
+              type="button" 
+              className={`${selectTab === "user" ? "active" : ""}`}
+              onClick={() => handleTabChange("user")} 
+            >
+              유저 랭킹
+            </button>
+          </div>
+
+          {selectTab === "study" && (
+            <StudyRanking onLoadComplete={() => setRankingLoading(false)} />
+          )}
+          {selectTab === "user" && (
+            <UserRanking onLoadComplete={() => setRankingLoading(false)} />
+          )}
+
+          <p className="ranking-guide">
+            포인트를 모아 더 높은 순위에 도전해보세요!
+          </p>
         </div>
-        <div className="ranking-tabs">
-          <button
-            type="button"
-            className={`${selectTab === "study" ? "active" : ""}`}
-            onClick={() => setSelectTab("study")}
-          >
-            스터디 랭킹
-          </button>
-          <button
-            type="button" 
-            className={`${selectTab === "user" ? "active" : ""}`}
-            onClick={() => setSelectTab("user")} 
-          >
-            유저 랭킹
-          </button>
-        </div>
-        {selectTab === "study" && <StudyRanking />}
-        {selectTab === "user" && <UserRanking />}
-        <p className="ranking-guide">
-          포인트를 모아 더 높은 순위에 도전해보세요!
-        </p>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 

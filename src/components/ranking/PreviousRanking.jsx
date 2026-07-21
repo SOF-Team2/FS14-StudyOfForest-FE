@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "../../utils/axios.js";
+import AlertMessage from "../AlertMessage.jsx";
 
-function PreviousRanking() {
-  const [previousRanking, setPreviousRanking] = useState(null);
+function PreviousRanking({ onLoadComplete }) {
+  const [previousRanking, setPreviousRanking] = useState({
+    studies: [],
+    users: [],
+  });
+  const [errorMessage, setErrorMessage] = useState("");
 
   const getPreviousRanking = async () => {
     try {
@@ -10,12 +15,30 @@ function PreviousRanking() {
       setPreviousRanking(response.data)
     } catch(error) {
       console.error(error);
+
+      setErrorMessage(
+        error.response?.data?.message ||
+        "지난주 랭킹을 불러오지 못했습니다"
+      );
+    } finally {
+      onLoadComplete?.();
     }
   };
 
   useEffect(() => {
     getPreviousRanking();
   },[]);
+
+  if (errorMessage) {
+    return (
+      <section className="previous-ranking">
+        <AlertMessage
+          message={errorMessage}
+          variant="error"
+        />
+      </section>
+    );
+  }
 
   return (
     <section className="previous-ranking">
@@ -27,31 +50,44 @@ function PreviousRanking() {
       <div className="previous-ranking-list">
         <div className="previous-ranking-card">
           <h3>스터디 1위</h3>
-          <div className="previous-ranking-result">
-            <p className="previous-ranking-name">
-              {previousRanking?.study?.name}
-            </p>
-            <p className="previous-ranking-point">
-              {previousRanking?.study?.point}P
-            </p>
-          </div>
+
+          {previousRanking.studies.length > 0 ? (
+            previousRanking.studies.map((study) => (
+              <div className="previous-ranking-result" key={study.id}>
+                <p className="previous-ranking-name">
+                  {study.name}
+                </p>
+                <p className="previous-ranking-point">
+                  {study.point}P
+                </p>
+              </div>
+            ))
+          ) : (
+            <p>지난주 랭킹 기록이 없습니다</p>
+          )}
         </div>
+
         <div className="previous-ranking-card">
           <h3>유저 1위</h3>
-          <div className="previous-ranking-result">
-            <p className="previous-ranking-name">
-              {previousRanking?.user?.nickname}
-            </p>
-            <p className="previous-ranking-point">
-              {previousRanking?.user?.point}P
-            </p>
-          </div>
-          
+
+          {previousRanking.users.length > 0 ? (
+            previousRanking.users.map((user) => (
+              <div className="previous-ranking-result" key={user.id}>
+                <p className="previous-ranking-name">
+                  {user.nickname}
+                </p>
+                <p className="previous-ranking-point">
+                  {user.point}P
+                </p>
+              </div>
+            ))
+          ) : (
+            <p>지난주 랭킹 기록이 없습니다</p>
+          )}
         </div>
       </div>
-      
     </section>
-  )
+  );
 }
 
 export default PreviousRanking;
