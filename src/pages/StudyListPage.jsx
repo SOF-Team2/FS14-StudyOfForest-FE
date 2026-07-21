@@ -26,6 +26,7 @@ function StudyListPage() {
   const [sortValue, setSortValue] = useState("latest");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [favoriteState, setFavoriteState] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -33,9 +34,7 @@ function StudyListPage() {
   const sentinelRef = useRef(null);
   const relatedSuggestions = Array.from(
     new Map(
-      items
-        .filter((study) => study?.name)
-        .map((study) => [study.name, study]),
+      items.filter((study) => study?.name).map((study) => [study.name, study]),
     ).values(),
   ).slice(0, 5);
 
@@ -173,11 +172,31 @@ function StudyListPage() {
     setSortValue(nextSortValue);
   };
 
+  const handleFavoriteChange = (studyId, isFavorite) => {
+    setFavoriteState((prev) => ({
+      ...prev,
+      [studyId]: isFavorite,
+    }));
+
+    setItems((prevItems) =>
+      prevItems.map((study) =>
+        study.id === studyId
+          ? {
+              ...study,
+              isFavorite,
+            }
+          : study,
+      ),
+    );
+  };
+
   return (
     <section>
       <div className="inner">
-        <RecentStudyList />
-
+        <RecentStudyList
+          favoriteState={favoriteState}
+          onFavoriteChange={handleFavoriteChange}
+        />
         <div className="card_container">
           <span className="container_title">스터디 둘러보기</span>
 
@@ -204,7 +223,17 @@ function StudyListPage() {
             )}
             {!isLoading &&
               !errorMessage &&
-              items.map((study) => <StudyCard key={study.id} study={study} />)}
+              items.map((study) => (
+                <StudyCard
+                  key={study.id}
+                  study={{
+                    ...study,
+                    isFavorite:
+                      favoriteState[study.id] ?? study.isFavorite ?? false,
+                  }}
+                  onFavoriteChange={handleFavoriteChange}
+                />
+              ))}
             {isLoadingMore && (
               <p className="list_state_message">불러오는 중...</p>
             )}

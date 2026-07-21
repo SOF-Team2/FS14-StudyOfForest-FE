@@ -9,23 +9,16 @@ import arrowRightIcon from "../assets/img/ic_arrow_right.svg";
 import plusIcon from "../assets/img/ic_plus.svg";
 import useAlert from "../components/useAlert.js";
 import { getStudyBackgroundStyle } from "../utils/studyBackground.js";
+import axios from "../utils/axios.js";
+import FavoriteButton from "../components/favoriteButton.jsx";
 
-//const API_BASE_URL = "http://127.0.0.1:3000";
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const USER_ID = "942d8758-939d-47f4-ba70-f418cccbdfd4";
 
-const getStudyErrorMessage = async (response) => {
-  try {
-    const result = await response.json();
-
-    return (
-      result?.error?.message ||
-      result?.message ||
-      "스터디 정보를 불러오지 못했습니다."
-    );
-  } catch {
-    return "스터디 정보를 불러오지 못했습니다.";
-  }
-};
+const getStudyErrorMessage = (error, fallbackMessage) =>
+  error?.response?.data?.error?.message ||
+  error?.response?.data?.message ||
+  error?.message ||
+  fallbackMessage;
 
 const StudyDetailPage = () => {
   const { id } = useParams();
@@ -77,16 +70,14 @@ const StudyDetailPage = () => {
       setErrorMessage("");
 
       try {
-        const response = await fetch(`${API_BASE_URL}/study/${id}`, {
+        const response = await axios.get(`/study/${id}`, {
+          headers: {
+            "x-user-id": USER_ID,
+          },
           signal: controller.signal,
         });
 
-        if (!response.ok) {
-          throw new Error(await getStudyErrorMessage(response));
-        }
-
-        const result = await response.json();
-        const nextStudy = result?.data;
+        const nextStudy = response.data?.data ?? response.data;
 
         if (!nextStudy?.id) {
           throw new Error("스터디 정보를 불러오지 못했습니다.");
@@ -95,13 +86,19 @@ const StudyDetailPage = () => {
         setStudy(nextStudy);
         setEmoji(Array.isArray(nextStudy.emojis) ? nextStudy.emojis : []);
       } catch (error) {
-        if (error.name === "AbortError") {
+        if (
+          error.name === "CanceledError" ||
+          error.name === "AbortError" ||
+          error.code === "ERR_CANCELED"
+        ) {
           return;
         }
 
         setStudy(null);
         setEmoji([]);
-        setErrorMessage(error.message || "스터디 정보를 불러오지 못했습니다.");
+        setErrorMessage(
+          getStudyErrorMessage(error, "스터디 정보를 불러오지 못했습니다."),
+        );
       } finally {
         if (!controller.signal.aborted) {
           setIsLoading(false);
@@ -117,20 +114,19 @@ const StudyDetailPage = () => {
   // 이모지 선택시 출력 확인
   const handleEmojiClick = async (selectedEmoji) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/study/${id}/emojis`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await axios.post(
+        `/study/${id}/emojis`,
+        {
+          emoji: selectedEmoji,
         },
-        body: JSON.stringify({ emoji: selectedEmoji }),
-      });
+        {
+          headers: {
+            "x-user-id": USER_ID,
+          },
+        },
+      );
 
-      if (!response.ok) {
-        throw new Error(await getStudyErrorMessage(response));
-      }
-
-      const result = await response.json();
-      const updatedEmoji = result?.data;
+      const updatedEmoji = response.data?.data ?? response.data;
 
       if (!updatedEmoji?.emoji) {
         throw new Error("응원 이모지를 저장하지 못했습니다.");
@@ -154,7 +150,9 @@ const StudyDetailPage = () => {
       setIsEmojiOpen(false);
       setIsEmojiMoreOpen(false);
     } catch (error) {
-      setPasswordError(error.message || "응원 이모지를 저장하지 못했습니다.");
+      showAlert(
+        getStudyErrorMessage(error, "응원 이모지를 저장하지 못했습니다."),
+      );
     }
   };
 
@@ -179,6 +177,19 @@ const StudyDetailPage = () => {
     setNextPath("");
   };
 
+  const handleFavoriteChange = (studyId, nextIsFavorite) => {
+    setStudy((prevStudy) => {
+      if (!prevStudy || prevStudy.id !== studyId) {
+        return prevStudy;
+      }
+
+      return {
+        ...prevStudy,
+        isFavorite: nextIsFavorite,
+      };
+    });
+  };
+
   const handlePasswordCheck = async () => {
     if (!password.trim()) {
       setPasswordError("비밀번호를 입력해주세요.");
@@ -187,32 +198,46 @@ const StudyDetailPage = () => {
 
     try {
       const isDeleteAction = passwordAction === "delete";
-      const response = await fetch(
-        `${API_BASE_URL}/study/${id}${isDeleteAction ? "" : "/password/verify"}`,
-        {
-          method: isDeleteAction ? "DELETE" : "POST",
+
+      if (isDeleteAction) {
+        await axios.delete(`/study/${id}`, {
           headers: {
-            "Content-Type": "application/json",
+            "x-user-id": USER_ID,
           },
-          body: JSON.stringify({ password }),
+          data: {
+            password,
+          },
+        });
+
+        closePasswordModal();
+        navigate("/");
+        return;
+      }
+
+      await axios.post(
+        `/study/${id}/password/verify`,
+        {
+          password,
+        },
+        {
+          headers: {
+            "x-user-id": USER_ID,
+          },
         },
       );
 
-      if (!response.ok) {
-        throw new Error(await getStudyErrorMessage(response));
-      }
+      const path = nextPath;
 
-      setPassword("");
-      setPasswordError("");
-      setIsPasswordModalOpen(false);
-      setPasswordAction("navigate");
-      navigate(isDeleteAction ? "/" : nextPath, {
+      closePasswordModal();
+      navigate(path, {
         state: {
           password,
         },
       });
     } catch (error) {
-      setPasswordError(error.message || "비밀번호가 일치하지 않습니다.");
+      setPasswordError(
+        getStudyErrorMessage(error, "비밀번호가 일치하지 않습니다."),
+      );
     }
   };
 
@@ -384,7 +409,7 @@ const StudyDetailPage = () => {
                     aria-label="이모지 추가"
                     onClick={() => {
                       setIsEmojiOpen((prev) => !prev);
-                      setIsEmojiMoreOpen(true);
+                      setIsEmojiMoreOpen(false);
                     }}
                   >
                     <img
@@ -416,11 +441,20 @@ const StudyDetailPage = () => {
                 <span>의</span>
                 <span>{study.name}</span>
               </div>
+              <FavoriteButton
+                studyId={study.id}
+                isFavorite={study.isFavorite ?? false}
+                onFavoriteChange={handleFavoriteChange}
+              />
             </div>
 
             <div>
               <span
-                style={{ fontSize: "22px", color: "#000000", fontWeight: "300" }}
+                style={{
+                  fontSize: "22px",
+                  color: "#000000",
+                  fontWeight: "300",
+                }}
               >
                 소개
               </span>
@@ -435,7 +469,6 @@ const StudyDetailPage = () => {
                 {study.description}
               </p>
             </div>
-
           </div>
 
           <WeeklyHabitRecordTable studyId={id} />
