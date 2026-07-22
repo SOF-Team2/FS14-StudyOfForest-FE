@@ -58,8 +58,7 @@ function DashboardPage() {
       setWeeklyFocus([]);
       setMaxFocusMinutes(0);
       setErrorMessage(
-        error.response?.data?.message ??
-          "대시보드 정보를 불러오지 못했습니다.",
+        error.response?.data?.message ?? "대시보드 정보를 불러오지 못했습니다.",
       );
     } finally {
       setIsLoading(false);
@@ -113,20 +112,30 @@ function DashboardPage() {
     },
   ];
 
-  const favoriteStudies = [
-    {
-      id: 1,
-      name: "React 프론트엔드 스터디",
-      members: 7,
-      category: "개발",
-    },
-    {
-      id: 2,
-      name: "매일 알고리즘",
-      members: 5,
-      category: "코딩 테스트",
-    },
-  ];
+  const [favoriteStudies, setFavoriteStudies] = useState([]);
+  const [favoriteTotalCount, setFavoriteTotalCount] = useState(0);
+
+  const loadFavorites = async () => {
+    try {
+      const response = await axios.get("/api/favorites/me", {
+        headers: { "x-user-id": userId },
+      });
+
+      const list = response.data?.data ?? [];
+      const totalCount = response.data?.pagination?.totalCount ?? list.length;
+      setFavoriteStudies(list);
+      setFavoriteTotalCount(totalCount);
+    } catch (error) {
+      console.error("즐겨찾기 조회 실패:", error);
+      setFavoriteStudies([]);
+      setFavoriteTotalCount(0);
+    }
+  };
+
+  useEffect(() => {
+    handleLoad();
+    loadFavorites();
+  }, []);
 
   return (
     <section className="dashboard_page">
@@ -163,63 +172,72 @@ function DashboardPage() {
               {!isLoading &&
                 !errorMessage &&
                 todayStatus.map((status, index) => (
-                <div className="card dashboard_card" key={status?.id ?? index}>
-                  <div className="dashboard_card_header">
-                    <div>
-                      <div className="dashboard_card_label">{status?.label ?? ""}</div>
+                  <div
+                    className="card dashboard_card"
+                    key={status?.id ?? index}
+                  >
+                    <div className="dashboard_card_header">
+                      <div>
+                        <div className="dashboard_card_label">
+                          {status?.label ?? ""}
+                        </div>
 
-                      <p className="dashboard_card_description">
-                        {status?.description ?? ""}
-                      </p>
+                        <p className="dashboard_card_description">
+                          {status?.description ?? ""}
+                        </p>
+                      </div>
+
+                      <div className="dashboard_card_icon">
+                        {status?.icon ?? ""}
+                      </div>
                     </div>
 
-                    <div className="dashboard_card_icon">{status?.icon ?? ""}</div>
-                  </div>
-
-                  {status.type === "time" && (
-                    <div className="dashboard_card_value">
-                      <strong>{status.hour}</strong>
-                      <span>시간</span>
-                      <strong>{status.minute}</strong>
-                      <span>분</span>
-                    </div>
-                  )}
-
-                  {status.type === "progress" && (
-                    <>
+                    {status.type === "time" && (
                       <div className="dashboard_card_value">
-                        <strong>{status.current}</strong>
-
-                        <span className="dashboard_value_total">
-                          / {status.total}개
-                        </span>
+                        <strong>{status.hour}</strong>
+                        <span>시간</span>
+                        <strong>{status.minute}</strong>
+                        <span>분</span>
                       </div>
+                    )}
 
-                      <div className="dashboard_progress">
-                        <div
-                          className="dashboard_progress_bar"
-                          style={{ width: `${Number(status?.progress ?? 0)}%` }}
-                        />
+                    {status.type === "progress" && (
+                      <>
+                        <div className="dashboard_card_value">
+                          <strong>{status.current}</strong>
+
+                          <span className="dashboard_value_total">
+                            / {status.total}개
+                          </span>
+                        </div>
+
+                        <div className="dashboard_progress">
+                          <div
+                            className="dashboard_progress_bar"
+                            style={{
+                              width: `${Number(status?.progress ?? 0)}%`,
+                            }}
+                          />
+                        </div>
+                      </>
+                    )}
+
+                    {status.type === "streak" && (
+                      <div className="dashboard_card_value">
+                        <strong>{status.value}</strong>
+                        <span>일째</span>
                       </div>
-                    </>
-                  )}
+                    )}
 
-                  {status.type === "streak" && (
-                    <div className="dashboard_card_value">
-                      <strong>{status.value}</strong>
-                      <span>일째</span>
+                    <div className="dashboard_card_footer">
+                      <span>{status.footerLabel}</span>
+
+                      <strong className={status.footerClassName || ""}>
+                        {status.footerValue}
+                      </strong>
                     </div>
-                  )}
-
-                  <div className="dashboard_card_footer">
-                    <span>{status.footerLabel}</span>
-
-                    <strong className={status.footerClassName || ""}>
-                      {status.footerValue}
-                    </strong>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
 
@@ -294,8 +312,13 @@ function DashboardPage() {
                 </div>
 
                 <div className="dashboard_weekly_total">
-                  <strong>{weeklyFocusCard.hour ? weeklyFocusCard.hour : '00'}</strong>
-                  <span>시간 {weeklyFocusCard.minute ? weeklyFocusCard.minute : '00'}분</span>
+                  <strong>
+                    {weeklyFocusCard.hour ? weeklyFocusCard.hour : "00"}
+                  </strong>
+                  <span>
+                    시간{" "}
+                    {weeklyFocusCard.minute ? weeklyFocusCard.minute : "00"}분
+                  </span>
                 </div>
 
                 <div className="dashboard_weekly_chart">
@@ -308,30 +331,35 @@ function DashboardPage() {
                   {!isLoading &&
                     !errorMessage &&
                     weeklyFocus.map((item, index) => {
-                    const minutes = Number(item?.minutes ?? 0);
-                    const barHeight =
-                      maxFocusMinutes > 0
-                        ? (minutes / maxFocusMinutes) * 100
-                        : 0;
+                      const minutes = Number(item?.minutes ?? 0);
+                      const barHeight =
+                        maxFocusMinutes > 0
+                          ? (minutes / maxFocusMinutes) * 100
+                          : 0;
 
-                    return (
-                      <div className="dashboard_chart_item" key={item?.day ?? index}>
-                        <div className="dashboard_chart_bar_wrap">
-                          <div
-                            className="dashboard_chart_bar"
-                            style={{ height: `${barHeight}%` }}
-                          />
+                      return (
+                        <div
+                          className="dashboard_chart_item"
+                          key={item?.day ?? index}
+                        >
+                          <div className="dashboard_chart_bar_wrap">
+                            <div
+                              className="dashboard_chart_bar"
+                              style={{ height: `${barHeight}%` }}
+                            />
+                          </div>
+
+                          <span>{item?.day ?? "-"}</span>
                         </div>
-
-                        <span>{item?.day ?? "-"}</span>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
                 </div>
 
                 <div className="dashboard_card_footer">
                   <span>지난주보다</span>
-                  <strong className="dashboard_increase">{weeklyFocusCard.footerValue}</strong>
+                  <strong className="dashboard_increase">
+                    {weeklyFocusCard.footerValue}
+                  </strong>
                 </div>
               </div>
 
@@ -396,7 +424,7 @@ function DashboardPage() {
                         <strong>{study.name}</strong>
 
                         <p>
-                          {study.category} · 참여자 {study.members}명
+                          {study.description} · 참여자 {study.currentMembers}/{study.maxMembers}명
                         </p>
                       </div>
 
@@ -407,7 +435,7 @@ function DashboardPage() {
 
                 <div className="dashboard_card_footer">
                   <span>즐겨찾기</span>
-                  <strong>{favoriteStudies.length}개</strong>
+                  <strong>{favoriteTotalCount}개</strong>
                 </div>
               </div>
 
