@@ -1,6 +1,6 @@
 import HabitItem from "./HabitItem.jsx"
 
-function HabitList({ habits, handleLoad, isLoading }) {
+function HabitList({ habits, studyId, handleLoad, isLoading }) {
   if (isLoading) {
     return (
       <p className="habit_state_message">
@@ -24,7 +24,7 @@ function HabitList({ habits, handleLoad, isLoading }) {
         <HabitItem 
           key={habit.id}
           habit={habit}
-          habits={habits}
+          studyId={studyId}
           handleLoad={handleLoad}
         />
       ))}
