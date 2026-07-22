@@ -1,8 +1,6 @@
 import { useState } from "react";
 import axios from "../utils/axios";
 
-const USER_ID = "942d8758-939d-47f4-ba70-f418cccbdfd4";
-
 function FavoriteButton({
   studyId,
   isFavorite,
@@ -10,6 +8,7 @@ function FavoriteButton({
   isPreview = false,
 }) {
   const [isLoading, setIsLoading] = useState(false);
+  const userId = localStorage.getItem("userId");
 
   const handleToggle = async (event) => {
     event.preventDefault();
@@ -25,7 +24,7 @@ function FavoriteButton({
         {},
         {
           headers: {
-            "x-user-id": USER_ID,
+            "x-user-id": userId,
           },
         },
       );

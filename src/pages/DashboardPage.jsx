@@ -11,6 +11,7 @@ function DashboardPage() {
   const [maxFocusMinutes, setMaxFocusMinutes] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const userId = localStorage.getItem("userId");
 
   const handleLoad = async () => {
     setIsLoading(true);
@@ -20,7 +21,7 @@ function DashboardPage() {
     try {
       const response = await axios.get("/api/users/dashboard", {
         headers: {
-          "x-user-id": "942d8758-939d-47f4-ba70-f418cccbdfd4",
+          "x-user-id": userId,
         },
       });
 
