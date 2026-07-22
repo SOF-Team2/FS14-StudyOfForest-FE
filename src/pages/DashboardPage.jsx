@@ -8,6 +8,7 @@ function DashboardPage() {
 
   const [todayStatus, setTodayStatus] = useState([]);
   const [weeklyFocus, setWeeklyFocus] = useState([]);
+  const [weeklyFocusCard, setWeeklyFocusCard] = useState({});
   const [maxFocusMinutes, setMaxFocusMinutes] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -43,10 +44,12 @@ function DashboardPage() {
               ...loadedWeeklyFocus.map((item) => Number(item?.minutes ?? 0)),
             )
           : 0;
+      const loadedWeeklyFocusCard = data.weeklyFocusCard;
 
       setTodayStatus(loadedTodayStatus);
       setWeeklyFocus(loadedWeeklyFocus);
       setMaxFocusMinutes(loadedMaxFocusMinutes);
+      setWeeklyFocusCard(loadedWeeklyFocusCard);
     } catch (error) {
       console.error("대시보드 조회 실패:", error);
       console.error("서버 응답:", error.response?.data);
@@ -291,8 +294,8 @@ function DashboardPage() {
                 </div>
 
                 <div className="dashboard_weekly_total">
-                  <strong>13</strong>
-                  <span>시간 00분</span>
+                  <strong>{weeklyFocusCard.hour ? weeklyFocusCard.hour : '00'}</strong>
+                  <span>시간 {weeklyFocusCard.minute ? weeklyFocusCard.minute : '00'}분</span>
                 </div>
 
                 <div className="dashboard_weekly_chart">
@@ -328,7 +331,7 @@ function DashboardPage() {
 
                 <div className="dashboard_card_footer">
                   <span>지난주보다</span>
-                  <strong className="dashboard_increase">+2시간 30분</strong>
+                  <strong className="dashboard_increase">{weeklyFocusCard.footerValue}</strong>
                 </div>
               </div>
 
