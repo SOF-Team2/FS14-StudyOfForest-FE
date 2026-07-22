@@ -1,0 +1,136 @@
+.focus-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+.focus-timeline__day {
+  position: relative;
+  padding-left: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.focus-timeline__day::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 0;
+  bottom: -24px;   /* 다음 날짜까지 이어지게 아래로 연장 */
+  width: 1px;
+  background: var(--gray);
+}
+
+.focus-timeline__day h3 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--dark-gray);
+}
+
+.focus-timeline__summary {
+  display: flex;
+  gap: 32px;
+}
+
+.focus-timeline__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.focus-timeline__stat-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--brand);
+  line-height: 1.1;
+}
+
+.focus-timeline__stat-label {
+  font-size: 13px;
+  color: var(--dark-gray);
+}
+
+.focus-timeline__session {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--green);
+  color: var(--green-text);
+}
+
+.focus-timeline__time {
+  flex-shrink: 0;
+  width: 64px;
+  font-weight: bold;
+}
+
+.focus-timeline__duration {
+  flex-grow: 1;
+}
+
+.focus-timeline__point {
+  flex-shrink: 0;
+  font-weight: bold;
+}
+
+.focus-timeline__point--empty {
+  color: var(--dark-gray);
+  font-weight: normal;
+}
+
+
+.focus-timeline__toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.focus-timeline__toggle button {
+  padding: 6px 16px;
+  border: 1px solid var(--gray);
+  border-radius: 20px;
+  background: var(--wh);
+  color: var(--dark-gray);
+  cursor: pointer;
+}
+
+.focus-timeline__toggle button.is-active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--wh);
+}
+
+.focus-timeline__session--empty {
+  background: var(--light-gray);
+  color: var(--dark-gray);
+}
+
+.focus-timeline__row {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.focus-timeline__dot {
+  position: absolute;
+  left: -30px;              /* 카드 왼쪽 선 위로 */
+  top: 50%;
+  transform: translateY(-50%);   /* 세로 정확히 중앙 */
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--brand);
+  z-index: 1;
+}
+
+.focus-timeline__session--empty ~ .focus-timeline__dot,
+.focus-timeline__row:has(.focus-timeline__session--empty) .focus-timeline__dot {
+  background: var(--wh);
+  border: 1px solid var(--gray);
+}
+
+.focus-timeline__day--last::before {
+  bottom: auto;
+  height: 60px;   /* 첫 카드 점 높이까지만 */
+}

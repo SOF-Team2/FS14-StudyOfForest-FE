@@ -17,7 +17,6 @@ export default function FocusTimer({ studyId, password }) {
     const [settingSeconds, setSettingSeconds] = useState(0);   // 설정한 초
     const [isEditing, setIsEditing] = useState(false);         // 수정할 때 쓴 거 
     const [toast, setToast] = useState(null);
-    const { showAlert } = useAlert();
 
     const loginId = localStorage.getItem('userId') ?? 'test1'; //로컬에서 꺼내다 쓴다
     const [startedAt, setStartedAt] = useState(null); //맨 처음 시작한 시각을 기록한다.
@@ -209,18 +208,18 @@ export default function FocusTimer({ studyId, password }) {
 
             <div className="focus-timer__buttons">
                 {!isStarted ? (
-                    <FocusButton onClick={handleStart}><img src={playIcon} alt="" />시작</FocusButton>
+                    <Button onClick={handleStart}><img src={playIcon} alt="" />시작</Button>
                 ) : (
                     <>
                         {isRunning ? (
-                            <FocusButton onClick={handlePause}><img src={pauseIcon} alt="" />일시정지</FocusButton>
+                            <Button onClick={handlePause}><img src={pauseIcon} alt="" />일시정지</Button>
                         ) : (
-                            <FocusButton onClick={handleResume}><img src={playIcon} alt="" />계속</FocusButton>
+                            <Button onClick={handleResume}><img src={playIcon} alt="" />계속</Button>
                         )}
-                        <FocusButton onClick={handleFinish}>
+                        <Button onClick={handleFinish}>
                             <img src={stopIcon} alt="" />
                             {isCompleted ? '완료' : '정지'}
-                        </FocusButton>
+                        </Button>
                     </>
                 )}
             </div>

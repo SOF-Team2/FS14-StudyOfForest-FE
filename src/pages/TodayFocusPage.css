@@ -23,6 +23,8 @@
   gap: 40px;
 }
 
+.card_container.inner_container .inner { position: relative; max-width: 1000px !important; }
+
 .focus-page__study-info {
   min-width: 0;
 }
@@ -102,9 +104,28 @@
   text-align: center;
 }
 
+/* 컴퓨터: 좌우 정렬 */
+.focus-today__body {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.focus-today__body > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+/* 제목 중앙정렬 */
+.focus-today__title {
+  display: block;
+  text-align: center;
+}
+
 /* ==================================================== */
 /* 미디어 쿼리 */
 /* ==================================================== */
+
+
 /* 태블릿 */
 @media (max-width: 1023px) {
   .focus-page {
@@ -131,6 +152,11 @@
 
 /* 모바일 */
 @media (max-width: 767px) {
+
+  .focus-today__body {
+    flex-direction: column;
+  }
+
   .focus-page {
     padding-bottom: 40px;
   }

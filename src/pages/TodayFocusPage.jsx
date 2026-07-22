@@ -8,6 +8,8 @@ import FocusTimer from '../components/focus/FocusTimer.jsx';
 import PointSummary from '../components/PointSummary.jsx';
 import arrowRightIcon from '../assets/img/ic_arrow_right.svg';
 import { getStudyBackgroundStyle } from '../utils/studyBackground.js';
+import FocusTimeline from '../components/focus/FocusTimeline.jsx';
+import './TodayFocusPage.css';
 
 const FOCUS_LOADING_FADE_DURATION = 400;
 
@@ -26,6 +28,8 @@ function FocusPage() {
     const [focusLoadingAlertStatus, setFocusLoadingAlertStatus] = useState('visible');
     const [focusLoadError, setFocusLoadError] = useState('');
     const loadingAlertTimerRef = useRef(null);
+
+    const loginId = localStorage.getItem('userId') ?? 'test1';
 
     // 비밀번호 없이 들어왔으면 상세 페이지로 돌려보내기
     useEffect(() => {
@@ -203,11 +207,11 @@ function FocusPage() {
 
                     <div className="card_container inner_container">
                         <div className="inner">
-                            <span className="container_title">오늘의 집중</span>
-                            <FocusTimer
-                                studyId={studyId}
-                                password={password}
-                            />
+                            <span className="container_title focus-today__title">오늘의 집중</span>
+                            <div className="focus-today__body">
+                                <FocusTimer studyId={studyId} password={password} />
+                                <FocusTimeline studyId={studyId} password={password} loginId={loginId} />
+                            </div>
                         </div>
                     </div>
                 </section>
