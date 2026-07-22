@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useParams, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import axios from '../utils/axios.js';
 import AlertMessage from '../components/AlertMessage.jsx';
 import FocusTimer from '../components/focus/FocusTimer.jsx';
 import PointSummary from '../components/PointSummary.jsx';
+import useAlert from '../components/useAlert.js';
 import arrowRightIcon from '../assets/img/ic_arrow_right.svg';
 import { getStudyBackgroundStyle } from '../utils/studyBackground.js';
 import FocusTimeline from '../components/focus/FocusTimeline.jsx';
@@ -14,10 +15,8 @@ const FOCUS_LOADING_FADE_DURATION = 400;
 
 function FocusPage() {
     const { id: studyId } = useParams();
-    const location = useLocation();
     const navigate = useNavigate();
     const { showAlert } = useAlert();
-    const password = location.state?.password;
     const [focusData, setFocusData] = useState({
         studyName: '',
         currentPoint: 0,
@@ -26,17 +25,8 @@ function FocusPage() {
     const [isFocusLoading, setIsFocusLoading] = useState(true);
     const [focusLoadingAlertStatus, setFocusLoadingAlertStatus] = useState('visible');
     const [focusLoadError, setFocusLoadError] = useState('');
+    const [timelineRefreshKey, setTimelineRefreshKey] = useState(0);
     const loadingAlertTimerRef = useRef(null);
-
-    const loginId = localStorage.getItem('userId') ?? 'test1';
-
-    // 비밀번호 없이 들어왔으면 상세 페이지로 돌려보내기
-    useEffect(() => {
-        if (!password) {
-            showAlert('비밀번호 확인이 필요합니다.');   // ← alert 대신 이걸로
-            navigate(`/study/${studyId}`, { replace: true });
-        }
-    }, [password, studyId, navigate, showAlert]);
 
     useEffect(() => {
         let isActive = true;
@@ -82,10 +72,18 @@ function FocusPage() {
             } catch (error) {
                 console.error('오늘의 집중 조회 오류:', error);
 
-                setFocusLoadError(
+                const status = error?.response?.status;
+                const message =
                     error?.response?.data?.message ??
-                    '오늘의 집중 정보를 불러오지 못했습니다.',
-                );
+                    '오늘의 집중 정보를 불러오지 못했습니다.';
+
+                if (status === 400 || status === 401 || status === 403) {
+                    showAlert(message, 'error');
+                    navigate(`/study/${studyId}`, { replace: true });
+                    return;
+                }
+
+                setFocusLoadError(message);
             } finally {
                 if (isActive) {
                     if (loadingAlertTimerRef.current) {
@@ -112,7 +110,18 @@ function FocusPage() {
                 loadingAlertTimerRef.current = null;
             }
         };
-    }, [studyId, password]);
+    }, [navigate, showAlert, studyId]);
+
+    const handleFocusSessionCreated = (session) => {
+        if (Number.isFinite(session?.studyPoint)) {
+            setFocusData((currentData) => ({
+                ...currentData,
+                currentPoint: session.studyPoint,
+            }));
+        }
+
+        setTimelineRefreshKey((currentKey) => currentKey + 1);
+    };
 
     const {
         studyName,
@@ -202,8 +211,14 @@ function FocusPage() {
                         <div className="inner">
                             <span className="container_title focus-today__title">오늘의 집중</span>
                             <div className="focus-today__body">
-                                <FocusTimer studyId={studyId} password={password} />
-                                <FocusTimeline studyId={studyId} password={password} loginId={loginId} />
+                                <FocusTimer
+                                    studyId={studyId}
+                                    onSessionCreated={handleFocusSessionCreated}
+                                />
+                                <FocusTimeline
+                                    studyId={studyId}
+                                    refreshKey={timelineRefreshKey}
+                                />
                             </div>
                         </div>
                     </div>

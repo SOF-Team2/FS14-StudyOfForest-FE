@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "../utils/axios.js";
 import HabitList from "../components/habit/HabitList.jsx";
 import HabitEditModal from "../components/habit/HabitEditModal.jsx";
@@ -7,10 +7,13 @@ import CurrentTime from "../components/habit/CurrentTime.jsx";
 import arrowRightIcon from "../assets/img/ic_arrow_right.svg";
 import { useLoading } from "../contexts/LoadingContext.jsx";
 import { getStudyBackgroundStyle } from "../utils/studyBackground.js";
+import useAlert from "../components/useAlert.js";
 
 
 function TodayHabitPage() {
   const { startLoading, endLoading } = useLoading();
+  const { showAlert } = useAlert();
+  const navigate = useNavigate();
   const [isHabitLoading, setIsHabitLoading] = useState(true);
   const { id } = useParams();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -27,7 +30,18 @@ function TodayHabitPage() {
       setHabits(response.data.habits ?? []);
       setIsEditModalOpen(false);
     } catch (error) {
-      console.log(error);
+      console.error("오늘의 습관 조회 오류:", error);
+
+      const status = error?.response?.status;
+      const message =
+        error?.response?.data?.message ??
+        "오늘의 습관 정보를 불러오지 못했습니다.";
+
+      showAlert(message, "error");
+
+      if (status === 400 || status === 401 || status === 403) {
+        navigate(`/study/${id}`, { replace: true });
+      }
     } finally {
       setIsHabitLoading(false);
       endLoading();
@@ -119,6 +133,7 @@ function TodayHabitPage() {
               </button>
               <HabitList 
                 habits={habits} 
+                studyId={id}
                 handleLoad={handleLoad}
                 isLoading={isHabitLoading}
               />

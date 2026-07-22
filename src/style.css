@@ -271,7 +271,7 @@ input:focus { outline-color: var(--brand); }
 
 .card_wrap { display: flex; flex-direction: row; justify-content: left; gap: 24px; flex-wrap: wrap; }
 .card { position: relative; width: calc((100% - 48px) / 3); padding: 30px; background-color: var(--dark-gray); border-radius: 20px; cursor: pointer; overflow: hidden; }
-.study-card { transform-origin: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.study-card { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; height: 277px; transform-origin: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
 @media (hover: hover) and (pointer: fine) {
   .study-card:hover { z-index: 1; transform: scale(1.02); box-shadow: 0 0 16px rgba(0, 0, 0, 0.25); }
 }
@@ -279,16 +279,19 @@ input:focus { outline-color: var(--brand); }
   .study-card { transition: none; }
   .study-card:hover { transform: none; }
 }
-.card_title_wrap { position: relative; display: flex; flex-direction: row; justify-content: space-between; margin-bottom: 10px; }
-.card_title { color: var(--wh); font-size: 18px; font-weight: 400; word-break: keep-all; }
+.card_title_wrap { position: relative; display: flex; flex-direction: row; justify-content: space-between; min-width: 0; margin-bottom: 10px; }
+.card_title { display: -webkit-box; min-width: 0; overflow: hidden; color: var(--wh); font-size: 18px; font-weight: 400; word-break: keep-all; overflow-wrap: anywhere; text-overflow: ellipsis; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .card_title,
 .card_title * { font-weight: 700; font-size: 13pt !important; }
+.study-card-actions { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; align-self: end; column-gap: 12px; width: 100%; min-width: 0; }
+.study-card-actions .tag_wrap { min-width: 0; justify-content: flex-start; overflow: hidden; }
+.study-card-actions .favorite_btn_wrap { display: flex; justify-content: flex-end; justify-self: end; width: auto; }
 .tag_wrap { position: relative; display: flex; flex-direction: row; justify-content: left; gap: 5px; }
 .tag { display: flex; flex-direction: row; justify-content: space-between; gap: 4px; align-items: center; width: fit-content; height: 22px; padding: 4px 10px; border-radius: 50px; color: var(--wh); font-size: 12px; font-weight: 400; white-space: nowrap; border: 1px solid rgba(0, 0, 0, 0.10); background: rgba(0, 0, 0, 0.50); }
 .point_tag { flex: 0 0 auto; width: max-content; }
 .tag img { display: inline-block; height: 14px; }
 .card_status { position: relative; display: block; color: var(--light-gray); font-size: 14px; font-weight: 400; margin-bottom: 30px; }
-.card_text { position: relative; height: 48px; color: var(--wh); font-size: 16px; font-weight: 400; line-height: 24px; margin-bottom: 30px; word-break: keep-all; }
+.card_text { position: relative; display: -webkit-box; min-width: 0; min-height: 0; max-height: 48px; overflow: hidden; color: var(--wh); font-size: 16px; font-weight: 400; line-height: 24px; margin-bottom: 30px; word-break: keep-all; overflow-wrap: anywhere; text-overflow: ellipsis; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .dashboard_text { position: relative; width: 100%; padding-top: 50px; text-align: right; }
 
 .card.color .card_title,
@@ -1187,6 +1190,14 @@ input:focus { outline-color: var(--brand); }
   height: 243px;
   flex: 0 0 358px;
 }
+@media screen and (min-width: 801px) {
+  .recent_scroll .recent-study-card-slot { height: 317px; }
+  .recent_scroll .recent-study-card-slot .card { height: 277px; }
+}
+@media screen and (min-width: 501px) and (max-width: 800px) {
+  .recent_scroll .recent-study-card-slot { height: 220px; }
+  .recent_scroll .recent-study-card-slot .card { height: 180px; }
+}
 .recent_scroll .card_wrap::-webkit-scrollbar {
   height: 10px;
   background-color: #EEF1EC;
@@ -1760,7 +1771,6 @@ input:focus { outline-color: var(--brand); }
   .habit_record_icon_container { display: inline-block; width: calc(100% /7); padding: 6px; text-align: center; }
   .habit_record_icon { width: 36px; height: 36px; }
 
-  .user_menu_container { right: 30px; }
 }
 
 /* Mobile */
@@ -1917,8 +1927,9 @@ input:focus { outline-color: var(--brand); }
 
   /* 카드 형태 */
   .card_title_wrap { flex-direction: column-reverse; gap: 6px; }
+  .card_title { -webkit-line-clamp: 1; }
   .card_status { margin-bottom: 8px; }
-  .card_text { height: auto; margin-bottom: 8px; }
+  .card_text { max-height: 24px; margin-bottom: 8px; -webkit-line-clamp: 1; }
 
   .modal_title { font-size: 14pt; }
   

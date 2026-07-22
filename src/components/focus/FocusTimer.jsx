@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import axios from '../../utils/axios.js';
 import Button from '../Button.jsx';
@@ -9,17 +9,17 @@ import stopIcon from '../../assets/img/ic_pause (1).svg';
 
 import './FocusTimer.css';
 
-export default function FocusTimer({ studyId, password }) {
+export default function FocusTimer({ studyId, onSessionCreated }) {
     const [elapsedSeconds, setElapsedSeconds] = useState(0); // 실제 흘러간 초 (계속 증가, 포인트 계산할 때 역산)
     const [isRunning, setIsRunning] = useState(false);  // 업데이트
     const [isStarted, setIsStarted] = useState(false);  // 한 번이라도 시작했는지 (버튼 바뀌는 거)
     const [settingMinutes, setSettingMinutes] = useState(25);  // 설정한 분
     const [settingSeconds, setSettingSeconds] = useState(0);   // 설정한 초
     const [isEditing, setIsEditing] = useState(false);         // 수정할 때 쓴 거 
+    const handleFinishRef = useRef(null);
 
     const { showAlert } = useAlert();
 
-    const loginId = localStorage.getItem('userId') ?? 'test1'; //로컬에서 꺼내다 쓴다
     const [startedAt, setStartedAt] = useState(null); //맨 처음 시작한 시각을 기록한다.
 
     const totalSettingSeconds = settingMinutes * 60 + settingSeconds;
@@ -65,7 +65,7 @@ export default function FocusTimer({ studyId, password }) {
 
             if (e.key === 'Escape') {
                 if (isStarted) {
-                    handleFinish();
+                    handleFinishRef.current?.();
                 }
             }
         }
@@ -108,13 +108,27 @@ export default function FocusTimer({ studyId, password }) {
         }
 
         try {
-            const response = await axios.post(`/study/${studyId}/focus/session`, { loginId, password, startedAt, durationSeconds: elapsedSeconds })
-            const earnedPoint = response.data.data.point;
+            const response = await axios.post(
+                `/study/${studyId}/focus/session`,
+                {
+                    startedAt,
+                    durationSeconds: elapsedSeconds,
+                },
+            );
+            const session = response.data.data;
+            const earnedPoint = session.point;
+
+            onSessionCreated?.(session);
             showAlert(`집중 완료! ${earnedPoint}포인트를 획득했습니다.`, 'success');
         } catch (error) {
             console.error(
                 '포인트 업데이트 실패:',
                 error.response?.data ?? error,
+            );
+            showAlert(
+                error.response?.data?.message ??
+                '집중 기록을 저장하지 못했습니다.',
+                'error',
             );
         }
         handleReset();
@@ -126,6 +140,8 @@ export default function FocusTimer({ studyId, password }) {
         setElapsedSeconds(0);
         setStartedAt(null);
     }
+
+    handleFinishRef.current = handleFinish;
 
     return (
         <div className="focus-timer">
