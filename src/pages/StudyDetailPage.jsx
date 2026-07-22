@@ -11,8 +11,7 @@ import useAlert from "../components/useAlert.js";
 import { getStudyBackgroundStyle } from "../utils/studyBackground.js";
 import axios from "../utils/axios.js";
 import FavoriteButton from "../components/favoriteButton.jsx";
-
-const USER_ID = "942d8758-939d-47f4-ba70-f418cccbdfd4";
+import StudyDeleteModal from "../components/study/StudyDeleteModal.jsx";
 
 const getStudyErrorMessage = (error, fallbackMessage) =>
   error?.response?.data?.error?.message ||
@@ -27,15 +26,14 @@ const StudyDetailPage = () => {
   const [study, setStudy] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [password, setPassword] = useState("");
-  const [nextPath, setNextPath] = useState("");
-  const [passwordAction, setPasswordAction] = useState("navigate");
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
   const [isEmojiMoreOpen, setIsEmojiMoreOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
   const emojiRef = useRef(null);
   const [emoji, setEmoji] = useState([]);
-  const [passwordError, setPasswordError] = useState("");
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -49,7 +47,6 @@ const StudyDetailPage = () => {
       if (event.key === "Escape") {
         setIsEmojiOpen(false);
         setIsEmojiMoreOpen(false);
-        setIsPasswordModalOpen(false);
       }
     };
 
@@ -71,9 +68,6 @@ const StudyDetailPage = () => {
 
       try {
         const response = await axios.get(`/study/${id}`, {
-          headers: {
-            "x-user-id": USER_ID,
-          },
           signal: controller.signal,
         });
 
@@ -119,11 +113,6 @@ const StudyDetailPage = () => {
         {
           emoji: selectedEmoji,
         },
-        {
-          headers: {
-            "x-user-id": USER_ID,
-          },
-        },
       );
 
       const updatedEmoji = response.data?.data ?? response.data;
@@ -160,21 +149,54 @@ const StudyDetailPage = () => {
   const visibleEmoji = emoji.slice(0, 3);
   const hiddenEmoji = emoji.slice(3);
 
-  //모달
-  const handleOpenPasswordModal = (path, action = "navigate") => {
-    setNextPath(path);
-    setPasswordAction(action);
-    setPassword("");
-    setPasswordError("");
-    setIsPasswordModalOpen(true);
+  const handleOwnerNavigation = (path) => {
+    if (!study?.isOwner) {
+      showAlert("스터디 생성자만 이용할 수 있습니다.", "error");
+      return;
+    }
+
+    navigate(path);
   };
 
-  const closePasswordModal = () => {
-    setIsPasswordModalOpen(false);
-    setPassword("");
-    setPasswordError("");
-    setPasswordAction("navigate");
-    setNextPath("");
+  const handleOpenDeleteModal = () => {
+    if (!study?.isOwner) {
+      showAlert("스터디 생성자만 삭제할 수 있습니다.", "error");
+      return;
+    }
+
+    setDeleteConfirmation("");
+    setDeleteErrorMessage("");
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    if (isDeleting) {
+      return;
+    }
+
+    setIsDeleteModalOpen(false);
+    setDeleteConfirmation("");
+    setDeleteErrorMessage("");
+  };
+
+  const handleDeleteStudy = async () => {
+    if (deleteConfirmation !== study?.name || isDeleting) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteErrorMessage("");
+
+    try {
+      await axios.delete(`/study/${id}`);
+      navigate("/");
+    } catch (error) {
+      setDeleteErrorMessage(
+        getStudyErrorMessage(error, "스터디를 삭제하지 못했습니다."),
+      );
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleFavoriteChange = (studyId, nextIsFavorite) => {
@@ -188,57 +210,6 @@ const StudyDetailPage = () => {
         isFavorite: nextIsFavorite,
       };
     });
-  };
-
-  const handlePasswordCheck = async () => {
-    if (!password.trim()) {
-      setPasswordError("비밀번호를 입력해주세요.");
-      return;
-    }
-
-    try {
-      const isDeleteAction = passwordAction === "delete";
-
-      if (isDeleteAction) {
-        await axios.delete(`/study/${id}`, {
-          headers: {
-            "x-user-id": USER_ID,
-          },
-          data: {
-            password,
-          },
-        });
-
-        closePasswordModal();
-        navigate("/");
-        return;
-      }
-
-      await axios.post(
-        `/study/${id}/password/verify`,
-        {
-          password,
-        },
-        {
-          headers: {
-            "x-user-id": USER_ID,
-          },
-        },
-      );
-
-      const path = nextPath;
-
-      closePasswordModal();
-      navigate(path, {
-        state: {
-          password,
-        },
-      });
-    } catch (error) {
-      setPasswordError(
-        getStudyErrorMessage(error, "비밀번호가 일치하지 않습니다."),
-      );
-    }
   };
 
   if (isLoading) {
@@ -290,7 +261,7 @@ const StudyDetailPage = () => {
               <button
                 type="button"
                 className="focus-page__navigation-button"
-                onClick={() => handleOpenPasswordModal(`/study/${id}/habit`)}
+                onClick={() => handleOwnerNavigation(`/study/${id}/habit`)}
               >
                 <span>오늘의 습관</span>
 
@@ -304,7 +275,7 @@ const StudyDetailPage = () => {
               <button
                 type="button"
                 className="focus-page__navigation-button"
-                onClick={() => handleOpenPasswordModal(`/study/${id}/focus`)}
+                onClick={() => handleOwnerNavigation(`/study/${id}/focus`)}
               >
                 <span>오늘의 집중</span>
 
@@ -324,7 +295,7 @@ const StudyDetailPage = () => {
               <div className="study-menu-buttons">
                 <button
                   type="button"
-                  onClick={() => handleOpenPasswordModal(`/study/${id}/edit`)}
+                  onClick={() => handleOwnerNavigation(`/study/${id}/edit`)}
                 >
                   수정하기
                 </button>
@@ -333,7 +304,7 @@ const StudyDetailPage = () => {
                 <button
                   className="delete"
                   type="button"
-                  onClick={() => handleOpenPasswordModal("", "delete")}
+                  onClick={handleOpenDeleteModal}
                 >
                   삭제하기
                 </button>
@@ -474,55 +445,21 @@ const StudyDetailPage = () => {
           <WeeklyHabitRecordTable studyId={id} />
         </section>
 
-        {isPasswordModalOpen && (
-          <div className="password-modal-overlay" onClick={closePasswordModal}>
-            <div
-              className="password-modal"
-              onClick={(event) => {
-                event.stopPropagation();
-              }}
-            >
-              <h2>
-                {study.nickname} 의 {study.name}
-              </h2>
-              <p>권한이 필요해요</p>
-              <span>비밀번호</span>
-
-              <input
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="비밀번호를 입력하세요"
-              />
-
-              <div className="password-button-wrapper">
-                <button
-                  type="button"
-                  className="password-confirm-button"
-                  onClick={handlePasswordCheck}
-                >
-                  {passwordAction === "delete"
-                    ? "삭제하기"
-                    : passwordAction === "navigate" &&
-                        nextPath.includes("/edit")
-                      ? "수정하러 가기"
-                      : passwordAction === "navigate" &&
-                          nextPath.includes("/habit")
-                        ? "오늘의 습관으로 가기"
-                        : passwordAction === "navigate" &&
-                            nextPath.includes("/focus")
-                          ? "오늘의 집중으로 가기"
-                          : "확인"}
-                </button>
-              </div>
-            </div>
-            <AlertMessage
-              message={passwordError}
-              variant="error"
-              onClose={() => setPasswordError("")}
-            />
-          </div>
+        {isDeleteModalOpen && (
+          <StudyDeleteModal
+            studyName={study.name}
+            confirmation={deleteConfirmation}
+            errorMessage={deleteErrorMessage}
+            isDeleting={isDeleting}
+            onConfirmationChange={(value) => {
+              setDeleteConfirmation(value);
+              setDeleteErrorMessage("");
+            }}
+            onCancel={handleCloseDeleteModal}
+            onConfirm={handleDeleteStudy}
+          />
         )}
+
       </div>
     </section>
   );

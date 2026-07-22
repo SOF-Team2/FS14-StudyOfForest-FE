@@ -8,6 +8,7 @@ import {
   getBackgroundPreviewStyle,
   normalizeCustomBackground,
 } from "../../utils/studyBackground.js";
+import { StudyCardContent } from "./StudyCard.jsx";
 
 const layoutFitOptions = [
   { value: "cover", label: "채우기" },
@@ -22,6 +23,7 @@ function BackgroundSelector({
   onSelectedBackgroundChange,
   onCustomBackgroundChange,
   onError,
+  previewStudy,
 }) {
   const fileInputRef = useRef(null);
   const dragStateRef = useRef(null);
@@ -43,12 +45,27 @@ function BackgroundSelector({
   );
   const previewCardClassName = [
     "study-create-background-preview-card",
+    "card",
+    "study-card",
     isImagePreview ? "is-image" : "is-color",
+    isImagePreview ? "image" : "color",
     canDragCustomBackground ? "is-draggable" : "",
     isDragging ? "is-dragging" : "",
   ]
     .filter(Boolean)
     .join(" ");
+  const previewStudyData = {
+    id: previewStudy?.id ?? "study-card-preview",
+    nickname: previewStudy?.nickname || "닉네임",
+    name: previewStudy?.name || "스터디 이름",
+    description: previewStudy?.description || "스터디 소개가 표시됩니다.",
+    point: previewStudy?.point ?? previewStudy?.points ?? 0,
+    createdAt: previewStudy?.createdAt ?? new Date().toISOString(),
+    emojis: previewStudy?.emojis ?? previewStudy?.topEmojis ?? [],
+    isFavorite: previewStudy?.isFavorite ?? false,
+    backgroundType: isImagePreview ? "image" : "color",
+    backgroundValue: selectedPresetOption?.value ?? "",
+  };
 
   const openFilePicker = () => {
     fileInputRef.current?.click();
@@ -167,73 +184,6 @@ function BackgroundSelector({
     <fieldset className="study-create-background">
       <legend>배경을 선택해주세요</legend>
 
-      <div className="study-create-background-grid">
-        {backgroundOptions.map((option) => {
-          const isSelected = selectedBackground === option.id;
-
-          return (
-            <label className="study-create-background-option" key={option.id}>
-              <input
-                type="radio"
-                name="background"
-                value={option.value}
-                data-background-type={option.type}
-                checked={isSelected}
-                onChange={() => onSelectedBackgroundChange(option.id)}
-              />
-              <span
-                className={`study-create-background-tile ${option.className ?? ""}`}
-                aria-hidden="true"
-              >
-                {isSelected && <img src={selectedIcon} alt="" />}
-              </span>
-            </label>
-          );
-        })}
-
-        <button
-          type="button"
-          className="study-create-background-option study-create-background-upload"
-          aria-pressed={isCustomSelected}
-          onClick={handleCustomSelect}
-        >
-          <span
-            className={`study-create-background-tile study-create-background-upload-tile ${
-              normalizedCustomBackground.src ? "has-image" : ""
-            }`}
-            style={
-              normalizedCustomBackground.src
-                ? getBackgroundPreviewStyle(
-                    CUSTOM_BACKGROUND_ID,
-                    normalizedCustomBackground,
-                  )
-                : undefined
-            }
-            aria-hidden="true"
-          >
-            {isCustomSelected && normalizedCustomBackground.src && (
-              <img src={selectedIcon} alt="" />
-            )}
-            {!normalizedCustomBackground.src && (
-              <span className="study-create-background-upload-content">
-                <span className="study-create-background-upload-icon" />
-                <span>
-                  {isProcessing ? "처리 중" : "사진 업로드"}
-                </span>
-              </span>
-            )}
-          </span>
-        </button>
-      </div>
-
-      <input
-        ref={fileInputRef}
-        className="study-create-background-file"
-        type="file"
-        accept="image/png,image/jpeg,image/webp"
-        onChange={handleFileChange}
-      />
-
       <div className="study-create-background-preview">
         <div
           className={previewCardClassName}
@@ -248,13 +198,7 @@ function BackgroundSelector({
           onPointerUp={stopPreviewDragging}
           onPointerCancel={stopPreviewDragging}
         >
-          {isImagePreview && (
-            <div className="study-create-background-preview-cover" />
-          )}
-          <div className="study-create-background-preview-content">
-            <strong>배경 미리보기</strong>
-            <span>스터디 카드에 적용될 모습입니다.</span>
-          </div>
+          <StudyCardContent study={previewStudyData} isPreview />
         </div>
 
         {isCustomSelected && normalizedCustomBackground.src && (
@@ -311,6 +255,71 @@ function BackgroundSelector({
           </div>
         )}
       </div>
+
+      <div className="study-create-background-grid">
+        <button
+          type="button"
+          className="study-create-background-option study-create-background-upload"
+          aria-pressed={isCustomSelected}
+          onClick={handleCustomSelect}
+        >
+          <span
+            className={`study-create-background-tile study-create-background-upload-tile ${
+              normalizedCustomBackground.src ? "has-image" : ""
+            }`}
+            style={
+              normalizedCustomBackground.src
+                ? getBackgroundPreviewStyle(
+                    CUSTOM_BACKGROUND_ID,
+                    normalizedCustomBackground,
+                  )
+                : undefined
+            }
+            aria-hidden="true"
+          >
+            {isCustomSelected && normalizedCustomBackground.src && (
+              <img src={selectedIcon} alt="" />
+            )}
+            {!normalizedCustomBackground.src && (
+              <span className="study-create-background-upload-content">
+                <span className="study-create-background-upload-icon" />
+                <span>{isProcessing ? "처리 중" : "사진 업로드"}</span>
+              </span>
+            )}
+          </span>
+        </button>
+
+        {backgroundOptions.map((option) => {
+          const isSelected = selectedBackground === option.id;
+
+          return (
+            <label className="study-create-background-option" key={option.id}>
+              <input
+                type="radio"
+                name="background"
+                value={option.value}
+                data-background-type={option.type}
+                checked={isSelected}
+                onChange={() => onSelectedBackgroundChange(option.id)}
+              />
+              <span
+                className={`study-create-background-tile ${option.className ?? ""}`}
+                aria-hidden="true"
+              >
+                {isSelected && <img src={selectedIcon} alt="" />}
+              </span>
+            </label>
+          );
+        })}
+      </div>
+
+      <input
+        ref={fileInputRef}
+        className="study-create-background-file"
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        onChange={handleFileChange}
+      />
     </fieldset>
   );
 }

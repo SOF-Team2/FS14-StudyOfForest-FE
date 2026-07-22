@@ -4,6 +4,7 @@ import axios from "../utils/axios.js";
 import AlertMessage from "../components/AlertMessage.jsx";
 import BackgroundSelector from "../components/study/BackgroundSelector.jsx";
 import useAlert from "../components/useAlert.js";
+import useCurrentUser from "../components/useCurrentUser.js";
 import {
   backgroundOptions,
   createDefaultCustomBackground,
@@ -12,21 +13,13 @@ import {
 } from "../utils/studyBackground.js";
 
 const initialFormValues = {
-  nickname: "",
   studyName: "",
   description: "",
-  currentPassword: "",
-  newPassword: "",
-  newPasswordConfirm: "",
 };
 
 const initialErrors = {
-  nickname: "",
   studyName: "",
   description: "",
-  currentPassword: "",
-  newPassword: "",
-  newPasswordConfirm: "",
 };
 
 const normalizeSubmitErrorMessage = (error) => {
@@ -49,17 +42,13 @@ function StudyEditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showAlert } = useAlert();
+  const currentUser = useCurrentUser();
   const [formValues, setFormValues] = useState(initialFormValues);
   const [selectedBackground, setSelectedBackground] = useState(backgroundOptions[0].id);
   const [customBackground, setCustomBackground] = useState(
     createDefaultCustomBackground,
   );
-  const [visiblePasswords, setVisiblePasswords] = useState({
-    currentPassword: false,
-    newPassword: false,
-    newPasswordConfirm: false,
-  });
-  const [changePassword, setChangePassword] = useState(false);
+  const [previewStudy, setPreviewStudy] = useState({});
   const [errors, setErrors] = useState(initialErrors);
   const [pageErrorMessage, setPageErrorMessage] = useState("");
   const [submitErrorMessage, setSubmitErrorMessage] = useState("");
@@ -77,21 +66,23 @@ function StudyEditPage() {
         const response = await axios.get(`/study/${id}`, {
           signal: controller.signal,
         });
-        const result = response.data;
-        const study = result?.data;
+        const study = response.data?.data ?? response.data;
 
         if (!study) {
           throw new Error("스터디 정보를 불러오지 못했습니다.");
         }
 
+        if (!study.isOwner) {
+          showAlert("스터디 생성자만 수정할 수 있습니다.", "error");
+          navigate(`/study/${id}`, { replace: true });
+          return;
+        }
+
         setFormValues({
-          nickname: study.nickname ?? "",
           studyName: study.name ?? "",
           description: study.description ?? "",
-          currentPassword: "",
-          newPassword: "",
-          newPasswordConfirm: "",
         });
+        setPreviewStudy(study);
         const backgroundSelection = getBackgroundSelectionFromStudy(study);
 
         setSelectedBackground(backgroundSelection.selectedBackground);
@@ -112,7 +103,7 @@ function StudyEditPage() {
     fetchStudy();
 
     return () => controller.abort();
-  }, [id]);
+  }, [id, navigate, showAlert]);
 
   const clearErrors = (...fieldNames) => {
     setSubmitErrorMessage("");
@@ -136,59 +127,13 @@ function StudyEditPage() {
     clearErrors(fieldName);
   };
 
-  const togglePassword = (fieldName) => {
-    setVisiblePasswords((prevVisiblePasswords) => ({
-      ...prevVisiblePasswords,
-      [fieldName]: !prevVisiblePasswords[fieldName],
-    }));
-  };
-
-  const handleChangePasswordToggle = (event) => {
-    const isChecked = event.target.checked;
-
-    setChangePassword(isChecked);
-    setSubmitErrorMessage("");
-
-    if (!isChecked) {
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        currentPassword: "",
-        newPassword: "",
-        newPasswordConfirm: "",
-      }));
-      setVisiblePasswords((prevVisiblePasswords) => ({
-        ...prevVisiblePasswords,
-        currentPassword: false,
-        newPassword: false,
-        newPasswordConfirm: false,
-      }));
-      clearErrors("currentPassword", "newPassword", "newPasswordConfirm");
-    }
-  };
-
   const validateForm = () => {
     const nextErrors = { ...initialErrors };
-    const nickname = formValues.nickname.trim();
     const studyName = formValues.studyName.trim();
     const description = formValues.description.trim();
-    const currentPassword = formValues.currentPassword;
-    const newPassword = formValues.newPassword;
-    const newPasswordConfirm = formValues.newPasswordConfirm;
 
-    if (!nickname) nextErrors.nickname = "*닉네임을 입력해주세요";
     if (!studyName) nextErrors.studyName = "*스터디 이름을 입력해주세요";
     if (!description) nextErrors.description = "*소개를 입력해주세요";
-
-    if (changePassword) {
-      if (!currentPassword) nextErrors.currentPassword = "*현재 비밀번호를 입력해주세요";
-      if (!newPassword) nextErrors.newPassword = "*새 비밀번호를 입력해주세요";
-
-      if (!newPasswordConfirm) {
-        nextErrors.newPasswordConfirm = "*새 비밀번호 확인을 입력해주세요";
-      } else if (newPassword && newPassword !== newPasswordConfirm) {
-        nextErrors.newPasswordConfirm = "*새 비밀번호가 일치하지 않습니다";
-      }
-    }
 
     return nextErrors;
   };
@@ -216,18 +161,11 @@ function StudyEditPage() {
     }
 
     const payload = {
-      nickname: formValues.nickname.trim(),
       name: formValues.studyName.trim(),
       description: formValues.description.trim(),
       backgroundType: backgroundPayload.type,
       backgroundValue: backgroundPayload.value,
     };
-
-    if (changePassword) {
-      payload.password = formValues.currentPassword;
-      payload.newPassword = formValues.newPassword;
-      payload.newPasswordConfirmation = formValues.newPasswordConfirm;
-    }
 
     setIsSubmitting(true);
 
@@ -238,19 +176,15 @@ function StudyEditPage() {
 
       setFormValues((prevValues) => ({
         ...prevValues,
-        nickname: updatedStudy?.nickname ?? payload.nickname,
         studyName: updatedStudy?.name ?? payload.name,
         description: updatedStudy?.description ?? payload.description,
-        currentPassword: "",
-        newPassword: "",
-        newPasswordConfirm: "",
       }));
-      setChangePassword(false);
-      setVisiblePasswords({
-        currentPassword: false,
-        newPassword: false,
-        newPasswordConfirm: false,
-      });
+      setPreviewStudy((prevStudy) => ({
+        ...prevStudy,
+        ...updatedStudy,
+        name: updatedStudy?.name ?? payload.name,
+        description: updatedStudy?.description ?? payload.description,
+      }));
       setErrors(initialErrors);
       showAlert("스터디가 수정되었습니다.");
       navigate(`/study/${id}`);
@@ -301,28 +235,6 @@ function StudyEditPage() {
               onClose={() => setSubmitErrorMessage("")}
             />
 
-            <div className="study-create-field study-create-field--nickname">
-              <label htmlFor="nickname">닉네임</label>
-              <div className="study-create-control">
-                <input
-                  id="nickname"
-                  className={errors.nickname ? "is-error" : ""}
-                  name="nickname"
-                  type="text"
-                  maxLength="30"
-                  placeholder="닉네임을 입력해 주세요"
-                  value={formValues.nickname}
-                  aria-invalid={Boolean(errors.nickname)}
-                  aria-describedby={errors.nickname ? "nickname-error" : undefined}
-                  onChange={handleInputChange("nickname")}
-                  required
-                />
-                {errors.nickname && (
-                  <p id="nickname-error" className="study-create-error-message">{errors.nickname}</p>
-                )}
-              </div>
-            </div>
-
             <div className="study-create-field study-create-field--study-name">
               <label htmlFor="studyName">스터디 이름</label>
               <div className="study-create-control">
@@ -372,127 +284,13 @@ function StudyEditPage() {
               onSelectedBackgroundChange={setSelectedBackground}
               onCustomBackgroundChange={setCustomBackground}
               onError={setSubmitErrorMessage}
+              previewStudy={{
+                ...previewStudy,
+                nickname: currentUser?.nickname ?? previewStudy.nickname,
+                name: formValues.studyName,
+                description: formValues.description,
+              }}
             />
-
-            <div className="study-create-field study-create-field--password-toggle">
-              <label className="study-edit-password-checkbox">
-                <input
-                  type="checkbox"
-                  checked={changePassword}
-                  onChange={handleChangePasswordToggle}
-                />
-                <span>비밀번호 변경</span>
-              </label>
-            </div>
-
-            {changePassword && (
-              <>
-                <div className="study-create-field study-create-field--current-password">
-                  <label htmlFor="currentPassword">현재 비밀번호</label>
-                  <div className="study-create-control">
-                    <div className="study-create-password">
-                      <input
-                        id="currentPassword"
-                        className={errors.currentPassword ? "is-error" : ""}
-                        name="currentPassword"
-                        type={visiblePasswords.currentPassword ? "text" : "password"}
-                        placeholder="현재 비밀번호를 입력해 주세요"
-                        value={formValues.currentPassword}
-                        aria-invalid={Boolean(errors.currentPassword)}
-                        aria-describedby={errors.currentPassword ? "current-password-error" : undefined}
-                        onChange={handleInputChange("currentPassword")}
-                        required
-                      />
-                      <button
-                        type="button"
-                        className={`study-create-password-toggle ${
-                          visiblePasswords.currentPassword ? "is-visible" : ""
-                        }`}
-                        aria-label={
-                          visiblePasswords.currentPassword
-                            ? "현재 비밀번호 숨기기"
-                            : "현재 비밀번호 보기"
-                        }
-                        onClick={() => togglePassword("currentPassword")}
-                      />
-                    </div>
-                    {errors.currentPassword && (
-                      <p id="current-password-error" className="study-create-error-message">
-                        {errors.currentPassword}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="study-create-field study-create-field--new-password">
-                  <label htmlFor="newPassword">새 비밀번호</label>
-                  <div className="study-create-control">
-                    <div className="study-create-password">
-                      <input
-                        id="newPassword"
-                        className={errors.newPassword ? "is-error" : ""}
-                        name="newPassword"
-                        type={visiblePasswords.newPassword ? "text" : "password"}
-                        placeholder="새 비밀번호를 입력해 주세요"
-                        value={formValues.newPassword}
-                        aria-invalid={Boolean(errors.newPassword)}
-                        aria-describedby={errors.newPassword ? "new-password-error" : undefined}
-                        onChange={handleInputChange("newPassword")}
-                      />
-                      <button
-                        type="button"
-                        className={`study-create-password-toggle ${
-                          visiblePasswords.newPassword ? "is-visible" : ""
-                        }`}
-                        aria-label={visiblePasswords.newPassword ? "새 비밀번호 숨기기" : "새 비밀번호 보기"}
-                        onClick={() => togglePassword("newPassword")}
-                      />
-                    </div>
-                    {errors.newPassword && (
-                      <p id="new-password-error" className="study-create-error-message">
-                        {errors.newPassword}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="study-create-field study-create-field--new-password-confirm">
-                  <label htmlFor="newPasswordConfirm">새 비밀번호 확인</label>
-                  <div className="study-create-control">
-                    <div className="study-create-password">
-                      <input
-                        id="newPasswordConfirm"
-                        className={errors.newPasswordConfirm ? "is-error" : ""}
-                        name="newPasswordConfirm"
-                        type={visiblePasswords.newPasswordConfirm ? "text" : "password"}
-                        placeholder="새 비밀번호를 다시 한 번 입력해 주세요"
-                        value={formValues.newPasswordConfirm}
-                        aria-invalid={Boolean(errors.newPasswordConfirm)}
-                        aria-describedby={errors.newPasswordConfirm ? "new-password-confirm-error" : undefined}
-                        onChange={handleInputChange("newPasswordConfirm")}
-                      />
-                      <button
-                        type="button"
-                        className={`study-create-password-toggle ${
-                          visiblePasswords.newPasswordConfirm ? "is-visible" : ""
-                        }`}
-                        aria-label={
-                          visiblePasswords.newPasswordConfirm
-                            ? "새 비밀번호 확인 숨기기"
-                            : "새 비밀번호 확인 보기"
-                        }
-                        onClick={() => togglePassword("newPasswordConfirm")}
-                      />
-                    </div>
-                    {errors.newPasswordConfirm && (
-                      <p id="new-password-confirm-error" className="study-create-error-message">
-                        {errors.newPasswordConfirm}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
           </div>
 
           <button className="study-create-submit" type="submit" disabled={isSubmitting}>

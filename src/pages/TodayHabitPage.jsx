@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useLocation } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "../utils/axios.js";
 import HabitList from "../components/habit/HabitList.jsx";
 import HabitEditModal from "../components/habit/HabitEditModal.jsx";
@@ -10,8 +10,6 @@ import { getStudyBackgroundStyle } from "../utils/studyBackground.js";
 
 
 function TodayHabitPage() {
-  const location = useLocation();
-  const password = location.state?.password;
   const { startLoading, endLoading } = useLoading();
   const [isHabitLoading, setIsHabitLoading] = useState(true);
   const { id } = useParams();
@@ -77,7 +75,6 @@ function TodayHabitPage() {
 
               <Link
                 to={`/study/${id}/focus`}
-                state={{ password }}
                 className="focus-page__navigation-button"
               >
                 <span>오늘의 집중</span>

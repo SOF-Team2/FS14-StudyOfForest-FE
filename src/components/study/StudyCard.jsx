@@ -56,31 +56,16 @@ const getNicknameStyle = (study) => {
   return {};
 };
 
-function StudyCard({ study, onFavoriteChange }) {
-  const navigate = useNavigate();
-
+export function StudyCardContent({
+  study,
+  onFavoriteChange,
+  isPreview = false,
+}) {
   const emojis = getStudyEmojis(study);
-  const cardStyle = getStudyBackgroundStyle(study);
   const nicknameStyle = getNicknameStyle(study);
 
-  const backgroundTypeClassName =
-    study.backgroundType?.toLowerCase() ?? "color";
-
-  const handleClick = () => {
-    addRecentStudy(study);
-    navigate(`/study/${study.id}`);
-  };
-
-  const handleFavoriteChange = (isFavorite) => {
-    onFavoriteChange?.(study.id, isFavorite);
-  };
-
   return (
-    <div
-      className={`${backgroundTypeClassName} card study-card`}
-      style={cardStyle}
-      onClick={handleClick}
-    >
+    <>
       {isImageBackground(study) && (
         <div
           className="background_cover"
@@ -118,39 +103,65 @@ function StudyCard({ study, onFavoriteChange }) {
         {study.description}
       </div>
 
-      <div className="tag_wrap">
-        {emojis.length > 0 ? (
-          emojis.map((emojiItem) => (
-            <div
-              className="tag"
-              key={emojiItem.emoji}
-            >
-              {emojiItem.emoji}
-              <span>{emojiItem.count}</span>
-            </div>
-          ))
-        ) : (
-          <span className="tag_empty">
-            아직 반응이 없어요
-          </span>
-        )}
-      </div>
+      <div className="study-card-actions">
+        <div className="tag_wrap">
+          {emojis.length > 0 ? (
+            emojis.map((emojiItem) => (
+              <div
+                className="tag"
+                key={emojiItem.emoji}
+              >
+                {emojiItem.emoji}
+                <span>{emojiItem.count}</span>
+              </div>
+            ))
+          ) : (
+            <span className="tag_empty">
+              아직 반응이 없어요
+            </span>
+          )}
+        </div>
 
-      <div
-        className="favorite_btn_wrap"
-        onClick={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-        }}
-      >
-        <FavoriteButton
-          studyId={study.id}
-          isFavorite={
-            study.isFavorite ?? false
-          }
-      onFavoriteChange={onFavoriteChange}
-        />
+        <div
+          className="favorite_btn_wrap"
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+          }}
+        >
+          <FavoriteButton
+            studyId={study.id}
+            isFavorite={study.isFavorite ?? false}
+            onFavoriteChange={onFavoriteChange}
+            isPreview={isPreview}
+          />
+        </div>
       </div>
+    </>
+  );
+}
+
+function StudyCard({ study, onFavoriteChange }) {
+  const navigate = useNavigate();
+  const cardStyle = getStudyBackgroundStyle(study);
+  const backgroundTypeClassName =
+    study.backgroundType?.toLowerCase() ?? "color";
+
+  const handleClick = () => {
+    addRecentStudy(study);
+    navigate(`/study/${study.id}`);
+  };
+
+  return (
+    <div
+      className={`${backgroundTypeClassName} card study-card`}
+      style={cardStyle}
+      onClick={handleClick}
+    >
+      <StudyCardContent
+        study={study}
+        onFavoriteChange={onFavoriteChange}
+      />
     </div>
   );
 }

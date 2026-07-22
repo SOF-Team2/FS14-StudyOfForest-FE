@@ -3,14 +3,19 @@ import axios from "../utils/axios";
 
 const USER_ID = "942d8758-939d-47f4-ba70-f418cccbdfd4";
 
-function FavoriteButton({ studyId, isFavorite, onFavoriteChange }) {
+function FavoriteButton({
+  studyId,
+  isFavorite,
+  onFavoriteChange,
+  isPreview = false,
+}) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleToggle = async (event) => {
     event.preventDefault();
     event.stopPropagation();
 
-    if (isLoading) return;
+    if (isLoading || isPreview) return;
 
     setIsLoading(true);
 
@@ -36,11 +41,15 @@ function FavoriteButton({ studyId, isFavorite, onFavoriteChange }) {
   return (
     <button
       type="button"
-      className={`favorite-btn ${isFavorite ? "active" : ""}`}
+      className={`favorite-btn ${isFavorite ? "active" : ""} ${
+        isPreview ? "is-preview" : ""
+      }`}
       onClick={handleToggle}
       disabled={isLoading}
+      tabIndex={isPreview ? -1 : undefined}
       aria-label={isFavorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}
       aria-pressed={isFavorite}
+      aria-hidden={isPreview || undefined}
     >
       <svg
         className="heart-icon"
