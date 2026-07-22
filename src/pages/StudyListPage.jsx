@@ -37,6 +37,7 @@ function StudyListPage() {
       items.filter((study) => study?.name).map((study) => [study.name, study]),
     ).values(),
   ).slice(0, 5);
+  const userId = localStorage.getItem("userId");
 
   const rememberScrollPosition = () => {
     pendingScrollYRef.current = window.scrollY;
@@ -80,7 +81,7 @@ function StudyListPage() {
           signal: controller.signal,
 
           headers: {
-            "x-user-id": "942d8758-939d-47f4-ba70-f418cccbdfd4",
+            "x-user-id": userId,
           },
         });
 

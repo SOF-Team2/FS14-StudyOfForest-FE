@@ -12,6 +12,8 @@ const USER_ID = "942d8758-939d-47f4-ba70-f418cccbdfd4";
 function RecentStudyList({ favoriteState, onFavoriteChange }) {
   const [studies, setStudies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const userId = localStorage.getItem("userId");
+
   const handleFavoriteChange = (studyId, isFavorite) => {
     // RecentStudyList 내부 state 변경
     setStudies((prevStudies) =>
@@ -44,7 +46,7 @@ function RecentStudyList({ favoriteState, onFavoriteChange }) {
           ids.map(async (id) => {
             const res = await fetch(`${API_BASE_URL}/study/${id}`, {
               headers: {
-                "x-user-id": USER_ID,
+                "x-user-id": userId,
               },
             });
             if (!res.ok) {
