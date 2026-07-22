@@ -16,7 +16,8 @@ export default function FocusTimer({ studyId, password }) {
     const [settingMinutes, setSettingMinutes] = useState(25);  // 설정한 분
     const [settingSeconds, setSettingSeconds] = useState(0);   // 설정한 초
     const [isEditing, setIsEditing] = useState(false);         // 수정할 때 쓴 거 
-    const [toast, setToast] = useState(null);
+
+    const { showAlert } = useAlert();
 
     const loginId = localStorage.getItem('userId') ?? 'test1'; //로컬에서 꺼내다 쓴다
     const [startedAt, setStartedAt] = useState(null); //맨 처음 시작한 시각을 기록한다.
@@ -41,9 +42,9 @@ export default function FocusTimer({ studyId, password }) {
 
     useEffect(() => {
         if (isRunning && remainingSeconds === 0) {
-            setToast({ resultType: 'goalAchieved' });
+            showAlert('목표 시간을 달성했습니다!', 'success');
         }
-    }, [remainingSeconds, isRunning]);
+    }, [remainingSeconds, isRunning, showAlert]);
 
     useEffect(() => {
         function handleKeyDown(e) {
@@ -76,30 +77,16 @@ export default function FocusTimer({ studyId, password }) {
         };
     }, [isStarted, isRunning, isEditing]);
 
-    // 토스트가 뜨면 3초 뒤 자동으로 사라짐
-    useEffect(() => {
-        if (!toast) return;   // 토스트가 없으면 아무것도 안 함
-
-        const timeoutId = setTimeout(() => {
-            setToast(null);
-        }, 3000);
-
-        return () => {
-            clearTimeout(timeoutId);
-        };
-    }, [toast]);
-
     function formatTime(totalSeconds) {
         const isNegative = totalSeconds < 0;
         const abs = Math.abs(totalSeconds);
         const min = Math.floor(abs / 60);
         const sec = abs % 60;
-        const sign = isNegative ? '-' : '';
+        const sign = isNegative ? '+' : '';
         return `${sign}${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
     }
 
     function handleStart() {
-        setToast(null);
         setIsRunning(true);
         setIsStarted(true);
         setStartedAt(new Date());
@@ -115,20 +102,15 @@ export default function FocusTimer({ studyId, password }) {
 
     async function handleFinish() {
         if (!isCompleted) {
-            setToast({ resultType: 'interrupted' });
+            showAlert('집중이 중단되었습니다.', 'error');
             handleReset();
             return;
         }
 
         try {
             const response = await axios.post(`/study/${studyId}/focus/session`, { loginId, password, startedAt, durationSeconds: elapsedSeconds })
-
-            console.log('집중 성공:', response.data);
-
-            setToast({
-                resultType: 'success',
-                earnedPoint: response.data.data.point,
-            });
+            const earnedPoint = response.data.data.point;
+            showAlert(`집중 완료! ${earnedPoint}포인트를 획득했습니다.`, 'success');
         } catch (error) {
             console.error(
                 '포인트 업데이트 실패:',
@@ -197,13 +179,6 @@ export default function FocusTimer({ studyId, password }) {
                 >
                     {formatTime(remainingSeconds)}
                 </div>
-            )}
-
-            {toast && (
-                <FocusResultToast
-                    resultType={toast.resultType}
-                    earnedPoint={toast.earnedPoint}
-                />
             )}
 
             <div className="focus-timer__buttons">

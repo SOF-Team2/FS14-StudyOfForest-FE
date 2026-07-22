@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from '../../utils/axios.js';
 import './FocusTimeline.css';
+import AlertMessage from '../AlertMessage.jsx';
 
 export default function FocusTimeline({ studyId, password, loginId }) {
     const [scope, setScope] = useState('me');   // 토글용
@@ -8,6 +9,8 @@ export default function FocusTimeline({ studyId, password, loginId }) {
 
     const [isLoading, setIsLoading] = useState(false);
     const [loadError, setLoadError] = useState('');
+
+
 
     useEffect(() => {
         if (!password) return;
@@ -58,6 +61,13 @@ export default function FocusTimeline({ studyId, password, loginId }) {
 
     return (
         <div className="focus-timeline">
+            {loadError && (
+                <AlertMessage
+                    message={loadError}
+                    variant="error"
+                    onClose={() => setLoadError('')}
+                />
+            )}
             <div className="focus-timeline__summary">
                 <div className="focus-timeline__stat">
                     <span className="focus-timeline__stat-value">{Math.floor(stats.totalSeconds / 60)}</span>
