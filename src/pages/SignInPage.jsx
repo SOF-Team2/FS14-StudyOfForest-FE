@@ -46,7 +46,7 @@ function SignInPage() {
         response.data?.message ?? "로그인에 성공했습니다.",
       );
 
-      navigate("/");
+      navigate("/home");
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ??

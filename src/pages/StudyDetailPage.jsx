@@ -254,38 +254,40 @@ const StudyDetailPage = () => {
           />
 
           <div className="study-detail-content">
-            <nav
-              className="focus-page__navigation"
-              aria-label="스터디 페이지 이동"
-            >
-              <button
-                type="button"
-                className="focus-page__navigation-button"
-                onClick={() => handleOwnerNavigation(`/study/${id}/habit`)}
+            {study.isOwner && (
+              <nav
+                className="focus-page__navigation"
+                aria-label="스터디 페이지 이동"
               >
-                <span>오늘의 습관</span>
+                <button
+                  type="button"
+                  className="focus-page__navigation-button"
+                  onClick={() => handleOwnerNavigation(`/study/${id}/habit`)}
+                >
+                  <span>오늘의 습관</span>
 
-                <img
-                  className="focus-page__navigation-icon"
-                  src={arrowRightIcon}
-                  alt=""
-                />
-              </button>
+                  <img
+                    className="focus-page__navigation-icon"
+                    src={arrowRightIcon}
+                    alt=""
+                  />
+                </button>
 
-              <button
-                type="button"
-                className="focus-page__navigation-button"
-                onClick={() => handleOwnerNavigation(`/study/${id}/focus`)}
-              >
-                <span>오늘의 집중</span>
+                <button
+                  type="button"
+                  className="focus-page__navigation-button"
+                  onClick={() => handleOwnerNavigation(`/study/${id}/focus`)}
+                >
+                  <span>오늘의 집중</span>
 
-                <img
-                  className="focus-page__navigation-icon"
-                  src={arrowRightIcon}
-                  alt=""
-                />
-              </button>
-            </nav>
+                  <img
+                    className="focus-page__navigation-icon"
+                    src={arrowRightIcon}
+                    alt=""
+                  />
+                </button>
+              </nav>
+            )}
 
             <div className="study-detail-secondary-actions">
               <div className="study-detail-point-summary">
@@ -293,22 +295,26 @@ const StudyDetailPage = () => {
               </div>
 
               <div className="study-menu-buttons">
-                <button
-                  type="button"
-                  onClick={() => handleOwnerNavigation(`/study/${id}/edit`)}
-                >
-                  수정하기
-                </button>
-                <span className="dec_line">|</span>
+                {study.isOwner && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleOwnerNavigation(`/study/${id}/edit`)}
+                    >
+                      수정하기
+                    </button>
+                    <span className="dec_line">|</span>
 
-                <button
-                  className="delete"
-                  type="button"
-                  onClick={handleOpenDeleteModal}
-                >
-                  삭제하기
-                </button>
-                <span className="dec_line">|</span>
+                    <button
+                      className="delete"
+                      type="button"
+                      onClick={handleOpenDeleteModal}
+                    >
+                      삭제하기
+                    </button>
+                    <span className="dec_line">|</span>
+                  </>
+                )}
                 <button type="button" onClick={handleShare}>
                   공유하기
                 </button>

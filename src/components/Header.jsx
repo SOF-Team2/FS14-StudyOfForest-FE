@@ -76,7 +76,7 @@ function Header() {
       {!isAuthPage && (
         <header id="header">
           <div className="inner">
-            <Link to="/" className="logo">
+            <Link to={isAuthenticated ? "/home" : "/"} className="logo">
               <img src={logoImage} alt="공부의 숲 로고 이미지" />
             </Link>
 
