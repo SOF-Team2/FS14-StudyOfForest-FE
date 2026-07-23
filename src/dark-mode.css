@@ -564,3 +564,39 @@ body.dark-mode ::selection {
   color: #142014;
   background-color: #9ec795;
 }
+
+/* ---------- Ranking ---------- */
+body.dark-mode .previous-ranking-card::after {
+  background-color: #4a4027;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .rank-1 {
+  background-color: #5a4a24;
+}
+
+body.dark-mode .rank-2 {
+  background-color: #454b47;
+}
+
+body.dark-mode .rank-3 {
+  background-color: #5a4034;
+}
+
+body.dark-mode .rank-1 .top-ranking-name,
+body.dark-mode .rank-2 .top-ranking-name,
+body.dark-mode .rank-3 .top-ranking-name,
+body.dark-mode .rank-1 .top-ranking-point,
+body.dark-mode .rank-2 .top-ranking-point,
+body.dark-mode .rank-3 .top-ranking-point,
+body.dark-mode .rank-1 .top-ranking-rank,
+body.dark-mode .rank-2 .top-ranking-rank,
+body.dark-mode .rank-3 .top-ranking-rank {
+  color: #f1f5ef;
+}
+
+body.dark-mode .top-ranking-item.rank-1::after,
+body.dark-mode .top-ranking-item.rank-2::after,
+body.dark-mode .top-ranking-item.rank-3::after {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}

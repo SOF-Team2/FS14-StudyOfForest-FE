@@ -3071,6 +3071,7 @@ input:focus { outline-color: var(--brand); }
 }
 
 .top-ranking-name {
+  width: 90%;
   font-size: 18px;
   font-weight: 700;
   word-break: keep-all;
@@ -3681,4 +3682,16 @@ input:focus { outline-color: var(--brand); }
     min-height: 100px;
     font-size: 10px;
   }
+}
+
+/* 헤더 랭킹 아이콘 */
+.ranking_icon {
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--gray);
+  border-radius: 50%;
+  background-color: var(--wh);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
