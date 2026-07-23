@@ -34,7 +34,9 @@ const StudyDetailPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const emojiRef = useRef(null);
   const [emoji, setEmoji] = useState([]);
-
+  const [memberCount, setMemberCount] = useState(0);
+  const [members, setMembers] = useState([]);
+  const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (emojiRef.current && !emojiRef.current.contains(event.target)) {
@@ -58,6 +60,22 @@ const StudyDetailPage = () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    const fetchMemberData = async () => {
+      try {
+        const countRes = await axios.get(`/study/${id}/members/count`);
+        setMemberCount(countRes.data ?? 0);
+
+        const membersRes = await axios.get(`/study/${id}/members`);
+        setMembers(membersRes.data ?? []);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchMemberData();
+  }, [id]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -87,12 +105,22 @@ const StudyDetailPage = () => {
         ) {
           return;
         }
-
-        setStudy(null);
+        setStudy({
+          id: "temp-id",
+          name: "임시 스터디",
+          nickname: "테스트",
+          description: "백엔드 연동 전 임시 화면입니다.",
+          point: 0,
+          isOwner: true,
+          emojis: [],
+        });
         setEmoji([]);
-        setErrorMessage(
-          getStudyErrorMessage(error, "스터디 정보를 불러오지 못했습니다."),
-        );
+        setErrorMessage("");
+        // setStudy(null);
+        // setEmoji([]);
+        // setErrorMessage(
+        //   getStudyErrorMessage(error, "스터디 정보를 불러오지 못했습니다."),
+        // );
       } finally {
         if (!controller.signal.aborted) {
           setIsLoading(false);
@@ -108,12 +136,9 @@ const StudyDetailPage = () => {
   // 이모지 선택시 출력 확인
   const handleEmojiClick = async (selectedEmoji) => {
     try {
-      const response = await axios.post(
-        `/study/${id}/emojis`,
-        {
-          emoji: selectedEmoji,
-        },
-      );
+      const response = await axios.post(`/study/${id}/emojis`, {
+        emoji: selectedEmoji,
+      });
 
       const updatedEmoji = response.data?.data ?? response.data;
 
@@ -418,6 +443,65 @@ const StudyDetailPage = () => {
                 <span>의</span>
                 <span>{study.name}</span>
               </div>
+
+              <div>
+                <div>
+                  <button
+                    type="button"
+                    className="focus-page__navigation-button"
+                    onClick={() => setIsMemberModalOpen(true)}
+                  >
+                    <span>멤버 목록</span>
+                    <span style={{ marginLeft: "8px" }}>{memberCount}/3</span>
+                  </button>
+                </div>
+
+                {isMemberModalOpen && (
+                  <div
+                    onClick={() => setIsMemberModalOpen(false)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") setIsMemberModalOpen(false);
+                    }}
+                    style={{
+                      position: "fixed",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: "rgba(0,0,0,0.5)",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      zIndex: 1000,
+                    }}
+                  >
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        background: "white",
+                        padding: "24px",
+                        width: "280px",
+                        borderRadius: "16px",
+                        boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+                      }}
+                    >
+                      <h3>참여자 목록</h3>
+                      <ul style={{ listStyle: "none", padding: 0 }}>
+                        {[...members]
+                          .sort((a, b) =>
+                            a.role === "HOST" ? -1 : b.role === "HOST" ? 1 : 0,
+                          )
+                          .map((member) => (
+                            <li key={member.id} style={{ padding: "4px 0" }}>
+                              {member.role === "HOST" ? "👑 " : ""}
+                              {member.user.nickname}
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
               <FavoriteButton
                 studyId={study.id}
                 isFavorite={study.isFavorite ?? false}
@@ -465,7 +549,6 @@ const StudyDetailPage = () => {
             onConfirm={handleDeleteStudy}
           />
         )}
-
       </div>
     </section>
   );
