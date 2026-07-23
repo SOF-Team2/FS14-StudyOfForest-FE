@@ -6,9 +6,15 @@ import axios from "../utils/axios.js";
 import { saveUserId } from "../utils/authStorage.js";
 import logoImage from "../assets/img/logo.png";
 
+import eyeImage from "../assets/img/eye.png";
+import eyeHiddenImage from "../assets/img/eye.hiden.png";
+
 function SignInPage() {
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
+
+  // false이면 비밀번호를 숨기고, true이면 입력한 비밀번호 문자열을 화면에 표시한다.
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const navigate = useNavigate();
   const { showAlert } = useAlert();
@@ -86,19 +92,50 @@ function SignInPage() {
               </div>
               <div className="auth_input_wrap">
                 <label htmlFor="password">비밀번호</label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  minLength="8"
-                  maxLength="20"
-                  pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,20}"
-                  title="비밀번호는 영문과 숫자를 포함해 8~20자 입력해주세요."
-                  placeholder="비밀번호를 입력해주세요."
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  required
-                />
+
+                {/* 입력창 오른쪽 안에 눈 모양 버튼을 배치하기 위한 영역 */}
+                <div className="password_input_box">
+                  <input
+                    id="password"
+                    name="password"
+
+                    // 상태가 true이면 실제 글자를 보여주고,
+                    // false이면 비밀번호를 가린다.
+                    type={isPasswordVisible ? "text" : "password"}
+
+                    minLength="8"
+                    maxLength="20"
+                    pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,20}"
+                    title="비밀번호는 영문과 숫자를 포함해 8~20자 입력해주세요."
+                    placeholder="비밀번호를 입력해주세요."
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    required
+                  />
+
+                  <button
+                    // 로그인 form 안의 버튼이므로 submit되지 않도록 반드시 button 지정
+                    type="button"
+                    className="password_toggle_button"
+
+                    // 이전 상태의 반대값으로 바꿔서 보이기·숨기기를 전환한다.
+                    onClick={() => {
+                      setIsPasswordVisible((previousValue) => !previousValue);
+                    }}
+
+                    // 스크린리더가 버튼의 현재 역할을 알 수 있도록 설명한다.
+                    aria-label={
+                      isPasswordVisible ? "비밀번호 숨기기" : "비밀번호 보기"
+                    }
+                    aria-pressed={isPasswordVisible}
+                  >
+                    <img
+                      src={isPasswordVisible ? eyeHiddenImage : eyeImage}
+                      alt=""
+                      aria-hidden="true"
+                    />
+                  </button>
+                </div>
               </div>
               <button type="submit" className="btn">
                 <svg

@@ -5,6 +5,9 @@ import { useLoading } from "../contexts/LoadingContext.jsx";
 import axios from "../utils/axios.js";
 import logoImage from "../assets/img/logo.png";
 
+import eyeImage from "../assets/img/eye.png";
+import eyeHiddenImage from "../assets/img/eye.hiden.png";
+
 function SignUpPage() {
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
@@ -12,6 +15,13 @@ function SignUpPage() {
   // 비밀번호가 올바르게 반복 입력됐는지 확인하기 위한 값
   // 백엔드 API에는 전송하지 않고 프론트에서만 비교
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // 회원가입 비밀번호 입력창의 표시 여부
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  // 비밀번호 확인 입력창의 표시 여부
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
+    useState(false);
 
   // 화면에 표시될 사용자 닉네임 입력값
   const [nickname, setNickname] = useState("");
@@ -107,37 +117,90 @@ function SignUpPage() {
               </div>
               <div className="auth_input_wrap">
                 <label htmlFor="password">비밀번호</label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  minLength="8"
-                  maxLength="20"
-                  pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,20}"
-                  title="비밀번호는 영문과 숫자를 포함해 8~20자 입력해주세요."
-                  placeholder="비밀번호를 입력해주세요."
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  required
-                />
+
+                {/* 비밀번호 입력창과 눈 버튼을 함께 배치하는 영역 */}
+                <div className="password_input_box">
+                  <input
+                    id="password"
+                    name="password"
+                    type={isPasswordVisible ? "text" : "password"}
+                    minLength="8"
+                    maxLength="20"
+                    pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,20}"
+                    title="비밀번호는 영문과 숫자를 포함해 8~20자 입력해주세요."
+                    placeholder="비밀번호를 입력해주세요."
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    required
+                  />
+
+                  <button
+                    // 회원가입 form이 제출되지 않도록 반드시 button으로 지정
+                    type="button"
+                    className="password_toggle_button"
+                    onClick={() => {
+                      setIsPasswordVisible((previousValue) => !previousValue);
+                    }}
+                    aria-label={
+                      isPasswordVisible ? "비밀번호 숨기기" : "비밀번호 보기"
+                    }
+                    aria-pressed={isPasswordVisible}
+                  >
+                    <img
+                      src={isPasswordVisible ? eyeHiddenImage : eyeImage}
+                      alt=""
+                      aria-hidden="true"
+                    />
+                  </button>
+                </div>
               </div>
 
               {/* 입력한 비밀번호를 한 번 더 확인하는 입력창 */}
               <div className="auth_input_wrap">
                 <label htmlFor="confirmPassword">비밀번호 확인</label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  minLength="8"
-                  maxLength="20"
-                  pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,20}"
-                  title="비밀번호는 영문과 숫자를 포함해 8~20자 입력해주세요."
-                  placeholder="비밀번호를 다시 입력해주세요."
-                  value={confirmPassword}
-                  onChange={(event) => setConfirmPassword(event.target.value)}
-                  required
-                />
+
+                {/* 비밀번호 확인 입력창은 별도의 상태로 보이기·숨기기를 관리한다. */}
+                <div className="password_input_box">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={isConfirmPasswordVisible ? "text" : "password"}
+                    minLength="8"
+                    maxLength="20"
+                    pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,20}"
+                    title="비밀번호는 영문과 숫자를 포함해 8~20자 입력해주세요."
+                    placeholder="비밀번호를 다시 입력해주세요."
+                    value={confirmPassword}
+                    onChange={(event) => setConfirmPassword(event.target.value)}
+                    required
+                  />
+
+                  <button
+                    type="button"
+                    className="password_toggle_button"
+                    onClick={() => {
+                      setIsConfirmPasswordVisible(
+                        (previousValue) => !previousValue,
+                      );
+                    }}
+                    aria-label={
+                      isConfirmPasswordVisible
+                        ? "비밀번호 확인 숨기기"
+                        : "비밀번호 확인 보기"
+                    }
+                    aria-pressed={isConfirmPasswordVisible}
+                  >
+                    <img
+                      src={
+                        isConfirmPasswordVisible
+                          ? eyeHiddenImage
+                          : eyeImage
+                      }
+                      alt=""
+                      aria-hidden="true"
+                    />
+                  </button>
+                </div>
               </div>
 
               {/* 화면에 표시할 사용자 닉네임 입력창 */}
