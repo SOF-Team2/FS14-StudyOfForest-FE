@@ -424,7 +424,7 @@ function DashboardPage() {
                         <strong>{study.name}</strong>
 
                         <p>
-                          {study.description} · 참여자 {study.currentMembers}/{study.maxMembers}명
+                          {study.description} · 참여자 {study.currentMembers}명
                         </p>
                       </div>
 
