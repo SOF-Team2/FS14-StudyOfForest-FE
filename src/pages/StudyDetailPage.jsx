@@ -232,7 +232,9 @@ const StudyDetailPage = () => {
     try {
       await axios.post(`/study/${id}/members`);
       showAlert("스터디에 참여했습니다.");
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       showAlert(getStudyErrorMessage(error, "참여에 실패했습니다."));
     }
@@ -371,10 +373,14 @@ const StudyDetailPage = () => {
                   </>
                 ) : (
                   <>
-                    <button type="button" onClick={handleJoin}>
-                      참여하기
-                    </button>
-                    <span className="dec_line">|</span>
+                    {!study.isMember && (
+                      <>
+                        <button type="button" onClick={handleJoin}>
+                          참여하기
+                        </button>
+                        <span className="dec_line">|</span>
+                      </>
+                    )}
                   </>
                 )}
                 <button type="button" onClick={handleShare}>
@@ -491,7 +497,7 @@ const StudyDetailPage = () => {
                     onClick={() => setIsMemberModalOpen(true)}
                   >
                     <span>멤버 목록</span>
-                    <span style={{ marginLeft: "8px" }}>{memberCount}/{study.maxMembers}</span>
+                    <span style={{ marginLeft: "8px" }}>{memberCount}/3</span>
                   </button>
                 </div>
               </div>
