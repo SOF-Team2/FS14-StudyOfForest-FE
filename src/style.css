@@ -2,28 +2,28 @@
 style.css 구성표
 001-027: 이 목차는 style.css의 페이지/기능별 위치를 빠르게 찾기 위한 안내입니다.
 
+공통 레이아웃
+029-098: 전역 변수, reset, 기본 레이아웃
+099-181: 공통 헤더와 버튼
+182-504: 공통 카드 컨테이너, 스터디 상세 상단 정보/메뉴/배경
+505-685: 카드 인터랙션, 목록 카드 내용과 배경
+
 페이지/기능별 줄 범위
-029-061: 전역 변수, reset, 기본 레이아웃
-062-066: 공통 헤더
-067-073: 공통 버튼
-074-292: 공통 카드, 스터디 상세 상단 정보/메뉴/배경
-293-307: 공통 모달
-308-347: 오늘의 습관, 습관 수정 모달, 주간 기록표
-348-361: 스터디 목록 검색/정렬
-362-367: 더보기 버튼과 빈 목록 메시지
-368-427: 스터디 상세 이모지 목록/추가/피커
-428-430: 상세/습관/집중 페이지 이동 버튼
-431-563: 스터디 상세 비밀번호 확인 모달
-564-645: 상세/습관/집중 페이지 네비게이션과 전역 로딩
-646-904: 공통 태블릿/모바일 반응형
-905-919: 스터디 만들기/수정 페이지 컨테이너
-920-1059: 스터디 만들기/수정 알림 메시지
-1060-1183: 스터디 만들기/수정 폼, 입력값, 오류 표시
-1184-1495: 스터디 만들기/수정 배경 선택, 업로드, 미리보기
-1496-1562: 스터디 만들기/수정 비밀번호 입력과 제출 버튼
-1563-1637: 스터디 만들기/수정 데스크탑 반응형
-1638-1668: 스터디 만들기/수정 태블릿 반응형
-1669-1776: 스터디 만들기/수정 모바일 반응형
+686-1352: 대시보드 기본 레이아웃, 카드, 차트, 업적, 즐겨찾기, 목표
+1353-1600: 대시보드 태블릿/모바일 반응형
+1601-1660: 최근 조회 스터디 스크롤 영역
+1661-1753: 공통 모달과 입력 폼
+1754-2014: 오늘의 습관, 습관 수정 모달, 주간 기록표와 현재 시간
+2015-2178: 스터디 목록 검색/정렬/더보기/상태 메시지
+2179-2323: 스터디 상세 이모지 목록/추가/피커
+2324-2466: 상세 화면 기능 버튼과 확인 모달
+2467-2584: 상세/습관/집중 네비게이션, 전역 로딩과 인증 화면
+2585-2833: 헤더 유저 메뉴와 접근성 애니메이션
+2834-2953: 다크 모드 토글과 즐겨찾기 버튼
+2954-3442: 공통 태블릿/모바일 반응형과 목록 상태
+3443-4387: 스터디 만들기/수정 폼, 배경 미리보기와 반응형
+4388-4721: 랭킹 페이지 기본 레이아웃
+4722-4901: 랭킹 페이지 태블릿/모바일 반응형
 */
 
 :root {
@@ -735,11 +735,17 @@ input:focus {
 
 .dashboard_more_link {
   flex: 0 0 auto;
+  padding: 0;
+  border: 0;
   color: #578246;
   font-size: 14px;
   font-weight: 600;
+  font-family: inherit;
+  line-height: 1.4;
   text-decoration: none;
   white-space: nowrap;
+  background: transparent;
+  cursor: pointer;
 }
 
 .dashboard_more_link:hover {
@@ -762,6 +768,56 @@ input:focus {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
   width: 100%;
+}
+
+.dashboard_study_section {
+  transition: height 0.25s ease;
+}
+
+.dashboard_study_section.is-collapsing {
+  overflow: hidden;
+}
+
+.dashboard_study_card--revealed {
+  animation: dashboard-study-reveal 0.25s ease;
+}
+
+.dashboard_study_card--hiding {
+  animation: dashboard-study-hide 0.25s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes dashboard-study-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dashboard-study-hide {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard_study_section,
+  .dashboard_study_card--revealed,
+  .dashboard_study_card--hiding {
+    transition: none;
+    animation: none;
+  }
 }
 
 .dashboard_activity_grid {

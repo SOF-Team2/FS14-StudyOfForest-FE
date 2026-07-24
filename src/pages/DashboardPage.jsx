@@ -1,8 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useLoading } from "../contexts/LoadingContext";
 import axios from "../utils/axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getUserId } from "../utils/authStorage";
+
+const DEFAULT_VISIBLE_STUDY_COUNT = 3;
+const STUDY_TOGGLE_ANIMATION_MS = 250;
 
 function DashboardPage() {
   const { startLoading, endLoading } = useLoading();
@@ -13,12 +16,18 @@ function DashboardPage() {
   const [weeklyFocus, setWeeklyFocus] = useState([]);
   const [weeklyFocusCard, setWeeklyFocusCard] = useState({});
   const [studies, setStudies] = useState([]);
+  const [showAllStudies, setShowAllStudies] = useState(false);
+  const [isCollapsingStudies, setIsCollapsingStudies] = useState(false);
+  const [studySectionHeight, setStudySectionHeight] = useState(null);
   const [favoriteStudies, setFavoriteStudies] = useState([]);
   const [favoriteTotalCount, setFavoriteTotalCount] = useState(0);
   const [goalCard, setGoalCard] = useState({});
   const [maxFocusMinutes, setMaxFocusMinutes] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const studySectionRef = useRef(null);
+  const studyCollapseTimerRef = useRef(null);
+  const studyResizeFrameRef = useRef(null);
   const userId = getUserId();
 
   const handleLoad = async () => {
@@ -140,6 +149,77 @@ function DashboardPage() {
     handleLoad();
   }, []);
 
+  useEffect(
+    () => () => {
+      if (studyCollapseTimerRef.current) {
+        window.clearTimeout(studyCollapseTimerRef.current);
+      }
+
+      if (studyResizeFrameRef.current) {
+        window.cancelAnimationFrame(studyResizeFrameRef.current);
+      }
+    },
+    [],
+  );
+
+  const handleToggleStudies = () => {
+    if (isCollapsingStudies) {
+      return;
+    }
+
+    if (!showAllStudies) {
+      setShowAllStudies(true);
+      return;
+    }
+
+    const animationDuration = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    ).matches
+      ? 0
+      : STUDY_TOGGLE_ANIMATION_MS;
+
+    if (animationDuration === 0) {
+      setShowAllStudies(false);
+      return;
+    }
+
+    const studySection = studySectionRef.current;
+    const studyCards = studySection?.querySelectorAll(
+      ".dashboard_study_card",
+    );
+    const lastVisibleCard =
+      studyCards?.[DEFAULT_VISIBLE_STUDY_COUNT - 1] ?? null;
+
+    if (studySection && lastVisibleCard) {
+      const sectionRect = studySection.getBoundingClientRect();
+      const lastVisibleCardRect = lastVisibleCard.getBoundingClientRect();
+      const sectionStyle = window.getComputedStyle(studySection);
+      const paddingBottom = Number.parseFloat(sectionStyle.paddingBottom) || 0;
+      const borderBottom =
+        Number.parseFloat(sectionStyle.borderBottomWidth) || 0;
+      const collapsedHeight = Math.ceil(
+        lastVisibleCardRect.bottom -
+          sectionRect.top +
+          paddingBottom +
+          borderBottom,
+      );
+
+      setStudySectionHeight(Math.ceil(sectionRect.height));
+      studyResizeFrameRef.current = window.requestAnimationFrame(() => {
+        setStudySectionHeight(collapsedHeight);
+        studyResizeFrameRef.current = null;
+      });
+    }
+
+    setIsCollapsingStudies(true);
+    studyCollapseTimerRef.current = window.setTimeout(() => {
+      setShowAllStudies(false);
+      setIsCollapsingStudies(false);
+      setStudySectionHeight(null);
+      studyCollapseTimerRef.current = null;
+    }, animationDuration);
+  };
+
   const achievements = [
     {
       id: 1,
@@ -154,6 +234,10 @@ function DashboardPage() {
       description: "하루 집중 시간 3시간을 달성했어요",
     },
   ];
+  const hasHiddenStudies = studies.length > DEFAULT_VISIBLE_STUDY_COUNT;
+  const visibleStudies = showAllStudies
+    ? studies
+    : studies.slice(0, DEFAULT_VISIBLE_STUDY_COUNT);
 
   return (
     <section className="dashboard_page">
@@ -262,24 +346,49 @@ function DashboardPage() {
             </div>
           </div>
 
-          <div className="card_container inner_container">
+          <div
+            ref={studySectionRef}
+            className={`card_container inner_container dashboard_study_section${
+              isCollapsingStudies ? " is-collapsing" : ""
+            }`}
+            style={
+              studySectionHeight === null
+                ? undefined
+                : { height: studySectionHeight }
+            }
+          >
             <div className="container_title dec">
               <span>진행 중인 스터디</span>
 
-              <Link to="/study" className="dashboard_more_link">
-                전체 보기
-              </Link>
+              {hasHiddenStudies && (
+                <button
+                  type="button"
+                  className="dashboard_more_link"
+                  aria-controls="dashboard-study-grid"
+                  aria-expanded={showAllStudies}
+                  disabled={isCollapsingStudies}
+                  onClick={handleToggleStudies}
+                >
+                  {showAllStudies ? "접기" : "전체 보기"}
+                </button>
+              )}
             </div>
 
-            <div className="dashboard_study_grid">
+            <div className="dashboard_study_grid" id="dashboard-study-grid">
               {!isLoading && studies.length === 0 && (
                 <p>진행 중인 스터디가 없습니다.</p>
               )}
 
-              {studies.map((study) => (
+              {visibleStudies.map((study, index) => (
                 <Link
                   to={`/study/${study.studyId}`}
-                  className="card dashboard_card dashboard_study_card"
+                  className={`card dashboard_card dashboard_study_card${
+                    index >= DEFAULT_VISIBLE_STUDY_COUNT
+                      ? isCollapsingStudies
+                        ? " dashboard_study_card--hiding"
+                        : " dashboard_study_card--revealed"
+                      : ""
+                  }`}
                   key={study.studyId}
                 >
                   <div className="dashboard_card_header">
