@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AlertMessage from "../components/AlertMessage.jsx";
 import PreviousRanking from "../components/ranking/PreviousRanking.jsx";
 import StudyRanking from "../components/ranking/StudyRanking.jsx";
+
 import UserRanking from "../components/ranking/UserRanking.jsx";
 
 // 랭킹 집계 기간 구하기

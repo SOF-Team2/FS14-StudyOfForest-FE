@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../assets/img/logo.png";
 import userIcon from "../assets/img/ic_user_line.svg";
+import rankingIcon from "../assets/img/ic_trophy.svg";
 import UserMenu from "./user/UserMenu";
 import { getUserId, removeUserId } from "../utils/authStorage.js";
 import useAlert from "./useAlert.js";
@@ -81,6 +82,9 @@ function Header() {
             </Link>
 
             <div className="header-actions">
+              <Link to="/ranking" className="ranking_icon">
+                <img src={rankingIcon} alt="" />
+              </Link>
               <div
                 className={`user_wrap ${isUserMenuOpen ? "has-menu" : ""} ${isUserMenuVisible && !isUserMenuOpen ? "is-closing" : ""
                   }`}

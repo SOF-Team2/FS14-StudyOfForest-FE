@@ -19,7 +19,7 @@ export default function FocusTimeline({ studyId, refreshKey = 0 }) {
 
             try {
                 const response = await axios.post(`/study/${studyId}/focus/sessions`, {
-                    scope,
+                    scope
                 });
 
                 const nextSessionData = response.data.data;

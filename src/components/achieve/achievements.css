@@ -1,0 +1,215 @@
+/* ========================================
+   업적 전체보기 모달
+======================================== */
+
+.modal.achieve_modal {
+  width: 720px;
+  max-width: calc(100vw - 40px);
+}
+
+/* 모달 헤더 */
+.achieve_header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--gray);
+}
+
+.achieve_header_text {
+  min-width: 0;
+}
+
+.achieve_header_text strong {
+  display: block;
+  color: var(--black);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.achieve_header_text p {
+  margin-top: 8px;
+  color: var(--dark-gray);
+  font-size: 14px;
+}
+
+.achieve_header_text b {
+  color: var(--green-text);
+  font-weight: 700;
+}
+
+/* 닫기 버튼 */
+.achieve_close {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--gray);
+  border-radius: 50%;
+  background: var(--wh);
+  color: var(--dark-gray);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.achieve_close:hover {
+  background: var(--light-gray);
+  color: var(--black);
+}
+
+/* 카드 목록 */
+.achieve_list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  max-height: 440px; 
+  padding: 14px;
+  margin: -14px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.achieve_list::-webkit-scrollbar {
+  width: 10px;
+  background-color: #EEF1EC;
+  border-radius: 10px;
+}
+
+.achieve_list::-webkit-scrollbar-thumb {
+  background-color: #A8B89D;
+  border-radius: 10px;
+}
+
+/* 카드 한 장 */
+.achieve_item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(87, 130, 70, 0.12);
+  border-radius: 20px;
+  background: linear-gradient(145deg, #edf5eb 0%, #dcebd8 100%);
+  box-shadow: 0 4px 6px rgba(87, 130, 70, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.achieve_item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(87, 130, 70, 0.14);
+}
+
+.achieve_icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background-color: rgba(255, 255, 255, 0.75);
+  font-size: 22px;
+}
+
+.achieve_text {
+  flex: 1;
+  min-width: 0;
+}
+
+.achieve_text strong {
+  display: block;
+  overflow: hidden;
+  color: #33532b;
+  font-size: 15px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.achieve_text p {
+  margin-top: 5px;
+  color: #71806d;
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.achieve_state {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 50px;
+  background-color: rgba(87, 130, 70, 0.16);
+  color: var(--green-text);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* 잠긴 업적 */
+.achieve_item.is_locked {
+  border-color: var(--gray);
+  background: var(--light-gray);
+  box-shadow: none;
+}
+
+.achieve_item.is_locked:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.achieve_item.is_locked .achieve_icon {
+  background-color: var(--gray);
+  opacity: 0.55;
+  filter: grayscale(1);
+}
+
+.achieve_item.is_locked .achieve_text strong,
+.achieve_item.is_locked .achieve_text p {
+  color: var(--dark-gray);
+}
+
+.achieve_item.is_locked .achieve_state {
+  background-color: var(--gray);
+  color: var(--wh);
+}
+
+.achieve_date {
+  display: block;
+  margin-top: 6px;
+  color: var(--green-text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+/* 모바일 */
+@media screen and (max-width: 800px) {
+  .modal.achieve_modal { width: 90%; }
+
+  .achieve_list {
+    grid-template-columns: 1fr;
+    max-height: 60vh;
+    gap: 12px;
+  }
+
+  .achieve_item {
+    padding: 14px;
+  }
+
+  .achieve_icon {
+    width: 40px;
+    height: 40px;
+    font-size: 19px;
+  }
+}
+
+button.modal_close_btn { border: none; background: transparent;}

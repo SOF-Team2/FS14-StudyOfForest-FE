@@ -16,6 +16,7 @@ const FOCUS_LOADING_FADE_DURATION = 400;
 function FocusPage() {
     const { id: studyId } = useParams();
     const navigate = useNavigate();
+
     const { showAlert } = useAlert();
     const [focusData, setFocusData] = useState({
         studyName: '',
