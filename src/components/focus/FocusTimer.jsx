@@ -109,7 +109,14 @@ export default function FocusTimer({ studyId }) {
         try {
             const response = await axios.post(`/study/${studyId}/focus/session`, { startedAt, durationSeconds: elapsedSeconds })
             const earnedPoint = response.data.data.point;
+            const newAchievements = response.data.data.newAchievements || [];
             showAlert(`집중 완료! ${earnedPoint}포인트를 획득했습니다.`, 'success');
+
+            if (newAchievements.length > 0) {
+              setTimeout(() => {
+                showAlert('새로운 업적을 달성했습니다!', 'success');
+              }, 4000);
+            }
         } catch (error) {
             console.error(
                 '포인트 업데이트 실패:',
