@@ -1,18 +1,25 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLoading } from "../contexts/LoadingContext";
 import axios from "../utils/axios";
 import { useEffect, useState } from "react";
+import { getUserId } from "../utils/authStorage";
 
 function DashboardPage() {
   const { startLoading, endLoading } = useLoading();
+  const navigate = useNavigate();
 
+  const [currentUser, setCurrentUser] = useState(null);
   const [todayStatus, setTodayStatus] = useState([]);
   const [weeklyFocus, setWeeklyFocus] = useState([]);
   const [weeklyFocusCard, setWeeklyFocusCard] = useState({});
+  const [studies, setStudies] = useState([]);
+  const [favoriteStudies, setFavoriteStudies] = useState([]);
+  const [favoriteTotalCount, setFavoriteTotalCount] = useState(0);
+  const [goalCard, setGoalCard] = useState({});
   const [maxFocusMinutes, setMaxFocusMinutes] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
-  const userId = localStorage.getItem("userId");
+  const userId = getUserId();
 
   const handleLoad = async () => {
     setIsLoading(true);
@@ -20,15 +27,34 @@ function DashboardPage() {
     startLoading();
 
     try {
-      const response = await axios.get("/api/users/dashboard", {
-        headers: {
-          "x-user-id": userId,
-        },
-      });
+      const [
+        currentUserResult,
+        dashboardResult,
+        studiesResult,
+        favoritesResult,
+        goalResult,
+      ] = await Promise.allSettled([
+        axios.get("/users/me"),
+        axios.get("/api/users/dashboard"),
+        axios.get("/api/users/studies"),
+        axios.get("/api/favorites/me"),
+        axios.get("/api/users/goal"),
+      ]);
+
+      if (currentUserResult.status === "rejected") {
+        throw currentUserResult.reason;
+      }
+
+      if (dashboardResult.status === "rejected") {
+        throw dashboardResult.reason;
+      }
+
+      setCurrentUser(currentUserResult.value.data?.data ?? null);
 
       // 서버가 { todayStatus, weeklyFocus } 또는
       // { data: { todayStatus, weeklyFocus } } 형태로 응답하는 경우 모두 처리합니다.
-      const data = response.data?.data ?? response.data ?? {};
+      const data =
+        dashboardResult.value.data?.data ?? dashboardResult.value.data ?? {};
 
       const loadedTodayStatus = Array.isArray(data.todayStatus)
         ? data.todayStatus
@@ -49,17 +75,56 @@ function DashboardPage() {
       setTodayStatus(loadedTodayStatus);
       setWeeklyFocus(loadedWeeklyFocus);
       setMaxFocusMinutes(loadedMaxFocusMinutes);
-      setWeeklyFocusCard(loadedWeeklyFocusCard);
+      setWeeklyFocusCard(loadedWeeklyFocusCard ?? {});
+
+      if (studiesResult.status === "fulfilled") {
+        setStudies(studiesResult.value.data?.data ?? []);
+      } else {
+        console.error("내 스터디 조회 실패:", studiesResult.reason);
+        setStudies([]);
+      }
+
+      if (favoritesResult.status === "fulfilled") {
+        const favoriteList = favoritesResult.value.data?.data ?? [];
+        setFavoriteStudies(favoriteList);
+        setFavoriteTotalCount(
+          favoritesResult.value.data?.pagination?.totalCount ??
+            favoriteList.length,
+        );
+      } else {
+        console.error("즐겨찾기 조회 실패:", favoritesResult.reason);
+        setFavoriteStudies([]);
+        setFavoriteTotalCount(0);
+      }
+
+      if (goalResult.status === "fulfilled") {
+        setGoalCard(goalResult.value.data?.data ?? {});
+      } else {
+        console.error("주간 목표 조회 실패:", goalResult.reason);
+        setGoalCard({});
+      }
     } catch (error) {
       console.error("대시보드 조회 실패:", error);
       console.error("서버 응답:", error.response?.data);
 
+      setCurrentUser(null);
       setTodayStatus([]);
       setWeeklyFocus([]);
+      setWeeklyFocusCard({});
+      setStudies([]);
+      setFavoriteStudies([]);
+      setFavoriteTotalCount(0);
+      setGoalCard({});
       setMaxFocusMinutes(0);
       setErrorMessage(
-        error.response?.data?.message ?? "대시보드 정보를 불러오지 못했습니다.",
+        error.response?.data?.error?.message ??
+          error.response?.data?.message ??
+          "대시보드 정보를 불러오지 못했습니다.",
       );
+
+      if ([400, 401, 404].includes(error.response?.status)) {
+        navigate("/signin", { replace: true });
+      }
     } finally {
       setIsLoading(false);
       endLoading();
@@ -67,35 +132,13 @@ function DashboardPage() {
   };
 
   useEffect(() => {
+    if (!userId) {
+      navigate("/signin", { replace: true });
+      return;
+    }
+
     handleLoad();
   }, []);
-
-  const studies = [
-    {
-      id: 1,
-      name: "React 프론트엔드 스터디",
-      description: "컴포넌트와 상태 관리 공부하기",
-      progress: 80,
-      completedHabit: 4,
-      totalHabit: 5,
-    },
-    {
-      id: 2,
-      name: "알고리즘 스터디",
-      description: "매일 알고리즘 문제 풀이",
-      progress: 45,
-      completedHabit: 2,
-      totalHabit: 4,
-    },
-    {
-      id: 3,
-      name: "영어 회화 스터디",
-      description: "하루 30분 영어로 말하기",
-      progress: 100,
-      completedHabit: 3,
-      totalHabit: 3,
-    },
-  ];
 
   const achievements = [
     {
@@ -112,38 +155,16 @@ function DashboardPage() {
     },
   ];
 
-  const [favoriteStudies, setFavoriteStudies] = useState([]);
-  const [favoriteTotalCount, setFavoriteTotalCount] = useState(0);
-
-  const loadFavorites = async () => {
-    try {
-      const response = await axios.get("/api/favorites/me", {
-        headers: { "x-user-id": userId },
-      });
-
-      const list = response.data?.data ?? [];
-      const totalCount = response.data?.pagination?.totalCount ?? list.length;
-      setFavoriteStudies(list);
-      setFavoriteTotalCount(totalCount);
-    } catch (error) {
-      console.error("즐겨찾기 조회 실패:", error);
-      setFavoriteStudies([]);
-      setFavoriteTotalCount(0);
-    }
-  };
-
-  useEffect(() => {
-    handleLoad();
-    loadFavorites();
-  }, []);
-
   return (
     <section className="dashboard_page">
       <div className="inner">
         <div className="card_container">
           <div className="container_title">
             <span>
-              <span className="bold green">승현지</span> 님의{" "}
+              <span className="bold green">
+                {currentUser?.nickname ?? ""}
+              </span>{" "}
+              님의{" "}
               <span className="bold">대시보드</span>
             </span>
           </div>
@@ -251,18 +272,22 @@ function DashboardPage() {
             </div>
 
             <div className="dashboard_study_grid">
+              {!isLoading && studies.length === 0 && (
+                <p>진행 중인 스터디가 없습니다.</p>
+              )}
+
               {studies.map((study) => (
                 <Link
-                  to={`/study/${study.id}`}
+                  to={`/study/${study.studyId}`}
                   className="card dashboard_card dashboard_study_card"
-                  key={study.id}
+                  key={study.studyId}
                 >
                   <div className="dashboard_card_header">
                     <div>
                       <div className="dashboard_card_label">{study.name}</div>
 
                       <p className="dashboard_card_description">
-                        {study.description}
+                        {study.description ?? ""}
                       </p>
                     </div>
 
@@ -280,13 +305,13 @@ function DashboardPage() {
                   <div className="dashboard_progress">
                     <div
                       className="dashboard_progress_bar"
-                      style={{ width: `${study.progress}%` }}
+                      style={{ width: `${Number(study.progress ?? 0)}%` }}
                     />
                   </div>
 
                   <div className="dashboard_card_footer">
                     <span>오늘의 달성률</span>
-                    <strong>{study.progress}%</strong>
+                    <strong>{Number(study.progress ?? 0)}%</strong>
                   </div>
                 </Link>
               ))}
@@ -424,7 +449,7 @@ function DashboardPage() {
                         <strong>{study.name}</strong>
 
                         <p>
-                          {study.description} · 참여자 {study.currentMembers}/{study.maxMembers}명
+                          {study.description} · 참여자 {study.currentMembers}명
                         </p>
                       </div>
 
@@ -445,32 +470,36 @@ function DashboardPage() {
                     <div className="dashboard_card_label">이번 주 목표</div>
 
                     <p className="dashboard_card_description">
-                      목표까지 조금만 더 힘내세요
+                      {goalCard.description ?? "이번 주 목표를 설정해보세요"}
                     </p>
                   </div>
 
-                  <div className="dashboard_card_icon">🎯</div>
+                  <div className="dashboard_card_icon">
+                    {goalCard.icon ?? "🎯"}
+                  </div>
                 </div>
 
                 <div className="dashboard_goal_value">
-                  <strong>72</strong>
+                  <strong>{Number(goalCard.progress ?? 0)}</strong>
                   <span>%</span>
                 </div>
 
                 <div className="dashboard_progress dashboard_goal_progress">
                   <div
                     className="dashboard_progress_bar"
-                    style={{ width: "72%" }}
+                    style={{ width: `${Number(goalCard.progress ?? 0)}%` }}
                   />
                 </div>
 
                 <p className="dashboard_goal_description">
-                  이번 주 목표 18시간 중 13시간을 달성했어요.
+                  {goalCard.summaryText ??
+                    goalCard.description ??
+                    "이번 주 목표를 설정해보세요"}
                 </p>
 
                 <div className="dashboard_card_footer">
-                  <span>남은 목표</span>
-                  <strong>5시간</strong>
+                  <span>{goalCard.footerLabel ?? "남은 목표"}</span>
+                  <strong>{goalCard.footerValue ?? "-"}</strong>
                 </div>
               </div>
             </div>
