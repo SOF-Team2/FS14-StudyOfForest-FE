@@ -63,7 +63,8 @@ body.dark-mode .user_pic_wrap {
   background-color: var(--wh);
 }
 
-body.dark-mode .user_pic_wrap img {
+body.dark-mode .user_pic_wrap img,
+body.dark-mode .ranking_icon img {
   filter: brightness(1.35);
 }
 
@@ -582,6 +583,15 @@ body.dark-mode ::selection {
 body.dark-mode .previous-ranking-card::after {
   background-color: #4a4027;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .ranking-tabs button {
+  color: var(--dark-gray);
+}
+
+body.dark-mode .ranking-tabs button:hover,
+body.dark-mode .ranking-tabs button.active {
+  color: var(--green-text);
 }
 
 body.dark-mode .rank-1 {
