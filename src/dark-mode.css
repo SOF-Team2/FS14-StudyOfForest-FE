@@ -339,6 +339,10 @@ body.dark-mode .password-error-toast {
 }
 
 /* ---------- Habit ---------- */
+body.dark-mode .habit_record_icon {
+  filter: brightness(0.8);
+}
+
 body.dark-mode .habit_btn {
   color: var(--black);
   background-color: var(--light-gray);
@@ -373,7 +377,16 @@ body.dark-mode .delete_habit_btn:hover {
 }
 
 body.dark-mode .edit_habit_modal form button {
-  background-color: var(--blue);
+  background-color: #3b4f36;
+}
+
+body.dark-mode .edit_habit_modal form button:hover {
+  background-color: #486043;
+}
+
+body.dark-mode .edit_habit_modal form button img {
+  filter: brightness(0) invert(1);
+  opacity: 0.85;
 }
 
 body.dark-mode .modal_btn_wrap button {
