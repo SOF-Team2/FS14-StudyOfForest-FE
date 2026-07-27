@@ -143,3 +143,14 @@
   bottom: auto;
   height: 60px;   /* 첫 카드 점 높이까지만 */
 }
+
+@media (max-width: 767px) {
+  .focus-timeline {
+    gap: 16px;              /* 기존 24px */
+    padding: 0 16px 16px;   /* 기존 0 24px 24px */
+  }
+
+  .focus-timeline__summary {
+    padding-top: 16px;      /* 기존 24px — 상단이 유독 비어 보이던 원인 */
+  }
+}

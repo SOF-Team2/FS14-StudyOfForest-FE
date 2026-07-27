@@ -1,29 +1,27 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "../utils/axios.js";
+import AlertMessage from "../components/AlertMessage.jsx";
 import HabitList from "../components/habit/HabitList.jsx";
 import HabitEditModal from "../components/habit/HabitEditModal.jsx";
 import CurrentTime from "../components/habit/CurrentTime.jsx";
 import arrowRightIcon from "../assets/img/ic_arrow_right.svg";
-import { useLoading } from "../contexts/LoadingContext.jsx";
 import { getStudyBackgroundStyle } from "../utils/studyBackground.js";
 import useAlert from "../components/useAlert.js";
 
 
 function TodayHabitPage() {
-  const { startLoading, endLoading } = useLoading();
   const { showAlert } = useAlert();
   const navigate = useNavigate();
-  const [isHabitLoading, setIsHabitLoading] = useState(true);
   const { id } = useParams();
+
+  const [isHabitLoading, setIsHabitLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [study, setStudy] = useState({});
   const [habits, setHabits] = useState([]);
   const [isOwner, setIsOwner] = useState(false);
 
   const handleLoad = async () => {
-    startLoading();
-
     try {
       const [habitResponse, studyResponse] =
       await Promise.all([
@@ -53,7 +51,6 @@ function TodayHabitPage() {
       }
     } finally {
       setIsHabitLoading(false);
-      endLoading();
     }
   };
 
@@ -70,6 +67,12 @@ function TodayHabitPage() {
 
   return (
     <section>
+      {isHabitLoading && (
+        <AlertMessage
+          message="오늘의 습관을 불러오는 중입니다"
+          variant="loading"
+        />
+      )}
       <div className="inner">
         <section className="study-detail-section card_container study-subpage-detail study-habit-detail">
           <div

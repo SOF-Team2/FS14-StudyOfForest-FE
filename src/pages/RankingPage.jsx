@@ -80,7 +80,7 @@ function RankingPage() {
   useEffect(() => {
     const interval = setInterval(() => {
       setRemainingTime(getRemainingTime());
-    }, 60000);
+    }, 1000 * 60 * 60);
 
     return () => {
       clearInterval(interval);
@@ -90,7 +90,10 @@ function RankingPage() {
   return (
     <>
       {isLoading && (
-        <AlertMessage message="랭킹을 불러오는 중입니다" />
+        <AlertMessage 
+          message="랭킹을 불러오는 중입니다"
+          variant="loading"
+        />
       )}
       
       <section 
