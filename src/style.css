@@ -5328,3 +5328,88 @@ input:focus {
   justify-content: center;
   align-items: center;
 }
+
+/* 이번 주 목표 설정 모달 */
+.modal_overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal_content {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.modal_content h3 {
+    margin: 0 0 20px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.modal_content form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modal_content label {
+    font-size: 14px;
+    color: #555;
+}
+
+.modal_content input {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.modal_content input:focus {
+    outline: none;
+    border-color: #4caf50;
+}
+
+.modal_error {
+    color: #e53935;
+    font-size: 13px;
+    margin: 4px 0 0;
+}
+
+.modal_actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.modal_actions button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.modal_actions button[type="button"] {
+    background: #f0f0f0;
+    color: #555;
+}
+
+.modal_actions button[type="submit"] {
+    background: #4caf50;
+    color: #fff;
+}
+
+.modal_actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
