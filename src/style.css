@@ -2943,6 +2943,62 @@ input:focus {
   outline-offset: 2px;
 }
 
+/* 최상단 이동 버튼 */
+.scroll-to-top-button {
+  position: fixed;
+  right: 30px;
+  bottom: 72px;
+  z-index: 140;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--gray);
+  border-radius: 50%;
+  background-color: var(--wh);
+  box-shadow: 0 5px 5px rgba(65, 65, 65, 0.15);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition:
+    opacity 0.25s ease,
+    visibility 0.25s ease,
+    transform 0.25s ease,
+    background-color 0.2s ease;
+}
+
+.scroll-to-top-button.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.scroll-to-top-button img {
+  width: 24px;
+  height: 24px;
+  transform: rotate(-90deg);
+}
+
+.scroll-to-top-button:hover {
+  background-color: var(--green);
+}
+
+.scroll-to-top-button:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-to-top-button {
+    transition: none;
+  }
+}
+
 .favorite_btn_wrap {
   display: flex;
   flex-direction: row;
