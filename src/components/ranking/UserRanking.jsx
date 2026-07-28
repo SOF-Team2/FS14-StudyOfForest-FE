@@ -25,15 +25,13 @@ function UserRanking({ onLoadComplete }) {
     }
   };
 
-  const topUserRanking = userRanking.filter(
-    (user) => user.rank <= 3
-  );
-  const otherUserRanking = userRanking.filter(
-    (user) => user.rank > 3 && user.rank <= 10
-  );
+  // 정렬된 랭킹 데이터 중 앞의 3개만 TOP 영역에 표시
+  const topUserRanking = userRanking.slice(0, 3);
 
-  const firstPlaceCount =
-    userRanking.filter((user) => user.rank === 1).length;
+  // TOP 영역에 들어가지 않은 항복 중 실제 순위가 10위 이내인 항목
+  const otherUserRanking = userRanking
+    .slice(3)
+    .filter((user) => user.rank <= 10);
 
   useEffect(() => {
     getUserRanking();
@@ -55,9 +53,12 @@ function UserRanking({ onLoadComplete }) {
         <p className="ranking-empty">이번 주 유저 랭킹 기록이 없습니다</p>
       ) : (
         <>
-          <ul className={`top-ranking-list first-count-${firstPlaceCount}`}>
-            {topUserRanking.map((user) => (
-              <li key={user.id} className={`top-ranking-item rank-${user.rank}`}>
+          <ul className="top-ranking-list">
+            {topUserRanking.map((user, index) => (
+              <li 
+                key={user.id} 
+                className={`top-ranking-item top-position-${index + 1} rank-${user.rank}`}
+              >
                 <p className="top-ranking-rank">{user.rank}위</p>
                 <p className="top-ranking-name">{user.nickname}</p>
                 <p className="top-ranking-point">{user.point}P</p>

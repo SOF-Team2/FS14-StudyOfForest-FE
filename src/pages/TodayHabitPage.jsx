@@ -1,33 +1,40 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "../utils/axios.js";
+import AlertMessage from "../components/AlertMessage.jsx";
 import HabitList from "../components/habit/HabitList.jsx";
 import HabitEditModal from "../components/habit/HabitEditModal.jsx";
 import CurrentTime from "../components/habit/CurrentTime.jsx";
 import arrowRightIcon from "../assets/img/ic_arrow_right.svg";
-import { useLoading } from "../contexts/LoadingContext.jsx";
 import { getStudyBackgroundStyle } from "../utils/studyBackground.js";
 import useAlert from "../components/useAlert.js";
 
 
 function TodayHabitPage() {
-  const { startLoading, endLoading } = useLoading();
   const { showAlert } = useAlert();
   const navigate = useNavigate();
-  const [isHabitLoading, setIsHabitLoading] = useState(true);
   const { id } = useParams();
+
+  const [isHabitLoading, setIsHabitLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [study, setStudy] = useState({});
   const [habits, setHabits] = useState([]);
+  const [isOwner, setIsOwner] = useState(false);
 
   const handleLoad = async () => {
-    startLoading();
-
     try {
-      const response = await axios.get(`/study/${id}/habit`);
+      const [habitResponse, studyResponse] =
+      await Promise.all([
+        axios.get(`/study/${id}/habit`),
+        axios.get(`/study/${id}`),
+      ]);
 
-      setStudy(response.data);
-      setHabits(response.data.habits ?? []);
+      const studyDetail =
+      studyResponse.data?.data ?? studyResponse.data;
+
+      setStudy(habitResponse.data);
+      setHabits(habitResponse.data.habits ?? []);
+      setIsOwner(Boolean(studyDetail?.isOwner));
       setIsEditModalOpen(false);
     } catch (error) {
       console.error("오늘의 습관 조회 오류:", error);
@@ -44,7 +51,6 @@ function TodayHabitPage() {
       }
     } finally {
       setIsHabitLoading(false);
-      endLoading();
     }
   };
 
@@ -61,6 +67,12 @@ function TodayHabitPage() {
 
   return (
     <section>
+      {isHabitLoading && (
+        <AlertMessage
+          message="오늘의 습관을 불러오는 중입니다"
+          variant="loading"
+        />
+      )}
       <div className="inner">
         <section className="study-detail-section card_container study-subpage-detail study-habit-detail">
           <div
@@ -124,13 +136,15 @@ function TodayHabitPage() {
           <div className="card_container inner_container today_habit_card">
             <div className="inner">
               <span className="container_title">오늘의 습관</span>
-              <button
-                type="button"
-                onClick={() => setIsEditModalOpen(true)}
-                className="edit_habit_btn"
-              >
-                목록 수정
-              </button>
+              {isOwner && (
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="edit_habit_btn"
+                >
+                  목록 수정
+                </button>
+              )}
               <HabitList 
                 habits={habits} 
                 studyId={id}
@@ -141,13 +155,13 @@ function TodayHabitPage() {
           </div>
         </section>
       </div>
-      {isEditModalOpen && (
-                <HabitEditModal
-                  habits={habits}
-                  onClose={() => setIsEditModalOpen(false)}
-                  onSave={handleLoad}
-                  studyId={id}
-                />
+      {isOwner && isEditModalOpen && (
+        <HabitEditModal
+          habits={habits}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleLoad}
+          studyId={id}
+        />
       )}
     </section>
   );

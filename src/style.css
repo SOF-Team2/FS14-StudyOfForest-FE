@@ -12,18 +12,18 @@ style.css 구성표
 686-1404: 대시보드 기본 레이아웃, 카드, 차트, 업적, 즐겨찾기, 목표
 1405-1652: 대시보드 태블릿/모바일 반응형
 1653-1712: 최근 조회 스터디 스크롤 영역
-1713-1805: 공통 모달과 입력 폼
+1713-1806: 공통 모달과 입력 폼
 1806-2066: 오늘의 습관, 습관 수정 모달, 주간 기록표와 현재 시간
-2067-2230: 스터디 목록 검색/정렬/더보기/상태 메시지
-2231-2375: 스터디 상세 이모지 목록/추가/피커
-2376-2518: 상세 화면 기능 버튼과 확인 모달
-2519-2636: 상세/습관/집중 네비게이션, 전역 로딩과 인증 화면
-2637-2885: 헤더 유저 메뉴와 접근성 애니메이션
-2886-3005: 다크 모드 토글과 즐겨찾기 버튼
-3006-3494: 공통 태블릿/모바일 반응형과 목록 상태
-3495-4428: 스터디 만들기/수정 폼, 배경 미리보기와 반응형
-4429-4763: 랭킹 페이지 기본 레이아웃
-4764-5274: 랭킹 페이지 반응형과 헤더 랭킹 아이콘
+2068-2231: 스터디 목록 검색/정렬/더보기/상태 메시지
+2232-2376: 스터디 상세 이모지 목록/추가/피커
+2377-2519: 상세 화면 기능 버튼과 확인 모달
+2520-2637: 상세/습관/집중 네비게이션, 전역 로딩과 인증 화면
+2638-2886: 헤더 유저 메뉴와 접근성 애니메이션
+2887-3006: 다크 모드 토글과 즐겨찾기 버튼
+3007-3495: 공통 태블릿/모바일 반응형과 목록 상태
+3496-4429: 스터디 만들기/수정 폼, 배경 미리보기와 반응형
+4430-4757: 랭킹 페이지 기본 레이아웃
+4758-5181: 랭킹 페이지 반응형과 헤더 랭킹 아이콘
 */
 
 :root {
@@ -352,6 +352,136 @@ input:focus {
   height: 100%;
   padding: 0 2px;
   color: var(--gray);
+}
+
+/* 스터디 상세 삭제 확인 모달 */
+.study-delete-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.study-delete-modal {
+  width: 100%;
+  max-width: 520px;
+  max-height: calc(100vh - 40px);
+  padding: 40px;
+  overflow-y: auto;
+  color: var(--black);
+  border: 1px solid var(--gray);
+  border-radius: 20px;
+  background-color: var(--wh);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+}
+
+.study-delete-modal h2 {
+  margin: 0 0 20px;
+  color: var(--black);
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.study-delete-modal > p {
+  margin: 0 0 32px;
+  color: var(--dark-gray);
+  font-size: 16px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.study-delete-modal label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--black);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.study-delete-modal input {
+  width: 100%;
+  height: 54px;
+  padding: 0 16px;
+  color: var(--black);
+  border: 1px solid var(--gray);
+  border-radius: 20px;
+  background-color: var(--wh);
+  font-size: 16px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.study-delete-modal input::placeholder {
+  color: var(--dark-gray);
+}
+
+.study-delete-modal input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 24%, transparent);
+}
+
+.study-delete-modal input[aria-invalid="true"] {
+  border-color: var(--red-error);
+}
+
+.study-delete-modal-error {
+  margin: 10px 0 0;
+  color: var(--red-error);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.study-delete-modal-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.study-delete-modal-actions button {
+  height: 54px;
+  color: var(--black);
+  border: 0;
+  border-radius: 20px;
+  background-color: var(--light-gray);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.study-delete-modal-actions button:not(:disabled):hover {
+  background-color: var(--gray);
+}
+
+.study-delete-modal-actions button.delete {
+  color: var(--red-error);
+  background-color: var(--red--error-bg);
+}
+
+.study-delete-modal-actions button.delete:not(:disabled):hover {
+  color: var(--wh);
+  background-color: var(--red-error);
+}
+
+.study-delete-modal-actions button:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.study-delete-modal-actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .card_container.inner_container .container_title {
@@ -1718,6 +1848,7 @@ input:focus {
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.3);
+  z-index: 1000;
 }
 
 .modal {
@@ -2901,6 +3032,7 @@ input:focus {
   background-color: var(--wh);
   cursor: pointer;
   transition: all 0.25s ease;
+  z-index: 900;
 }
 
 .dark_mode_btn:hover {
@@ -3222,6 +3354,30 @@ input:focus {
   .study-menu-buttons button {
     padding: 0 8px;
     font-size: 13px;
+  }
+
+  .study-delete-modal-overlay {
+    padding: 16px;
+  }
+
+  .study-delete-modal {
+    max-height: calc(100vh - 32px);
+    padding: 28px 20px;
+    border-radius: 16px;
+  }
+
+  .study-delete-modal h2 {
+    margin-bottom: 16px;
+    font-size: 24px;
+  }
+
+  .study-delete-modal > p {
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+
+  .study-delete-modal-actions {
+    margin-top: 24px;
   }
 
   .emoji-add-wrapper.is-open::before {
@@ -4675,12 +4831,23 @@ input:focus {
   box-shadow: 0 4px 12px rgba(65, 65, 65, 0.06);
 }
 
-.top-ranking-item.rank-1 {
+.top-ranking-item.top-position-1 {
   grid-column: 1 / -1;
   width: 180px;
   height: 180px;
-  border-color: #E6C76A;
-  background-color: #FFF9E8;
+}
+
+.top-ranking-item.top-position-2 {
+  grid-column: 1;
+}
+
+.top-ranking-item.top-position-3 {
+  grid-column: 2;
+}
+
+.top-ranking-item.rank-1 {
+  border-color: #e6c76a;
+  background-color: #fff9e8;
 }
 
 .top-ranking-item.rank-2 {
@@ -4693,15 +4860,15 @@ input:focus {
   background-color: #FFF5EC;
 }
 
-.top-ranking-item.rank-1 .top-ranking-rank {
+.top-ranking-item.top-position-1 .top-ranking-rank  {
   font-size: 16px;
 }
 
-.top-ranking-item.rank-1 .top-ranking-name {
+.top-ranking-item.top-position-1 .top-ranking-name {
   font-size: 20px;
 }
 
-.top-ranking-item.rank-1 .top-ranking-point {
+.top-ranking-item.top-position-1 .top-ranking-point {
   font-size: 24px;
 }
 
@@ -4751,24 +4918,6 @@ input:focus {
 
 .top-ranking-item.rank-3::after {
   content: "🥉";
-}
-
-/* 공동 1위 랭킹 */
-.top-ranking-list.first-count-2 .top-ranking-item.rank-1 {
-  grid-column: auto;
-}
-
-.top-ranking-list.first-count-2 .top-ranking-item:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-}
-
-.top-ranking-list.first-count-3 {
-  grid-template-columns: repeat(3, 1fr);
-  max-width: 680px;
-}
-
-.top-ranking-list.first-count-3 .top-ranking-item.rank-1 {
-  grid-column: auto;
 }
 
 /* 4~10위 랭킹 */
@@ -4901,20 +5050,20 @@ input:focus {
     height: 140px;
   }
 
-  .top-ranking-item.rank-1 {
+  .top-ranking-item.top-position-1 {
     width: 160px;
     height: 160px;
   }
 
-  .top-ranking-item.rank-1 .top-ranking-rank {
+  .top-ranking-item.top-position-1 .top-ranking-rank {
     font-size: 14px;
   }
 
-  .top-ranking-item.rank-1 .top-ranking-name {
+  .top-ranking-item.top-position-1 .top-ranking-name {
     font-size: 18px;
   }
 
-  .top-ranking-item.rank-1 .top-ranking-point {
+  .top-ranking-item.top-position-1 .top-ranking-point {
     font-size: 22px;
   }
 
@@ -4927,38 +5076,6 @@ input:focus {
   .top-ranking-item.rank-3::after {
     width: 34px;
     height: 34px;
-    font-size: 18px;
-  }
-
-  /* 공동 1위 랭킹 */
-  .top-ranking-list.first-count-3 {
-    width: 100%;
-    max-width: 440px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .top-ranking-list.first-count-3 .top-ranking-item.rank-1 {
-    width: min(130px, 100%);
-    height: auto;
-    aspect-ratio: 1;
-  }
-
-  .top-ranking-list.first-count-3
-  .top-ranking-item.rank-1
-  .top-ranking-rank {
-    font-size: 12px;
-  }
-
-  .top-ranking-list.first-count-3
-  .top-ranking-item.rank-1
-  .top-ranking-name {
-    font-size: 14px;
-    line-height: 1.3;
-  }
-
-  .top-ranking-list.first-count-3
-  .top-ranking-item.rank-1
-  .top-ranking-point {
     font-size: 18px;
   }
 
@@ -5068,20 +5185,20 @@ input:focus {
     height: 100px;
   }
 
-  .top-ranking-item.rank-1 {
+  .top-ranking-item.top-position-1 {
     width: 120px;
     height: 120px;
   }
 
-  .top-ranking-item.rank-1 .top-ranking-rank {
+  .top-ranking-item.top-position-1 .top-ranking-rank {
     font-size: 12px;
   }
 
-  .top-ranking-item.rank-1 .top-ranking-name {
+  .top-ranking-item.top-position-1 .top-ranking-name {
     font-size: 12px;
   }
 
-  .top-ranking-item.rank-1 .top-ranking-point {
+  .top-ranking-item.top-position-1 .top-ranking-point {
     font-size: 14px;
   }
 
@@ -5103,34 +5220,6 @@ input:focus {
     width: 26px;
     height: 26px;
     font-size: 16px;
-  }
-
-  /* 공동 1위 랭킹 */
-  .top-ranking-list.first-count-3 {
-    max-width: 320px;
-  }
-
-  .top-ranking-list.first-count-3 .top-ranking-item.rank-1 {
-    width: 85px;
-    height: 85px;
-  }
-
-  .top-ranking-list.first-count-3
-  .top-ranking-item.rank-1
-  .top-ranking-rank {
-    font-size: 10px;
-  }
-
-  .top-ranking-list.first-count-3
-  .top-ranking-item.rank-1
-  .top-ranking-name {
-    font-size: 10px;
-  }
-
-  .top-ranking-list.first-count-3
-  .top-ranking-item.rank-1
-  .top-ranking-point {
-    font-size: 12px;
   }
 
   /* 4~10위 랭킹 */
@@ -5224,20 +5313,20 @@ input:focus {
     height: 80px;
   }
 
-  .top-ranking-item.rank-1 {
+  .top-ranking-item.top-position-1 {
     width: 95px;
     height: 95px;
   }
 
-  .top-ranking-item.rank-1 .top-ranking-rank {
+  .top-ranking-item.top-position-1 .top-ranking-rank {
     font-size: 10px;
   }
 
-  .top-ranking-item.rank-1 .top-ranking-name {
+  .top-ranking-item.top-position-1 .top-ranking-name {
     font-size: 10px;
   }
 
-  .top-ranking-item.rank-1 .top-ranking-point {
+  .top-ranking-item.top-position-1 .top-ranking-point {
     font-size: 12px;
   }
 
@@ -5255,34 +5344,6 @@ input:focus {
     width: 22px;
     height: 22px;
     font-size: 12px;
-  }
-
-  /* 공동 1위 3명 */
-  .top-ranking-list.first-count-3 {
-    max-width: 280px;
-  }
-
-  .top-ranking-list.first-count-3 .top-ranking-item.rank-1 {
-    width: 80px;
-    height: 80px;
-  }
-
-  .top-ranking-list.first-count-3
-  .top-ranking-item.rank-1
-  .top-ranking-rank {
-    font-size: 8px;
-  }
-
-  .top-ranking-list.first-count-3
-  .top-ranking-item.rank-1
-  .top-ranking-name {
-    font-size: 8px;
-  }
-
-  .top-ranking-list.first-count-3
-  .top-ranking-item.rank-1
-  .top-ranking-point {
-    font-size: 10px;
   }
 
   /* 4~10위 랭킹 */
@@ -5324,6 +5385,7 @@ input:focus {
   border: 1px solid var(--gray);
   border-radius: 50%;
   background-color: var(--wh);
+  box-shadow: 0 0 4px rgba(63, 63, 63, 0.15);
   display: flex;
   justify-content: center;
   align-items: center;

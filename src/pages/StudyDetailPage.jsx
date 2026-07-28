@@ -306,7 +306,7 @@ const StudyDetailPage = () => {
                     />
 
                     <div className="study-detail-content">
-                        {study.isOwner && (
+                        {study.isMember && (
                             <nav
                                 className="focus-page__navigation"
                                 aria-label="스터디 페이지 이동"
@@ -314,7 +314,7 @@ const StudyDetailPage = () => {
                                 <button
                                     type="button"
                                     className="focus-page__navigation-button"
-                                    onClick={() => handleOwnerNavigation(`/study/${id}/habit`)}
+                                    onClick={() => navigate(`/study/${id}/habit`)}
                                 >
                                     <span>오늘의 습관</span>
 
@@ -328,7 +328,7 @@ const StudyDetailPage = () => {
                                 <button
                                     type="button"
                                     className="focus-page__navigation-button"
-                                    onClick={() => handleOwnerNavigation(`/study/${id}/focus`)}
+                                    onClick={() => navigate(`/study/${id}/focus`)}
                                 >
                                     <span>오늘의 집중</span>
 
@@ -610,8 +610,9 @@ const StudyDetailPage = () => {
                             </p>
                         </div>
                     </div>
-
+                  {study.isMember && (
                     <WeeklyHabitRecordTable studyId={id} />
+                  )}
                 </section>
 
                 {isDeleteModalOpen && (

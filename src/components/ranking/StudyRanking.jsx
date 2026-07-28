@@ -25,15 +25,13 @@ function StudyRanking({ onLoadComplete }) {
     }
   };
 
-  const topStudyRanking = studyRanking.filter(
-    (study) => study.rank <=3
-  );
-  const otherStudyRanking = studyRanking.filter(
-    (study) => study.rank > 3 && study.rank <= 10
-  );
+  // 정렬된 랭킹 데이터 중 핲의 3개만 TOP 영역에 표시
+  const topStudyRanking = studyRanking.slice(0, 3);
 
-  const firstPlaceCount 
-    = studyRanking.filter((study) => study.rank === 1).length;
+  // TOP 영역에 들어가지 않은 항목 중 실제 순위가 10위 이내인 항목
+  const otherStudyRanking = studyRanking
+    .slice(3)
+    .filter((study) => study.rank <= 10);
 
   useEffect(() => {
     getStudyRanking();
@@ -55,9 +53,12 @@ function StudyRanking({ onLoadComplete }) {
         <p className="ranking-empty">이번 주 스터디 랭킹 기록이 없습니다</p>
       ) : (
         <>
-          <ul className={`top-ranking-list first-count-${firstPlaceCount}`}>
-            {topStudyRanking.map((study) => (
-              <li key={study.id} className={`top-ranking-item rank-${study.rank}`}>
+          <ul className="top-ranking-list">
+            {topStudyRanking.map((study, index) => (
+              <li 
+                key={study.id} 
+                className={`top-ranking-item top-position-${index + 1} rank-${study.rank}`}
+              >
                 <p className="top-ranking-rank">{study.rank}위</p>
                 <p className="top-ranking-name">{study.name}</p>
                 <p className="top-ranking-point">{study.point}P</p>

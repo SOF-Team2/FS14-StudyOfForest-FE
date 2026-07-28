@@ -111,6 +111,9 @@ export default function FocusTimer({ studyId, onSessionCreated }) {
             const response = await axios.post(`/study/${studyId}/focus/session`, { startedAt, durationSeconds: elapsedSeconds })
             const earnedPoint = response.data.data.point;
             const newAchievements = response.data.data.newAchievements || [];
+
+            onSessionCreated?.(response.data.data);
+
             showAlert(`집중 완료! ${earnedPoint}포인트를 획득했습니다.`, 'success');
 
             if (newAchievements.length > 0) {
